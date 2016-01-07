@@ -1,4 +1,4 @@
-[![forthebadge](http://forthebadge.com/images/badges/powered-by-electricity.svg)](http://forthebadge.com) 
+[![forthebadge](http://forthebadge.com/images/badges/powered-by-electricity.svg)](http://forthebadge.com)
 
 ### Summary
 
@@ -7,6 +7,7 @@ This is the repository for my own portfolio site. It's built using:
 - [Foundation 6](http://foundation.zurb.com/)
 - [Sass](http://sass-lang.com/)
 - [Github Pages](https://pages.github.com/)
+- [AngularJS](https://angularjs.org/) *Coming soon!
 - [Magic](http://giphy.com/gifs/VHngktboAlxHW)
 
 ### Fork Me
