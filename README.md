@@ -27,8 +27,8 @@ You're welcome to use this repo as a starting point for your own portfolio with 
   sass --watch scss/style.scss:css/style.css
   ```
 
-If you’re working on a large project with many Sass files, you can tell Sass to just watch your Sass directory and update your CSS directory.
-Once my project is all set up, I like to use the command:
+  If you’re working on a large project with many Sass files, you can tell Sass to just watch your Sass directory and update your CSS directory.
+  Once my project is all set up, I like to use the command:
 
   ```
   sass --watch scss:css
