@@ -33,3 +33,5 @@ You're welcome to use this repo as a starting point for your own portfolio with 
   ```
   sass --watch scss:css
   ```
+
+5. Push changes back into the `gh-pages` branch and watch them go live.
