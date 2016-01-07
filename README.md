@@ -12,15 +12,11 @@ This is the personal site for Jami Gibbs. It's built using:
 You're welcome to use this repo as a starting point for your own portfolio with Github Pages. Here are some steps to get you started:
 
 1. Update the `CNAME` file with your own domain
-
 2. [Configure your domain with your DNS provider](https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages/). Alternately, you can use the default Github url (ie. http://username.github.io/repository) and not bother messing around with a custom domain
-
 3. Install Sass if you don't have it already:
-
 ```
 gem install sass
 ```
-
 4. `cd` into your project folder and begin compiling your Sass:
 
 ```
