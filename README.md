@@ -2,7 +2,7 @@
 
 ### Summary
 
-This is the personal site for Jami Gibbs. It's built using:
+This is the repository for my own portfolio site. It's built using:
 
 - [Foundation 6](http://foundation.zurb.com/)
 - [Sass](http://sass-lang.com/)
