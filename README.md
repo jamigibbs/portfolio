@@ -13,9 +13,7 @@ You're welcome to use this repo as a starting point for your own portfolio with 
 
 1. Update the `CNAME` file with your own domain
 
-2. [Configure your domain with your DNS provider](https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages/)
-
-*Alternately, you can use the default Github url (ie. http://username.github.io/repository) and not bother messing around with a custom domain*
+2. [Configure your domain with your DNS provider](https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages/). Alternately, you can use the default Github url (ie. http://username.github.io/repository) and not bother messing around with a custom domain
 
 3. Install Sass if you don't have it already:
 
