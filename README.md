@@ -1,3 +1,5 @@
+[![forthebadge](http://forthebadge.com/images/badges/powered-by-netflix.svg)](http://forthebadge.com) [![forthebadge](http://forthebadge.com/images/badges/ages-12.svg)](http://forthebadge.com)
+
 ### Summary
 
 This is the personal site for Jami Gibbs. It's built using:
