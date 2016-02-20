@@ -1,40 +1,33 @@
-[![forthebadge](http://forthebadge.com/images/badges/powered-by-electricity.svg)](http://forthebadge.com)
-
 ### Summary
 
-This is the repository for my own portfolio site. It's built using:
+This is the repository for my own portfolio site but it's also a rad Jekyll theme I built for anyone to use.
 
-- [Foundation 6](http://foundation.zurb.com/)
-- [Sass](http://sass-lang.com/)
-- [Github Pages](https://pages.github.com/)
-- [AngularJS](https://angularjs.org/) *Coming soon!*
-- [Magic](http://giphy.com/gifs/VHngktboAlxHW)
+### Fancy using it for your own site?
 
-### Fork Me
+Here are some steps to get you started:
 
-You're welcome to use this repo as a starting point for your own portfolio with Github Pages. Here are some steps to get you started:
+1. Clone this repo and cd into the directory:
+
+  `git clone https://github.com/jamigibbs/portfolio.git your-dir-name`
+  `cd your-dir-name`
+
+2. Run Jekyll:
+
+  `jekyll serve --watch`
+
+  _Don't have Jekyll yet? [Get `er installed then!](http://jekyllrb.com/docs/installation/)_
+
+3. Visit in your browser at:
+
+  `http://127.0.0.1:4000`
+
+## Launching with Github Pages :rocket:
 
 1. Update the `CNAME` file with your own domain
 
 2. [Configure your domain with your DNS provider](https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages/). Alternately, you can use the default Github url (ie. http://username.github.io/repository) and not bother messing around with a custom domain
 
-3. Install Sass if you don't have it already:
 
-  ```
-  gem install sass
-  ```
+### Credit
 
-4. Navigate to your project folder and begin compiling your Sass:
-
-  ```
-  sass --watch scss/style.scss:css/style.css
-  ```
-
-  If you’re working on a large project with many Sass files, you can tell Sass to just watch your Sass directory and update your CSS directory.
-  Once my project is all set up, I like to use the command:
-
-  ```
-  sass --watch scss:css
-  ```
-
-5. Push changes back into the `gh-pages` branch and watch them go live.
+* Bootstrap, http://getbootstrap.com/, (C) 2011 - 2016 Twitter, Inc., [MIT](https://github.com/twbs/bootstrap/blob/master/LICENSE)
