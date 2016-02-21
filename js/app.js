@@ -1,1 +1,6 @@
-$(document).foundation();
+(function(){
+  'use strict';
+
+  new WOW().init();
+  
+})();
