@@ -2,8 +2,28 @@
 //
 // Styles for managing the structural hierarchy of the site.
 
-.social i {
-  font-size: 28px;
+.social {
+  ul {
+    @include bp-small {
+      text-align: center;
+    }
+    @include bp-medium {
+      text-align: center;
+    }
+  }
+  li {
+    @include bp-small {
+      display: inline-block;
+      padding-right: 1em;
+    }
+    @include bp-medium {
+      display: inline-block;
+      padding-right: 1em;
+    }
+  }
+  i {
+    font-size: 28px;
+  }
 }
 
 footer {
@@ -18,5 +38,11 @@ footer {
   .copyright {
     margin-top: 4em;
     color: #d1d1d1;
+    @include bp-small {
+      text-align: center;
+    }
+    @include bp-medium {
+      text-align: center;
+    }
   }
 }
