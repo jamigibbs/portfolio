@@ -1,4 +1,0 @@
-== Portfolio Changelog ==
-
-= 1.0.0 - Feb 21, 2016 =
-* Initial release

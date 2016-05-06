@@ -1,21 +1,86 @@
-{% include header.html %}
+<!DOCTYPE html>
+<html lang="en">
 
-    {% include title-group.html %}
+  {% include head.html %}
 
-    <main>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
+  <body>
 
-                    {% for post in paginator.posts %}
-                      {% include tile.html %}
-                    {% endfor %}
+    <div class="row">
+      <div class="large-12 large-centered columns">
 
-                    {% include pagination.html %}
+        <header class="masthead">
+          <img src="{{ site.baseurl }}/public/profile.jpg" alt="Jami Gibbs">
+        </header>
 
-                </div>
-            </div>
-        </div>
-    </main>
+    </div>
+  </div>
 
-{% include footer.html %}
+  <div class="row">
+
+    <div class="large-6 large-offset-3 columns">
+
+      <div class="content-section">
+
+        <p>
+Hello, there. I’m <strong>Jami Gibbs</strong>. I’m a frontend developer and designer from Chicago. Some would call me a <a href="https://medium.com/@katherinemartinez/the-unicorn-hybrid-designer-developer-5e89607d5fe0#.2hh6ki85r">unicorn</a>. I founded <a href="https://rescuethemes.com">Rescue Themes</a> which specializes in nonprofit and niche WordPress themes and I’ve also created a number of <a href="https://github.com/jamigibbs/projects">open source projects</a> using JavaScript, Angular, &amp; Jekyll.
+        </p>
+
+        <p>
+In my spare time I like to <a href="https://connect.garmin.com/modern/profile/jami0821">kick up road dust</a> and pour down a few <a href="https://untappd.com/user/jami0821">craft brews</a>.
+        </p>
+
+        <p>
+I’m currently exploring JavaScript libraries and frameworks like React and Node and actively seeking opportunities that put my design and development skills to use. <a href="mailto:jami0821@gmail.com?Subject=Hello,%20Jami!" target="_top">Get in touch</a>.
+        </p>
+
+      </div>
+
+      <main>
+        <h2>Latest Work</h2>
+        {% for post in site.posts %}
+          <div class="project-post">
+            <h3><a href="{{ post.git }}">{{ post.title }}</a></h3>
+            {{ post.content }}
+          </div>
+        {% endfor %}
+      </main>
+
+      <footer>
+        <h2>Contact Me</h2>
+
+        <p>
+        Send me an <a href="mailto:jami0821@gmail.com?Subject=Hello,%20Jami!">email</a> or ping me on <a href="https://twitter.com/JamiGibbs">Twitter</a>. I’m also on <a href="https://github.com/jamigibbs">Github</a>, <a href="https://dribbble.com/JamiGibbs">Dribbble</a>, and <a href="https://www.linkedin.com/in/jami-gibbs-731985112
+">Linkedin</a> if you’re into that sort of thing.
+        </p>
+
+        <p class="copyright">
+          &copy; <time datetime="{{ site.time | date_to_xmlschema }}">{{ site.time | date: '%Y' }}</time>. All rights reserved.
+        </p>
+      </footer>
+
+    </div>
+
+    <div class="large-2 large-offset-1 columns social">
+      <ul>
+        <li><a href="https://twitter.com/{{ site.twitter }}"><i class="fa fa-twitter"></i></a></li>
+        <li><a href="https://github.com/{{ site.github }}"><i class="fa fa-github"></i></a></li>
+        <li><a href="https://blog.jamigibbs.com/"><i class="fa fa-medium"></i></a></li>
+        <li><a href="https://dribbble.com/{{ site.dribbble }}"><i class="fa fa-dribbble"></i></a></li>
+      </ul>
+    </div>
+
+  </div>
+
+    {% if site.google_analytics %}
+     <script>
+       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+       ga('create', '{{ site.google_analytics }}', 'auto');
+       ga('send', 'pageview');
+     </script>
+    {% endif %}
+
+  </body>
+</html>
