@@ -1,0 +1,24 @@
+---
+# Use a comment to ensure Jekyll reads the file to be transformed into CSS later
+# only main files contain this front matter, not partials.
+---
+
+// Foundation
+@import "vendor/foundation.min.css";
+
+//Font Awesome Icons
+@import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css");
+
+// Google Fonts
+@import url(https://fonts.googleapis.com/css?family=Merriweather:400,700);
+
+@import "variables";
+@import "base";
+@import "type";
+@import "syntax";
+@import "code";
+@import "layout";
+@import "masthead";
+@import "posts";
+@import "pagination";
+@import "message";

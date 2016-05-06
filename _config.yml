@@ -1,74 +1,36 @@
-# Where things are
-source:      .
-destination: ./_site
-plugins_dir:     ./_plugins
-layouts_dir:     ./_layouts
-data_dir: ./_data
-includes_dir: ./_includes
-# collections: null
+# Permalinks
+permalink:           pretty
 
-# Handling Reading
-safe:         false
-include:      [".htaccess"]
-exclude:      []
-keep_files:   [".git", ".svn"]
-encoding:     "utf-8"
-markdown_ext: "markdown,mkdown,mkdn,mkd,md"
+# Setup
+title:               JamiGibbs
+tagline:             Developer and designer from Chicago creating useful things for the web.
+url:                 http://jamigibbs.com
+paginate:            1
+baseurl:             ""
 
-# Filtering Content
-show_drafts: null
-limit_posts: 0
-future:      true
-unpublished: false
+# Assets
+#
+# We specify the directory for Jekyll so we can use @imports.
+sass:
+  sass_dir:          _sass
+  style:            :compressed
 
-# Plugins
-whitelist: []
-gems:      [jekyll-paginate]
+# About/contact
+author:
+  name:              Jami Gibbs
+  url:               https://twitter.com/jamigibbs
+  email:             jami0821@gmail.com
 
-# Conversion
-markdown:    kramdown
-highlighter: rouge
-lsi:         false
-excerpt_separator: "\n\n"
-# incremental: false
+# Custom vars
+version:             1.0.0
+github:
+  repo:              https://github.com/jamigibbs/portfolio
+google_analytics:    UA-3363703-15
+twitter:             jamigibbs
+github:              jamigibbs
+dribbble:            jamigibbs
 
-# Serving
-detach:  false
-port:    4000
-host:    127.0.0.1
-baseurl: "" # does not include hostname
-
-# Outputting
-permalink:     date
-paginate:       10
-paginate_path: /page:num
-timezone:      null
-
-quiet:    false
-defaults: []
-
-# Markdown Processors
-rdiscount:
-  extensions: []
-
-redcarpet:
-  extensions: []
-
-kramdown:
-  auto_ids:       true
-  footnote_nr:    1
-  entity_output:  as_char
-  toc_levels:     1..6
-  smart_quotes:   lsquo,rsquo,ldquo,rdquo
-  enable_coderay: false
-
-  coderay:
-    coderay_wrap:              div
-    coderay_line_numbers:      inline
-    coderay_line_number_start: 1
-    coderay_tab_width:         4
-    coderay_bold_every:        10
-    coderay_css:               style
-
-
-include: ['_pages']
+# Gems
+gems:
+  - jekyll-paginate
+  - jekyll-gist
