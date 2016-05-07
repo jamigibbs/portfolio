@@ -35,16 +35,6 @@ p {
   margin-bottom: 1rem;
 }
 
-a {
-  font-weight: bold;
-  color: $gray-1;
-  @include transition(color .2s ease-in-out);
-  &:hover {
-    color: $pink;
-    text-decoration: none;
-  }
-}
-
 strong {
   color: $gray-1;
 }
