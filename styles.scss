@@ -4,13 +4,13 @@
 ---
 
 // Foundation
-@import "vendor/foundation.min.css";
+@import url("https://cdnjs.cloudflare.com/ajax/libs/foundation/6.2.4/foundation.min.css");
 
 //Font Awesome Icons
 @import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css");
 
 // Google Fonts
-@import url(https://fonts.googleapis.com/css?family=Merriweather:400,700);
+@import url("https://fonts.googleapis.com/css?family=Merriweather:400,700");
 
 @import "variables";
 @import "base";
