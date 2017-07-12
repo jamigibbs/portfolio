@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+ <title>Saikat Kumar Dey</title>
+ <link href="http://localhost:4000/atom.xml" rel="self"/>
+ <link href="http://localhost:4000/"/>
+ <updated>2017-07-12T09:06:14+05:30</updated>
+ <id>http://localhost:4000</id>
+ <author>
+   <name>Saikat Kumar Dey</name>
+   <email>deysaikatkumar@gmail.com</email>
+ </author>
+
+ 
+ <entry>
+   <title>Youtube Comments Spam Detection</title>
+   <link href="http://localhost:4000/2017/07/12/youtube-spam-detection/"/>
+   <updated>2017-07-12T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2017/07/12/youtube-spam-detection</id>
+   <content type="html">&lt;p&gt;A classifier to detect spam comments in youtube.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Employee churn prediction</title>
+   <link href="http://localhost:4000/2017/07/12/predict-employee-churn/"/>
+   <updated>2017-07-12T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2017/07/12/predict-employee-churn</id>
+   <content type="html">&lt;p&gt;Models to predict the likelihood of churn of an employee.&lt;/p&gt;
+
+&lt;p&gt;An &lt;a href=&quot;http://nbviewer.jupyter.org/github/saikatkumardey/data-science/blob/master/employee-churn/employee-churn-EDA.ipynb&quot;&gt;exploratory analysis&lt;/a&gt; and &lt;a href=&quot;http://nbviewer.jupyter.org/github/saikatkumardey/data-science/blob/master/employee-churn/employee-churn-neural-net-models.ipynb&quot;&gt;Deep neural net models&lt;/a&gt;&lt;/p&gt;
+</content>
+ </entry>
+ 
+
+</feed>
