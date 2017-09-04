@@ -4,13 +4,22 @@
  <title>Saikat Kumar Dey</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2017-07-12T16:13:43+05:30</updated>
+ <updated>2017-09-05T00:10:21+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name>Saikat Kumar Dey</name>
    <email>deysaikatkumar@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>An interactive data visualization app written in pure python</title>
+   <link href="http://localhost:4000/2017/09/03/interactive-data-visualization/"/>
+   <updated>2017-09-03T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2017/09/03/interactive-data-visualization</id>
+   <content type="html">&lt;p&gt;It’s an interactive application written using Dash (a.k.a shiny for python). This application demonstrates how easily you can build interactive visualizations in pure Python. I have used the classic iris dataset in this project.&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>Youtube Comments Spam Detection</title>
