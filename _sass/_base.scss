@@ -92,14 +92,25 @@ ul {
   margin-bottom: 4em;
 }
 
+h2{
+  text-decoration: underline;
+}
+
 .project-post {
-  h3, p {
-    font-size: 18px;
+  h3 {
+    font-size: 1em;
   }
   p {
     color: #8e8e8e;
+    // font-size: 1em;
   }
+
+  #project-link{
+    color: #FF7F50;
+  }
+
 }
+
 
 .content-section p {
   line-height: 2;

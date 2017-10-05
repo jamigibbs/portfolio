@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+ <title>Saikat Kumar Dey</title>
+ <link href="http://localhost:4000/atom.xml" rel="self"/>
+ <link href="http://localhost:4000/"/>
+ <updated>2017-09-05T00:10:21+05:30</updated>
+ <id>http://localhost:4000</id>
+ <author>
+   <name>Saikat Kumar Dey</name>
+   <email>deysaikatkumar@gmail.com</email>
+ </author>
+
+ 
+ <entry>
+   <title>An interactive data visualization app written in pure python</title>
+   <link href="http://localhost:4000/2017/09/03/interactive-data-visualization/"/>
+   <updated>2017-09-03T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2017/09/03/interactive-data-visualization</id>
+   <content type="html">&lt;p&gt;It’s an interactive application written using Dash (a.k.a shiny for python). This application demonstrates how easily you can build interactive visualizations in pure Python. I have used the classic iris dataset in this project.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Youtube Comments Spam Detection</title>
+   <link href="http://localhost:4000/2017/07/12/youtube-spam-detection/"/>
+   <updated>2017-07-12T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2017/07/12/youtube-spam-detection</id>
+   <content type="html">&lt;p&gt;A classifier to detect spam comments in youtube.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Employee churn prediction</title>
+   <link href="http://localhost:4000/2017/07/12/predict-employee-churn/"/>
+   <updated>2017-07-12T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2017/07/12/predict-employee-churn</id>
+   <content type="html">&lt;p&gt;Models to predict the likelihood of churn of an employee.&lt;/p&gt;
+
+&lt;p&gt;An &lt;a href=&quot;http://nbviewer.jupyter.org/github/saikatkumardey/data-science/blob/master/employee-churn/employee-churn-EDA.ipynb&quot;&gt;exploratory analysis&lt;/a&gt; and &lt;a href=&quot;http://nbviewer.jupyter.org/github/saikatkumardey/data-science/blob/master/employee-churn/employee-churn-neural-net-models.ipynb&quot;&gt;Deep neural net models&lt;/a&gt;&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Predict blood donation</title>
+   <link href="http://localhost:4000/2017/07/12/predict-blood-donations/"/>
+   <updated>2017-07-12T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2017/07/12/predict-blood-donations</id>
+   <content type="html">&lt;p&gt;Predict if a donor will donate within a given time window, given parameters such as months since last donation (recency), number of donations made (frequency) , total volume of blood donated (cc) [monetary], months since first donation (time).&lt;/p&gt;
+</content>
+ </entry>
+ 
+
+</feed>
