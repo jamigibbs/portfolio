@@ -28,22 +28,27 @@
 }
 
 footer {
-  margin: 4em 0;
+  margin: 2em 0;
   h2 {
     margin-bottom: 1em;
     font-size: 22px;
   }
   p {
     font-size: 18px;
+    line-height: 2;
   }
   .copyright {
-    margin-top: 4em;
+    margin-top: 2em;
     color: #d1d1d1;
+    line-height: 1.75;
     @include bp-small {
       text-align: center;
     }
     @include bp-medium {
       text-align: center;
+    }
+    a {
+      color: #d1d1d1;
     }
   }
 }
