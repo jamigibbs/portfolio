@@ -3,7 +3,7 @@ permalink:           pretty
 
 # Setup
 title:               Jami Gibbs
-tagline:             Frontend Developer and Designer from Chicago.
+tagline:             Developer and Designer from Chicago.
 url:                 http://jamigibbs.com
 paginate:            1
 baseurl:             ""
@@ -22,7 +22,7 @@ author:
   email:             jami0821@gmail.com
 
 # Custom vars
-version:             1.0.0
+version:             2.0.1
 github:
   repo:              https://github.com/jamigibbs/portfolio
 google_analytics:    UA-3363703-15
