@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  {% include head.html %}
+{% include head.html %}
 
-  <body>
+<body>
 
-    <div class="row">
-      <div class="large-12 large-centered columns">
+  <div class="row">
+    <div class="large-12 large-centered columns">
 
-        <header class="masthead">
-          <img src="{{ site.baseurl }}/public/profile.jpg" alt="Jami Gibbs">
-        </header>
+      <header class="masthead">
+        <img src="{{ site.baseurl }}/public/profile.jpg" alt="Jami Gibbs">
+      </header>
 
     </div>
   </div>
@@ -22,7 +22,11 @@
       <div class="content-section">
 
         <p>
-Hello! I’m Jami Gibbs. I’m from Chicago and I do stuff with computers and websites and beep boop things. I founded <a href="https://rescuethemes.com">Rescue Themes</a> which specializes in nonprofit and niche WordPress themes. When I'm not honing my Javascript skills, I'm <a href="https://connect.garmin.com/modern/profile/jami0821">kicking up road dust</a> and pouring down a few <a href="https://untappd.com/user/jami0821">craft brews</a>.
+          Hello! I’m Jami Gibbs. I’m from Chicago and I do stuff with computers and websites and beep boop things. I founded
+          <a href="https://rescuethemes.com">Rescue Themes</a> which specializes in nonprofit and niche website templates. When I'm not sharpening my JavaScript
+          skills, I'm
+          <a href="https://connect.garmin.com/modern/profile/jami0821">kicking up road dust</a> and pouring down a few
+          <a href="https://untappd.com/user/jami0821">craft brews</a>.
         </p>
 
       </div>
@@ -31,13 +35,19 @@ Hello! I’m Jami Gibbs. I’m from Chicago and I do stuff with computers and we
         <h2>Get In Touch!</h2>
 
         <p>
-        Send me an <a href="mailto:jami0821@gmail.com?Subject=Hello,%20Jami!">email</a> or ping me on <a href="https://twitter.com/JamiGibbs">Twitter</a>. I’m also on <a href="https://github.com/jamigibbs">Github</a>, <a href="https://dribbble.com/JamiGibbs">Dribbble</a>, and <a href="https://www.linkedin.com/in/jami-gibbs-731985112
+          Send me an
+          <a href="mailto:jami0821@gmail.com?Subject=Hello,%20Jami!">email</a> or ping me on
+          <a href="https://twitter.com/JamiGibbs">Twitter</a>. I’m also on
+          <a href="https://github.com/jamigibbs">Github</a>,
+          <a href="https://dribbble.com/JamiGibbs">Dribbble</a>, and
+          <a href="https://www.linkedin.com/in/jami-gibbs-731985112
 ">Linkedin</a> if you’re into that sort of thing.
         </p>
 
         <p class="copyright">
           <!-- &copy; <time datetime="{{ site.time | date_to_xmlschema }}">{{ site.time | date: '%Y' }}</time>. -->
-          This site as a Jekyll template and it's licensed MIT. You're welcome to <a href="https://github.com/jamigibbs/portfolio">use it</a>!
+          This site as a Jekyll template and it's licensed MIT. You're welcome to
+          <a href="https://github.com/jamigibbs/portfolio">use it</a>!
         </p>
       </footer>
 
@@ -45,25 +55,43 @@ Hello! I’m Jami Gibbs. I’m from Chicago and I do stuff with computers and we
 
     <div class="large-2 large-offset-1 columns social">
       <ul>
-        <li><a href="https://twitter.com/{{ site.twitter }}"><i class="fa fa-twitter"></i></a></li>
-        <li><a href="https://github.com/{{ site.github }}"><i class="fa fa-github"></i></a></li>
-        <li><a href="https://blog.jamigibbs.com/"><i class="fa fa-medium"></i></a></li>
-        <li><a href="https://dribbble.com/{{ site.dribbble }}"><i class="fa fa-dribbble"></i></a></li>
+        <li>
+          <a href="https://twitter.com/{{ site.twitter }}">
+            <i class="fa fa-twitter"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://github.com/{{ site.github }}">
+            <i class="fa fa-github"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://blog.jamigibbs.com/">
+            <i class="fa fa-medium"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://dribbble.com/{{ site.dribbble }}">
+            <i class="fa fa-dribbble"></i>
+          </a>
+        </li>
       </ul>
     </div>
 
   </div>
 
-    {% if site.google_analytics %}
-     <script>
-       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-       ga('create', '{{ site.google_analytics }}', 'auto');
-       ga('send', 'pageview');
-     </script>
-    {% endif %}
+  {% if site.google_analytics %}
+  <script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    ga('create', '{{ site.google_analytics }}', 'auto');
+    ga('send', 'pageview');
+  </script> {% endif %}
 
-  </body>
+</body>
+
 </html>
