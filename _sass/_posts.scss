@@ -36,6 +36,31 @@ main h2 {
   color: #9a9a9a;
 }
 
+.content-section {
+  margin-bottom: 2em;
+}
+
+.project-post {
+  h3, p {
+    font-size: 18px;
+  }
+  p {
+    color: #8e8e8e;
+    margin: 20px 0 0 0;
+    line-height: 1.9;
+  }
+  ul li {
+    display: inline-block;
+    padding-right: 10px;
+    margin-top: 10px;
+  }
+}
+
+.content-section p {
+  line-height: 2;
+}
+
+
 
 // Related posts
 .related {

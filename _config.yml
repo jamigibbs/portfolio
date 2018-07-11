@@ -31,6 +31,6 @@ github:              jamigibbs
 dribbble:            jamigibbs
 
 # Gems
-gems:
-  - jekyll-paginate
-  - jekyll-gist
+plugins:
+  # - jekyll-paginate
+  # - jekyll-gist

@@ -22,14 +22,34 @@
       <div class="content-section">
 
         <p>
-          Hello! I’m Jami Gibbs. I’m from Chicago and I do stuff with computers and websites and beep boop things. I founded
-          <a href="https://rescuethemes.com">Rescue Themes</a> which specializes in nonprofit and niche website templates. When I'm not sharpening my JavaScript
+          Hello! I’m Jami Gibbs and I'm a Full Stack Javascript developer from Chicago. I founded
+          <a href="https://rescuethemes.com">Rescue Themes</a> which specializes in nonprofit and niche website templates. When I'm not contributing to a <a href="https://github.com/code-map/capstone-1804">cool side project</a> or sharpening my JS
           skills, I'm
           <a href="https://connect.garmin.com/modern/profile/jami0821">kicking up road dust</a> and pouring down a few
           <a href="https://untappd.com/user/jami0821">craft brews</a>.
         </p>
 
       </div>
+
+      <main>
+        <h2>Latest Work</h2>
+        {% for post in site.posts %}
+          <div class="project-post">
+            <h3><a href="{{ post.site }}">{{ post.title }}</a></h3>
+
+            {{ post.content }}
+
+            <ul>
+              <li><a href="{{ post.git }}"><i class="fa fa-github"></i></a></li>
+              {% if post.site %}
+              <li><a href="{{ post.site }}"><i class="fa fa-link"></i></a></li>
+              {% endif %}
+            </ul>
+
+            <hr />
+          </div>
+        {% endfor %}
+      </main>
 
       <footer>
         <h2>Get In Touch!</h2>
@@ -46,7 +66,7 @@
 
         <p class="copyright">
           <!-- &copy; <time datetime="{{ site.time | date_to_xmlschema }}">{{ site.time | date: '%Y' }}</time>. -->
-          This site as a Jekyll template and it's licensed MIT. You're welcome to
+          This site as a Jekyll template and I've licensed it MIT. You're welcome to
           <a href="https://github.com/jamigibbs/portfolio">use it</a>!
         </p>
       </footer>
@@ -56,11 +76,6 @@
     <div class="large-2 large-offset-1 columns social">
       <ul>
         <li>
-          <a href="https://twitter.com/{{ site.twitter }}">
-            <i class="fa fa-twitter"></i>
-          </a>
-        </li>
-        <li>
           <a href="https://github.com/{{ site.github }}">
             <i class="fa fa-github"></i>
           </a>
@@ -68,6 +83,11 @@
         <li>
           <a href="https://blog.jamigibbs.com/">
             <i class="fa fa-medium"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://twitter.com/{{ site.twitter }}">
+            <i class="fa fa-twitter"></i>
           </a>
         </li>
         <li>
