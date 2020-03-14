@@ -2,7 +2,7 @@ My site.
 
 ### Fancy using it for your own site?
 
-Here are some steps to get you started:
+Here are some steps to get you started for local development:
 
 1. Clone this repo and cd into the directory:
 
@@ -13,12 +13,12 @@ Here are some steps to get you started:
 
   `jekyll serve --watch`
 
-  _Don't have Jekyll yet? [Get `er installed then!](http://jekyllrb.com/docs/installation/)_
+  _[Don't have Jekyll yet? ](http://jekyllrb.com/docs/installation/)_
 
-3. Visit in your browser at:
+3. In your browser, navigate to:
 
   `http://127.0.0.1:4000`
 
 ### Launching with Github Pages :rocket:
 
-Jekyll + Github pages is a marriage made in heaven. You can [use your own custom domain name](https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages/) or use the default Github url (ie. http://username.github.io/repository) and not bother messing around with DNS settings.
+You can [use your own custom domain name](https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages/) or use the default Github url (ie. http://username.github.io/repository) and not bother messing around with DNS settings.
