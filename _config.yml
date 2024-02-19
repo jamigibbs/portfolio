@@ -4,7 +4,7 @@ permalink:           pretty
 # Setup
 title:               Jami Gibbs
 tagline:             Software Developer from Chicago.
-url:                 https://jamigibbs.com
+url:                 http://jamigibbs.com
 paginate:            1
 baseurl:             ""
 
@@ -18,7 +18,7 @@ sass:
 # About/contact
 author:
   name:              Jami Gibbs
-  url:               https://twitter.com/jamigibbs
+  url:               https://hachyderm.io/@jamigibbs
   email:             jami0821@gmail.com
 
 # Custom vars
