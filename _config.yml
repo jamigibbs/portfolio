@@ -4,7 +4,7 @@ permalink:           pretty
 # Setup
 title:               Jami Gibbs
 tagline:             Software Developer from Chicago.
-url:                 http://jamigibbs.com
+url:                 https://jamigibbs.com
 paginate:            1
 baseurl:             ""
 
@@ -13,7 +13,7 @@ baseurl:             ""
 # We specify the directory for Jekyll so we can use @imports.
 sass:
   sass_dir:          _sass
-  style:            :compressed
+  style:            compressed
 
 # About/contact
 author:
