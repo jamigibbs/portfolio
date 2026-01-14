@@ -270,15 +270,6 @@ function calculateAndDisplay() {
                     </div>
         `;
 
-        if (savings > 0) {
-            popupHTML += `
-                    <div class="popup-row">
-                        <span class="label">Runway:</span>
-                        <span class="value runway-display">${runwayMonths} months</span>
-                    </div>
-            `;
-        }
-
         popupHTML += `</div>`;
 
         // Geopolitical risk
@@ -303,6 +294,45 @@ function calculateAndDisplay() {
                 `;
             });
             popupHTML += `</div>`;
+        }
+
+        // Savings runway section (redesigned for better readability)
+        if (savings > 0 && visaInfo && visaInfo.length > 0) {
+            popupHTML += `<div class="popup-section"><h4><span class="icon">⏱️</span> Savings Runway</h4>`;
+
+            // For each passport, show the runway calculation
+            visaInfo.forEach(info => {
+                const visaType = info.category === 'visa-free' ? 'visa-free entry' :
+                                 info.category === 'visa-on-arrival' ? 'visa on arrival' :
+                                 info.category === 'e-visa' ? 'e-Visa' :
+                                 info.category === 'citizen' ? 'citizenship rights' :
+                                 info.category;
+
+                popupHTML += `
+                    <div style="background: #f0f9ff; padding: 12px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #0096ff;">
+                        <div style="font-size: 0.9em; color: #333; line-height: 1.6;">
+                            Based on your <strong>$${savings.toLocaleString()}</strong> savings, you can live here for
+                            <strong style="color: #4CAF50; font-size: 1.1em;">${runwayMonths} months</strong>
+                            with <strong>${visaType}</strong>, which is supported by your <strong>${info.passport}</strong> passport.
+                        </div>
+                    </div>
+                `;
+            });
+
+            popupHTML += `</div>`;
+        } else if (savings > 0) {
+            // Show runway even without visa info
+            popupHTML += `
+                <div class="popup-section">
+                    <h4><span class="icon">⏱️</span> Savings Runway</h4>
+                    <div style="background: #f0f9ff; padding: 12px; border-radius: 6px; border-left: 3px solid #0096ff;">
+                        <div style="font-size: 0.9em; color: #333; line-height: 1.6;">
+                            Based on your <strong>$${savings.toLocaleString()}</strong> savings, you can live here for
+                            <strong style="color: #4CAF50; font-size: 1.1em;">${runwayMonths} months</strong>.
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         popupHTML += `</div>`;

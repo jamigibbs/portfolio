@@ -32,6 +32,19 @@
 
         header {
             margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            flex-shrink: 0;
+        }
+
+        .header-text {
+            flex: 1;
         }
 
         h1 {
@@ -45,7 +58,7 @@
         }
 
         .subtitle {
-            color: #aaa;
+            color: #bbb;
             font-size: 0.9em;
         }
 
@@ -57,31 +70,55 @@
             display: block;
             font-weight: 600;
             margin-bottom: 8px;
-            font-size: 0.85em;
+            font-size: 0.9em;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #00d4ff;
+            color: #4dd4ff;
+        }
+
+        .label-hint {
+            display: block;
+            font-size: 0.75em;
+            color: #888;
+            margin-top: 2px;
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 400;
         }
 
         input, select {
             width: 100%;
             padding: 12px 14px;
-            border: 1px solid #444;
-            border-radius: 6px;
+            border: 2px solid #3a3a3a;
+            border-radius: 8px;
             font-size: 0.95em;
             transition: all 0.3s;
-            background: #1e1e1e;
+            background: #252525;
             color: #fff;
         }
 
         input:focus, select:focus {
             outline: none;
             border-color: #00d4ff;
+            background: #2a2a2a;
             box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15);
         }
 
         select[multiple] {
-            min-height: 120px;
+            min-height: 130px;
+            background-image: none;
+        }
+
+        select[multiple] option {
+            padding: 8px;
+            border-radius: 4px;
+            margin: 2px 0;
+        }
+
+        select[multiple] option:checked {
+            background: linear-gradient(135deg, #00d4ff 0%, #0096ff 100%);
+            color: #1e1e1e;
+            font-weight: 600;
         }
 
         .autocomplete-container {
@@ -152,13 +189,14 @@
         }
 
         .info-box {
-            background: rgba(0, 212, 255, 0.1);
-            padding: 14px;
-            border-radius: 6px;
-            border-left: 3px solid #00d4ff;
+            background: rgba(0, 212, 255, 0.12);
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #00d4ff;
             margin-top: 20px;
-            font-size: 0.85em;
-            color: #00d4ff;
+            font-size: 0.88em;
+            color: #4dd4ff;
+            line-height: 1.5;
         }
 
         .legend {
@@ -264,8 +302,30 @@
     <div class="app-container">
         <div class="sidebar">
             <header>
-                <h1>🌍 Cost of Living</h1>
-                <p class="subtitle">Explorer</p>
+                <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="globeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#0096ff;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Globe circle -->
+                    <circle cx="50" cy="50" r="40" fill="url(#globeGradient)" opacity="0.2"/>
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="url(#globeGradient)" stroke-width="3"/>
+                    <!-- Latitude lines -->
+                    <ellipse cx="50" cy="50" rx="40" ry="12" fill="none" stroke="url(#globeGradient)" stroke-width="2" opacity="0.6"/>
+                    <ellipse cx="50" cy="50" rx="40" ry="25" fill="none" stroke="url(#globeGradient)" stroke-width="2" opacity="0.6"/>
+                    <!-- Longitude line -->
+                    <ellipse cx="50" cy="50" rx="12" ry="40" fill="none" stroke="url(#globeGradient)" stroke-width="2" opacity="0.6"/>
+                    <!-- Location pin -->
+                    <path d="M50 30 L50 48 M50 30 C47 30 45 32 45 35 C45 38 50 43 50 48 C50 43 55 38 55 35 C55 32 53 30 50 30 Z"
+                          fill="#00d4ff" stroke="#00d4ff" stroke-width="1.5"/>
+                    <circle cx="50" cy="35" r="2" fill="#1e1e1e"/>
+                </svg>
+                <div class="header-text">
+                    <h1>Cost of Living</h1>
+                    <p class="subtitle">Explorer</p>
+                </div>
             </header>
 
             <div class="form-group">
@@ -282,7 +342,10 @@
             </div>
 
             <div class="form-group">
-                <label for="passports">Your Passports</label>
+                <label for="passports">
+                    Your Passports
+                    <span class="label-hint">Hold Ctrl/Cmd to select multiple</span>
+                </label>
                 <select id="passports" multiple></select>
             </div>
 
