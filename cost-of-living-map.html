@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost of Living Comparison Map</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .control-group select,
+        .control-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .control-group select:focus,
+        .control-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .calculate-btn {
+            padding: 12px 30px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .calculate-btn:hover {
+            background: #45a049;
+        }
+
+        .calculate-btn:active {
+            transform: scale(0.98);
+        }
+
+        #map {
+            height: 600px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: white;
+        }
+
+        .legend {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .legend h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.2em;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 12px;
+            border: 2px solid rgba(0,0,0,0.2);
+        }
+
+        .legend-label {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .info-box p {
+            color: #1565C0;
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+
+        /* Custom marker styles */
+        .custom-marker {
+            background: white;
+            border: 3px solid;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.85em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .marker-green {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+
+        .marker-amber {
+            border-color: #FF9800;
+            color: #FF9800;
+        }
+
+        .marker-red {
+            border-color: #f44336;
+            color: #f44336;
+        }
+
+        .marker-gray {
+            border-color: #9E9E9E;
+            color: #9E9E9E;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .control-row {
+                flex-direction: column;
+            }
+
+            .control-group {
+                width: 100%;
+            }
+
+            #map {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Cost of Living Comparison Map</h1>
+            <p>Discover where your budget can take you around the world</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-row">
+                <div class="control-group">
+                    <label for="homeCity">Your Home City</label>
+                    <select id="homeCity">
+                        <option value="">Select your city...</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="budget">Monthly Budget ($)</label>
+                    <input type="number" id="budget" placeholder="e.g., 6000" min="0" step="100">
+                </div>
+
+                <div class="control-group">
+                    <button class="calculate-btn" onclick="calculateAndDisplay()">Calculate</button>
+                </div>
+            </div>
+
+            <div class="info-box" id="infoBox" style="display: none;">
+                <p id="infoText"></p>
+            </div>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="legend">
+            <h3>Cost of Living Difference</h3>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4CAF50;"></div>
+                <div class="legend-label"><strong>Green:</strong> 40%+ cheaper - High savings</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FF9800;"></div>
+                <div class="legend-label"><strong>Amber:</strong> 10-40% cheaper - Moderate savings</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #9E9E9E;"></div>
+                <div class="legend-label"><strong>Gray:</strong> ±10% - Similar cost</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f44336;"></div>
+                <div class="legend-label"><strong>Red:</strong> More expensive</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let map;
+        let markers = [];
+        let citiesData = [];
+
+        // Initialize the map
+        function initMap() {
+            map = L.map('map').setView([20, 0], 2);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+        }
+
+        // Load cities data
+        async function loadCitiesData() {
+            try {
+                const response = await fetch('public/cost-of-living-data.json');
+                const data = await response.json();
+                citiesData = data.cities;
+                populateCityDropdown();
+            } catch (error) {
+                console.error('Error loading cities data:', error);
+                alert('Error loading city data. Please refresh the page.');
+            }
+        }
+
+        // Populate the city dropdown
+        function populateCityDropdown() {
+            const select = document.getElementById('homeCity');
+
+            citiesData.forEach(city => {
+                const option = document.createElement('option');
+                const cityLabel = city.state
+                    ? `${city.city}, ${city.state}, ${city.country}`
+                    : `${city.city}, ${city.country}`;
+                option.value = city.city;
+                option.textContent = cityLabel;
+                select.appendChild(option);
+            });
+        }
+
+        // Get color based on percentage difference
+        function getColor(percentDiff) {
+            if (percentDiff <= -40) return '#4CAF50'; // Green - very cheap
+            if (percentDiff <= -10) return '#FF9800'; // Amber - moderately cheap
+            if (percentDiff < 10) return '#9E9E9E';   // Gray - similar
+            return '#f44336';                          // Red - expensive
+        }
+
+        // Get label class based on percentage difference
+        function getMarkerClass(percentDiff) {
+            if (percentDiff <= -40) return 'marker-green';
+            if (percentDiff <= -10) return 'marker-amber';
+            if (percentDiff < 10) return 'marker-gray';
+            return 'marker-red';
+        }
+
+        // Clear all markers
+        function clearMarkers() {
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+        }
+
+        // Calculate and display results
+        function calculateAndDisplay() {
+            const homeCityName = document.getElementById('homeCity').value;
+            const budget = parseFloat(document.getElementById('budget').value);
+
+            if (!homeCityName) {
+                alert('Please select your home city');
+                return;
+            }
+
+            if (!budget || budget <= 0) {
+                alert('Please enter a valid monthly budget');
+                return;
+            }
+
+            const homeCity = citiesData.find(c => c.city === homeCityName);
+            if (!homeCity) {
+                alert('City not found');
+                return;
+            }
+
+            // Clear existing markers
+            clearMarkers();
+
+            // Show info box
+            const infoBox = document.getElementById('infoBox');
+            const infoText = document.getElementById('infoText');
+            const homeCityLabel = homeCity.state
+                ? `${homeCity.city}, ${homeCity.state}, ${homeCity.country}`
+                : `${homeCity.city}, ${homeCity.country}`;
+            infoText.textContent = `Comparing costs relative to ${homeCityLabel} with a $${budget.toLocaleString()}/month budget`;
+            infoBox.style.display = 'block';
+
+            // Center map on home city
+            map.setView([homeCity.lat, homeCity.lon], 3);
+
+            // Add markers for all cities
+            citiesData.forEach(city => {
+                const percentDiff = ((city.costOfLivingIndex - homeCity.costOfLivingIndex) / homeCity.costOfLivingIndex) * 100;
+                const equivalentBudget = (budget * city.costOfLivingIndex) / homeCity.costOfLivingIndex;
+                const savings = budget - equivalentBudget;
+
+                const color = getColor(percentDiff);
+                const markerClass = getMarkerClass(percentDiff);
+
+                // Create custom div icon
+                const icon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div class="custom-marker ${markerClass}">${percentDiff >= 0 ? '+' : ''}${Math.round(percentDiff)}%</div>`,
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 20],
+                    popupAnchor: [0, -20]
+                });
+
+                const cityLabel = city.state
+                    ? `${city.city}, ${city.state}, ${city.country}`
+                    : `${city.city}, ${city.country}`;
+
+                const popupContent = `
+                    <div style="min-width: 200px;">
+                        <h3 style="margin: 0 0 10px 0; color: #333;">${cityLabel}</h3>
+                        <p style="margin: 5px 0; color: #666;"><strong>Cost of Living:</strong> ${percentDiff >= 0 ? '+' : ''}${percentDiff.toFixed(1)}%</p>
+                        <p style="margin: 5px 0; color: #666;"><strong>Equivalent Budget:</strong> $${equivalentBudget.toLocaleString(undefined, {maximumFractionDigits: 0})}/month</p>
+                        <p style="margin: 5px 0; color: ${savings > 0 ? '#4CAF50' : '#f44336'};"><strong>${savings > 0 ? 'Savings' : 'Extra Cost'}:</strong> $${Math.abs(savings).toLocaleString(undefined, {maximumFractionDigits: 0})}/month</p>
+                    </div>
+                `;
+
+                const marker = L.marker([city.lat, city.lon], { icon: icon })
+                    .addTo(map)
+                    .bindPopup(popupContent);
+
+                markers.push(marker);
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            loadCitiesData();
+        });
+    </script>
+</body>
+</html>
