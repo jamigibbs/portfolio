@@ -66,7 +66,7 @@ function setupAutocomplete() {
     const input = document.getElementById('homeCity');
     const results = document.getElementById('homeCityResults');
 
-    input.addEventListener('input', (e) => {
+    input.addEventListener('input', async (e) => {
         const term = e.target.value.toLowerCase().trim();
 
         if (term.length < 2) {
@@ -74,43 +74,93 @@ function setupAutocomplete() {
             return;
         }
 
+        // First, try exact and partial matches in our database
         const matches = citiesData.filter(c =>
             c.city.toLowerCase().includes(term) ||
             c.country.toLowerCase().includes(term) ||
             (c.state && c.state.toLowerCase().includes(term))
         ).slice(0, 10);
 
-        if (matches.length === 0) {
-            results.classList.remove('show');
-            return;
-        }
+        // If we have matches, show them
+        if (matches.length > 0) {
+            results.innerHTML = matches.map(c => {
+                const cityLabel = c.state
+                    ? `${c.city}, ${c.state}, ${c.country}`
+                    : `${c.city}, ${c.country}`;
+                return `
+                    <div class="autocomplete-item" data-city-id="${citiesData.indexOf(c)}">
+                        <div class="city-name">${c.city}</div>
+                        <div class="city-details">${c.country}${c.state ? ', ' + c.state : ''}</div>
+                    </div>
+                `;
+            }).join('');
 
-        results.innerHTML = matches.map(c => {
-            const cityLabel = c.state
-                ? `${c.city}, ${c.state}, ${c.country}`
-                : `${c.city}, ${c.country}`;
-            return `
-                <div class="autocomplete-item" data-city-id="${citiesData.indexOf(c)}">
-                    <div class="city-name">${c.city}</div>
-                    <div class="city-details">${c.country}${c.state ? ', ' + c.state : ''}</div>
-                </div>
-            `;
-        }).join('');
+            results.classList.add('show');
 
-        results.classList.add('show');
-
-        // Add click handlers
-        results.querySelectorAll('.autocomplete-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const cityId = parseInt(item.dataset.cityId);
-                selectedHomeCity = citiesData[cityId];
-                const label = selectedHomeCity.state
-                    ? `${selectedHomeCity.city}, ${selectedHomeCity.state}, ${selectedHomeCity.country}`
-                    : `${selectedHomeCity.city}, ${selectedHomeCity.country}`;
-                input.value = label;
-                results.classList.remove('show');
+            // Add click handlers
+            results.querySelectorAll('.autocomplete-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const cityId = parseInt(item.dataset.cityId);
+                    selectedHomeCity = citiesData[cityId];
+                    selectedHomeCity._isNearestMatch = false;
+                    const label = selectedHomeCity.state
+                        ? `${selectedHomeCity.city}, ${selectedHomeCity.state}, ${selectedHomeCity.country}`
+                        : `${selectedHomeCity.city}, ${selectedHomeCity.country}`;
+                    input.value = label;
+                    results.classList.remove('show');
+                });
             });
-        });
+        } else {
+            // No matches - try to geocode the search term and find nearest city
+            try {
+                const geocodeUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(e.target.value)}&format=json&limit=1`;
+                const response = await fetch(geocodeUrl);
+                const data = await response.json();
+
+                if (data && data.length > 0) {
+                    const searchLat = parseFloat(data[0].lat);
+                    const searchLon = parseFloat(data[0].lon);
+                    const searchName = data[0].display_name;
+
+                    // Find nearest city in our database
+                    const nearest = findNearestCity(
+                        { lat: searchLat, lon: searchLon },
+                        null
+                    );
+
+                    if (nearest.city) {
+                        results.innerHTML = `
+                            <div class="autocomplete-item" data-nearest="true" data-city-id="${citiesData.indexOf(nearest.city)}" data-distance="${nearest.distance}" data-search-name="${searchName}">
+                                <div class="city-name">📍 "${e.target.value}" not found</div>
+                                <div class="city-details">Nearest city: ${nearest.city.city}, ${nearest.city.country} (~${nearest.distance} km away)</div>
+                            </div>
+                        `;
+                        results.classList.add('show');
+
+                        results.querySelector('.autocomplete-item').addEventListener('click', (event) => {
+                            const cityId = parseInt(event.currentTarget.dataset.cityId);
+                            const distance = parseInt(event.currentTarget.dataset.distance);
+                            const searchName = event.currentTarget.dataset.searchName;
+
+                            selectedHomeCity = citiesData[cityId];
+                            selectedHomeCity._isNearestMatch = true;
+                            selectedHomeCity._searchedCity = searchName;
+                            selectedHomeCity._distance = distance;
+
+                            input.value = `${selectedHomeCity.city}, ${selectedHomeCity.country} (nearest to "${e.target.value}")`;
+                            results.classList.remove('show');
+                        });
+                    } else {
+                        results.classList.remove('show');
+                    }
+                } else {
+                    results.classList.remove('show');
+                }
+            } catch (error) {
+                console.error('Geocoding error:', error);
+                results.classList.remove('show');
+            }
+        }
     });
 
     // Close autocomplete when clicking outside
@@ -119,6 +169,43 @@ function setupAutocomplete() {
             results.classList.remove('show');
         }
     });
+}
+
+// Calculate distance between two points using Haversine formula
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+// Find nearest city with data for a given location
+function findNearestCity(searchCity, searchCountry) {
+    let nearestCity = null;
+    let minDistance = Infinity;
+
+    citiesData.forEach(city => {
+        // Skip if country doesn't match (unless no country specified)
+        if (searchCountry && city.country.toLowerCase() !== searchCountry.toLowerCase()) {
+            return;
+        }
+
+        const distance = calculateDistance(
+            city.lat, city.lon,
+            searchCity.lat, searchCity.lon
+        );
+
+        if (distance < minDistance) {
+            minDistance = distance;
+            nearestCity = city;
+        }
+    });
+
+    return { city: nearestCity, distance: Math.round(minDistance) };
 }
 
 // Get color based on percentage difference
@@ -211,6 +298,9 @@ function calculateAndDisplay() {
         : `${selectedHomeCity.city}, ${selectedHomeCity.country}`;
 
     let infoMsg = `Comparing costs relative to ${homeCityLabel} with $${budget.toLocaleString()}/month budget`;
+    if (selectedHomeCity._isNearestMatch) {
+        infoMsg = `⚠️ Using ${homeCityLabel} as nearest available data point (${selectedHomeCity._distance} km from your search). ` + infoMsg;
+    }
     if (savings > 0) {
         infoMsg += ` and $${savings.toLocaleString()} in savings`;
     }
