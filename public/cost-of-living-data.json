@@ -1,0 +1,494 @@
+{
+  "metadata": {
+    "description": "Cost of Living Index data for major cities worldwide",
+    "baseline": "New York City, NY, USA = 100",
+    "note": "Index includes rent, food, transportation, and utilities",
+    "lastUpdated": "2026-01",
+    "sources": "Compiled from Numbeo, AdvisorSmith, and public cost of living indices"
+  },
+  "cities": [
+    {
+      "city": "New York",
+      "state": "NY",
+      "country": "USA",
+      "lat": 40.7128,
+      "lon": -74.0060,
+      "costOfLivingIndex": 100.0
+    },
+    {
+      "city": "San Francisco",
+      "state": "CA",
+      "country": "USA",
+      "lat": 37.7749,
+      "lon": -122.4194,
+      "costOfLivingIndex": 104.2
+    },
+    {
+      "city": "Los Angeles",
+      "state": "CA",
+      "country": "USA",
+      "lat": 34.0522,
+      "lon": -118.2437,
+      "costOfLivingIndex": 87.5
+    },
+    {
+      "city": "Philadelphia",
+      "state": "PA",
+      "country": "USA",
+      "lat": 39.9526,
+      "lon": -75.1652,
+      "costOfLivingIndex": 80.3
+    },
+    {
+      "city": "Boston",
+      "state": "MA",
+      "country": "USA",
+      "lat": 42.3601,
+      "lon": -71.0589,
+      "costOfLivingIndex": 93.8
+    },
+    {
+      "city": "Chicago",
+      "state": "IL",
+      "country": "USA",
+      "lat": 41.8781,
+      "lon": -87.6298,
+      "costOfLivingIndex": 82.1
+    },
+    {
+      "city": "Seattle",
+      "state": "WA",
+      "country": "USA",
+      "lat": 47.6062,
+      "lon": -122.3321,
+      "costOfLivingIndex": 91.7
+    },
+    {
+      "city": "Miami",
+      "state": "FL",
+      "country": "USA",
+      "lat": 25.7617,
+      "lon": -80.1918,
+      "costOfLivingIndex": 85.4
+    },
+    {
+      "city": "Austin",
+      "state": "TX",
+      "country": "USA",
+      "lat": 30.2672,
+      "lon": -97.7431,
+      "costOfLivingIndex": 78.9
+    },
+    {
+      "city": "Denver",
+      "state": "CO",
+      "country": "USA",
+      "lat": 39.7392,
+      "lon": -104.9903,
+      "costOfLivingIndex": 79.4
+    },
+    {
+      "city": "Portland",
+      "state": "OR",
+      "country": "USA",
+      "lat": 45.5152,
+      "lon": -122.6784,
+      "costOfLivingIndex": 83.6
+    },
+    {
+      "city": "Atlanta",
+      "state": "GA",
+      "country": "USA",
+      "lat": 33.7490,
+      "lon": -84.3880,
+      "costOfLivingIndex": 74.2
+    },
+    {
+      "city": "Nashville",
+      "state": "TN",
+      "country": "USA",
+      "lat": 36.1627,
+      "lon": -86.7816,
+      "costOfLivingIndex": 76.8
+    },
+    {
+      "city": "Raleigh",
+      "state": "NC",
+      "country": "USA",
+      "lat": 35.7796,
+      "lon": -78.6382,
+      "costOfLivingIndex": 72.5
+    },
+    {
+      "city": "London",
+      "country": "UK",
+      "lat": 51.5074,
+      "lon": -0.1278,
+      "costOfLivingIndex": 91.3
+    },
+    {
+      "city": "Paris",
+      "country": "France",
+      "lat": 48.8566,
+      "lon": 2.3522,
+      "costOfLivingIndex": 89.7
+    },
+    {
+      "city": "Berlin",
+      "country": "Germany",
+      "lat": 52.5200,
+      "lon": 13.4050,
+      "costOfLivingIndex": 72.8
+    },
+    {
+      "city": "Amsterdam",
+      "country": "Netherlands",
+      "lat": 52.3676,
+      "lon": 4.9041,
+      "costOfLivingIndex": 84.2
+    },
+    {
+      "city": "Barcelona",
+      "country": "Spain",
+      "lat": 41.3851,
+      "lon": 2.1734,
+      "costOfLivingIndex": 68.5
+    },
+    {
+      "city": "Madrid",
+      "country": "Spain",
+      "lat": 40.4168,
+      "lon": -3.7038,
+      "costOfLivingIndex": 66.9
+    },
+    {
+      "city": "Rome",
+      "country": "Italy",
+      "lat": 41.9028,
+      "lon": 12.4964,
+      "costOfLivingIndex": 71.4
+    },
+    {
+      "city": "Milan",
+      "country": "Italy",
+      "lat": 45.4642,
+      "lon": 9.1900,
+      "costOfLivingIndex": 75.3
+    },
+    {
+      "city": "Lisbon",
+      "country": "Portugal",
+      "lat": 38.7223,
+      "lon": -9.1393,
+      "costOfLivingIndex": 60.8
+    },
+    {
+      "city": "Prague",
+      "country": "Czech Republic",
+      "lat": 50.0755,
+      "lon": 14.4378,
+      "costOfLivingIndex": 56.2
+    },
+    {
+      "city": "Budapest",
+      "country": "Hungary",
+      "lat": 47.4979,
+      "lon": 19.0402,
+      "costOfLivingIndex": 50.3
+    },
+    {
+      "city": "Warsaw",
+      "country": "Poland",
+      "lat": 52.2297,
+      "lon": 21.0122,
+      "costOfLivingIndex": 52.7
+    },
+    {
+      "city": "Zurich",
+      "country": "Switzerland",
+      "lat": 47.3769,
+      "lon": 8.5417,
+      "costOfLivingIndex": 126.4
+    },
+    {
+      "city": "Geneva",
+      "country": "Switzerland",
+      "lat": 46.2044,
+      "lon": 6.1432,
+      "costOfLivingIndex": 122.8
+    },
+    {
+      "city": "Dublin",
+      "country": "Ireland",
+      "lat": 53.3498,
+      "lon": -6.2603,
+      "costOfLivingIndex": 88.9
+    },
+    {
+      "city": "Stockholm",
+      "country": "Sweden",
+      "lat": 59.3293,
+      "lon": 18.0686,
+      "costOfLivingIndex": 81.5
+    },
+    {
+      "city": "Copenhagen",
+      "country": "Denmark",
+      "lat": 55.6761,
+      "lon": 12.5683,
+      "costOfLivingIndex": 92.4
+    },
+    {
+      "city": "Oslo",
+      "country": "Norway",
+      "lat": 59.9139,
+      "lon": 10.7522,
+      "costOfLivingIndex": 95.6
+    },
+    {
+      "city": "Tokyo",
+      "country": "Japan",
+      "lat": 35.6762,
+      "lon": 139.6503,
+      "costOfLivingIndex": 83.4
+    },
+    {
+      "city": "Osaka",
+      "country": "Japan",
+      "lat": 34.6937,
+      "lon": 135.5023,
+      "costOfLivingIndex": 76.8
+    },
+    {
+      "city": "Seoul",
+      "country": "South Korea",
+      "lat": 37.5665,
+      "lon": 126.9780,
+      "costOfLivingIndex": 82.3
+    },
+    {
+      "city": "Singapore",
+      "country": "Singapore",
+      "lat": 1.3521,
+      "lon": 103.8198,
+      "costOfLivingIndex": 95.2
+    },
+    {
+      "city": "Hong Kong",
+      "country": "Hong Kong",
+      "lat": 22.3193,
+      "lon": 114.1694,
+      "costOfLivingIndex": 98.7
+    },
+    {
+      "city": "Sydney",
+      "country": "Australia",
+      "lat": -33.8688,
+      "lon": 151.2093,
+      "costOfLivingIndex": 87.9
+    },
+    {
+      "city": "Melbourne",
+      "country": "Australia",
+      "lat": -37.8136,
+      "lon": 144.9631,
+      "costOfLivingIndex": 82.6
+    },
+    {
+      "city": "Toronto",
+      "country": "Canada",
+      "lat": 43.6532,
+      "lon": -79.3832,
+      "costOfLivingIndex": 76.4
+    },
+    {
+      "city": "Vancouver",
+      "country": "Canada",
+      "lat": 49.2827,
+      "lon": -123.1207,
+      "costOfLivingIndex": 79.8
+    },
+    {
+      "city": "Montreal",
+      "country": "Canada",
+      "lat": 45.5017,
+      "lon": -73.5673,
+      "costOfLivingIndex": 68.3
+    },
+    {
+      "city": "Mexico City",
+      "country": "Mexico",
+      "lat": 19.4326,
+      "lon": -99.1332,
+      "costOfLivingIndex": 44.7
+    },
+    {
+      "city": "Buenos Aires",
+      "country": "Argentina",
+      "lat": -34.6037,
+      "lon": -58.3816,
+      "costOfLivingIndex": 38.2
+    },
+    {
+      "city": "São Paulo",
+      "country": "Brazil",
+      "lat": -23.5505,
+      "lon": -46.6333,
+      "costOfLivingIndex": 42.8
+    },
+    {
+      "city": "Rio de Janeiro",
+      "country": "Brazil",
+      "lat": -22.9068,
+      "lon": -43.1729,
+      "costOfLivingIndex": 41.5
+    },
+    {
+      "city": "Bogotá",
+      "country": "Colombia",
+      "lat": 4.7110,
+      "lon": -74.0721,
+      "costOfLivingIndex": 35.6
+    },
+    {
+      "city": "Lima",
+      "country": "Peru",
+      "lat": -12.0464,
+      "lon": -77.0428,
+      "costOfLivingIndex": 39.4
+    },
+    {
+      "city": "Santiago",
+      "country": "Chile",
+      "lat": -33.4489,
+      "lon": -70.6693,
+      "costOfLivingIndex": 48.9
+    },
+    {
+      "city": "Dubai",
+      "country": "UAE",
+      "lat": 25.2048,
+      "lon": 55.2708,
+      "costOfLivingIndex": 76.5
+    },
+    {
+      "city": "Tel Aviv",
+      "country": "Israel",
+      "lat": 32.0853,
+      "lon": 34.7818,
+      "costOfLivingIndex": 95.8
+    },
+    {
+      "city": "Istanbul",
+      "country": "Turkey",
+      "lat": 41.0082,
+      "lon": 28.9784,
+      "costOfLivingIndex": 37.9
+    },
+    {
+      "city": "Bangkok",
+      "country": "Thailand",
+      "lat": 13.7563,
+      "lon": 100.5018,
+      "costOfLivingIndex": 42.3
+    },
+    {
+      "city": "Ho Chi Minh City",
+      "country": "Vietnam",
+      "lat": 10.8231,
+      "lon": 106.6297,
+      "costOfLivingIndex": 38.5
+    },
+    {
+      "city": "Hanoi",
+      "country": "Vietnam",
+      "lat": 21.0285,
+      "lon": 105.8542,
+      "costOfLivingIndex": 36.8
+    },
+    {
+      "city": "Kuala Lumpur",
+      "country": "Malaysia",
+      "lat": 3.1390,
+      "lon": 101.6869,
+      "costOfLivingIndex": 39.2
+    },
+    {
+      "city": "Manila",
+      "country": "Philippines",
+      "lat": 14.5995,
+      "lon": 120.9842,
+      "costOfLivingIndex": 41.6
+    },
+    {
+      "city": "Jakarta",
+      "country": "Indonesia",
+      "lat": -6.2088,
+      "lon": 106.8456,
+      "costOfLivingIndex": 40.7
+    },
+    {
+      "city": "Beijing",
+      "country": "China",
+      "lat": 39.9042,
+      "lon": 116.4074,
+      "costOfLivingIndex": 54.8
+    },
+    {
+      "city": "Shanghai",
+      "country": "China",
+      "lat": 31.2304,
+      "lon": 121.4737,
+      "costOfLivingIndex": 59.3
+    },
+    {
+      "city": "Mumbai",
+      "country": "India",
+      "lat": 19.0760,
+      "lon": 72.8777,
+      "costOfLivingIndex": 32.4
+    },
+    {
+      "city": "Bangalore",
+      "country": "India",
+      "lat": 12.9716,
+      "lon": 77.5946,
+      "costOfLivingIndex": 28.9
+    },
+    {
+      "city": "Delhi",
+      "country": "India",
+      "lat": 28.7041,
+      "lon": 77.1025,
+      "costOfLivingIndex": 27.6
+    },
+    {
+      "city": "Cape Town",
+      "country": "South Africa",
+      "lat": -33.9249,
+      "lon": 18.4241,
+      "costOfLivingIndex": 45.3
+    },
+    {
+      "city": "Johannesburg",
+      "country": "South Africa",
+      "lat": -26.2041,
+      "lon": 28.0473,
+      "costOfLivingIndex": 43.8
+    },
+    {
+      "city": "Nairobi",
+      "country": "Kenya",
+      "lat": -1.2921,
+      "lon": 36.8219,
+      "costOfLivingIndex": 41.2
+    },
+    {
+      "city": "Cairo",
+      "country": "Egypt",
+      "lat": 30.0444,
+      "lon": 31.2357,
+      "costOfLivingIndex": 29.8
+    }
+  ]
+}
