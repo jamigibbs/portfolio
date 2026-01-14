@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cost of Living Comparison Map</title>
+    <title>Cost of Living & Digital Nomad Map</title>
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -28,7 +28,7 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -61,16 +61,32 @@
             margin-bottom: 20px;
         }
 
+        .control-section {
+            margin-bottom: 25px;
+        }
+
+        .control-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-section h3 {
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
         .control-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            align-items: flex-end;
-            flex-wrap: wrap;
+            align-items: end;
         }
 
         .control-group {
-            flex: 1;
-            min-width: 200px;
+            display: flex;
+            flex-direction: column;
         }
 
         .control-group label {
@@ -83,7 +99,6 @@
 
         .control-group select,
         .control-group input {
-            width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 6px;
@@ -97,16 +112,129 @@
             border-color: #4CAF50;
         }
 
+        /* Autocomplete styles */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .autocomplete-results.show {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .autocomplete-item:hover {
+            background: #f5f5f5;
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-item .city-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .autocomplete-item .city-details {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        /* Multi-select passport */
+        .passport-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        .passport-option {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .passport-option:hover {
+            background: #f0f0f0;
+        }
+
+        .passport-option input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .passport-option label {
+            cursor: pointer;
+            font-size: 0.9em;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* Savings runway presets */
+        .savings-presets {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .preset-btn {
+            padding: 6px 12px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+
+        .preset-btn:hover {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+
         .calculate-btn {
-            padding: 12px 30px;
+            padding: 14px 40px;
             background: #4CAF50;
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 1em;
+            font-size: 1.1em;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.3s;
+            width: 100%;
         }
 
         .calculate-btn:hover {
@@ -118,7 +246,7 @@
         }
 
         #map {
-            height: 600px;
+            height: 650px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             background: white;
@@ -138,10 +266,15 @@
             font-size: 1.2em;
         }
 
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
         .legend-item {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
         }
 
         .legend-color {
@@ -150,18 +283,19 @@
             border-radius: 50%;
             margin-right: 12px;
             border: 2px solid rgba(0,0,0,0.2);
+            flex-shrink: 0;
         }
 
         .legend-label {
             color: #666;
-            font-size: 0.95em;
+            font-size: 0.9em;
         }
 
         .info-box {
             background: #e3f2fd;
             padding: 15px;
             border-radius: 6px;
-            margin-top: 20px;
+            margin-top: 15px;
             border-left: 4px solid #2196F3;
         }
 
@@ -171,18 +305,18 @@
             font-size: 0.95em;
         }
 
-        /* Custom marker styles */
+        /* Custom marker */
         .custom-marker {
             background: white;
             border: 3px solid;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 0.85em;
+            font-size: 0.8em;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
@@ -206,21 +340,161 @@
             color: #9E9E9E;
         }
 
+        /* Enhanced popup styles */
+        .popup-content {
+            min-width: 350px;
+            max-width: 450px;
+        }
+
+        .popup-header {
+            margin: 0 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .popup-header h3 {
+            margin: 0 0 5px 0;
+            color: #333;
+            font-size: 1.3em;
+        }
+
+        .popup-header .country {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .popup-section {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+
+        .popup-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .popup-section h4 {
+            margin: 0 0 8px 0;
+            color: #333;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+        }
+
+        .popup-section h4 .icon {
+            margin-right: 6px;
+        }
+
+        .popup-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            font-size: 0.9em;
+        }
+
+        .popup-row .label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .popup-row .value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .popup-row .value.positive {
+            color: #4CAF50;
+        }
+
+        .popup-row .value.negative {
+            color: #f44336;
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .risk-low {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .risk-medium {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+
+        .risk-high {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .visa-info {
+            padding: 8px;
+            background: #E3F2FD;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .visa-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .visa-free {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .visa-on-arrival {
+            background: #FF9800;
+            color: white;
+        }
+
+        .visa-required {
+            background: #f44336;
+            color: white;
+        }
+
+        .visa-eta {
+            background: #2196F3;
+            color: white;
+        }
+
+        .runway-display {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #4CAF50;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.8em;
             }
 
             .control-row {
-                flex-direction: column;
+                grid-template-columns: 1fr;
             }
 
-            .control-group {
-                width: 100%;
+            .passport-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             }
 
             #map {
-                height: 400px;
+                height: 450px;
+            }
+
+            .popup-content {
+                min-width: 280px;
             }
         }
     </style>
@@ -228,27 +502,60 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌍 Cost of Living Comparison Map</h1>
-            <p>Discover where your budget can take you around the world</p>
+            <h1>🌍 Global Cost of Living & Digital Nomad Map</h1>
+            <p>Discover where your budget can take you, considering visas, living costs, and geopolitical safety</p>
         </div>
 
         <div class="controls">
-            <div class="control-row">
-                <div class="control-group">
-                    <label for="homeCity">Your Home City</label>
-                    <select id="homeCity">
-                        <option value="">Select your city...</option>
-                    </select>
-                </div>
+            <!-- Location & Budget Section -->
+            <div class="control-section">
+                <h3>📍 Location & Budget</h3>
+                <div class="control-row">
+                    <div class="control-group">
+                        <label for="homeCity">Your Home City</label>
+                        <div class="autocomplete-container">
+                            <input type="text" id="homeCity" placeholder="Search for your city...">
+                            <div class="autocomplete-results" id="homeCityResults"></div>
+                        </div>
+                    </div>
 
-                <div class="control-group">
-                    <label for="budget">Monthly Budget ($)</label>
-                    <input type="number" id="budget" placeholder="e.g., 6000" min="0" step="100">
+                    <div class="control-group">
+                        <label for="budget">Monthly Budget ($)</label>
+                        <input type="number" id="budget" placeholder="e.g., 6000" min="0" step="100">
+                    </div>
                 </div>
+            </div>
 
-                <div class="control-group">
-                    <button class="calculate-btn" onclick="calculateAndDisplay()">Calculate</button>
+            <!-- Passports Section -->
+            <div class="control-section">
+                <h3>🛂 Your Passports (Select all that apply)</h3>
+                <div id="passportGrid" class="passport-grid"></div>
+            </div>
+
+            <!-- Savings Runway Section -->
+            <div class="control-section">
+                <h3>💰 Savings Runway</h3>
+                <div class="control-row">
+                    <div class="control-group">
+                        <label for="savings">Total Savings ($)</label>
+                        <input type="number" id="savings" placeholder="e.g., 50000" min="0" step="1000">
+                        <div class="savings-presets">
+                            <button class="preset-btn" onclick="setSavings(1000)">$1K</button>
+                            <button class="preset-btn" onclick="setSavings(5000)">$5K</button>
+                            <button class="preset-btn" onclick="setSavings(10000)">$10K</button>
+                            <button class="preset-btn" onclick="setSavings(20000)">$20K</button>
+                            <button class="preset-btn" onclick="setSavings(30000)">$30K</button>
+                            <button class="preset-btn" onclick="setSavings(50000)">$50K</button>
+                            <button class="preset-btn" onclick="setSavings(100000)">$100K</button>
+                            <button class="preset-btn" onclick="setSavings(200000)">$200K</button>
+                        </div>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Calculate Button -->
+            <div class="control-section">
+                <button class="calculate-btn" onclick="calculateAndDisplay()">🔍 Explore Destinations</button>
             </div>
 
             <div class="info-box" id="infoBox" style="display: none;">
@@ -259,22 +566,24 @@
         <div id="map"></div>
 
         <div class="legend">
-            <h3>Cost of Living Difference</h3>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #4CAF50;"></div>
-                <div class="legend-label"><strong>Green:</strong> 40%+ cheaper - High savings</div>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #FF9800;"></div>
-                <div class="legend-label"><strong>Amber:</strong> 10-40% cheaper - Moderate savings</div>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #9E9E9E;"></div>
-                <div class="legend-label"><strong>Gray:</strong> ±10% - Similar cost</div>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #f44336;"></div>
-                <div class="legend-label"><strong>Red:</strong> More expensive</div>
+            <h3>Legend</h3>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4CAF50;"></div>
+                    <div class="legend-label"><strong>Green:</strong> 40%+ cheaper</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #FF9800;"></div>
+                    <div class="legend-label"><strong>Amber:</strong> 10-40% cheaper</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #9E9E9E;"></div>
+                    <div class="legend-label"><strong>Gray:</strong> ±10% similar</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f44336;"></div>
+                    <div class="legend-label"><strong>Red:</strong> More expensive</div>
+                </div>
             </div>
         </div>
     </div>
@@ -283,6 +592,9 @@
         let map;
         let markers = [];
         let citiesData = [];
+        let visaData = {};
+        let selectedHomeCity = null;
+        let selectedPassports = new Set();
 
         // Initialize the map
         function initMap() {
@@ -300,42 +612,205 @@
                 const response = await fetch('public/cost-of-living-data.json');
                 const data = await response.json();
                 citiesData = data.cities;
-                populateCityDropdown();
+                setupAutocomplete();
             } catch (error) {
                 console.error('Error loading cities data:', error);
                 alert('Error loading city data. Please refresh the page.');
             }
         }
 
-        // Populate the city dropdown
-        function populateCityDropdown() {
-            const select = document.getElementById('homeCity');
+        // Load visa data
+        async function loadVisaData() {
+            try {
+                const response = await fetch('public/passport-visa-data.json');
+                const data = await response.json();
+                visaData = data;
+                populatePassportGrid(data.passports);
+            } catch (error) {
+                console.error('Error loading visa data:', error);
+            }
+        }
 
-            citiesData.forEach(city => {
-                const option = document.createElement('option');
-                const cityLabel = city.state
-                    ? `${city.city}, ${city.state}, ${city.country}`
-                    : `${city.city}, ${city.country}`;
-                option.value = city.city;
-                option.textContent = cityLabel;
-                select.appendChild(option);
+        // Populate passport selection grid
+        function populatePassportGrid(passports) {
+            const grid = document.getElementById('passportGrid');
+            passports.forEach(passport => {
+                const div = document.createElement('div');
+                div.className = 'passport-option';
+                div.innerHTML = `
+                    <input type="checkbox" id="passport-${passport}" value="${passport}">
+                    <label for="passport-${passport}">${passport}</label>
+                `;
+                div.querySelector('input').addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        selectedPassports.add(passport);
+                    } else {
+                        selectedPassports.delete(passport);
+                    }
+                });
+                grid.appendChild(div);
             });
+        }
+
+        // Calculate distance between two coordinates (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                     Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Find city or nearest match
+        function findCityOrNearest(searchTerm) {
+            const term = searchTerm.toLowerCase().trim();
+
+            // Exact match
+            let match = citiesData.find(c =>
+                c.city.toLowerCase() === term ||
+                (c.searchAliases && c.searchAliases.includes(term))
+            );
+
+            if (match) return { city: match, isApproximate: false };
+
+            // Fuzzy match by name
+            const fuzzyMatches = citiesData.filter(c =>
+                c.city.toLowerCase().includes(term) ||
+                c.country.toLowerCase().includes(term) ||
+                (c.state && c.state.toLowerCase().includes(term))
+            );
+
+            if (fuzzyMatches.length > 0) {
+                return { city: fuzzyMatches[0], isApproximate: true, reason: 'name match' };
+            }
+
+            // No match found
+            return null;
+        }
+
+        // Setup autocomplete for city search
+        function setupAutocomplete() {
+            const input = document.getElementById('homeCity');
+            const results = document.getElementById('homeCityResults');
+
+            input.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase().trim();
+
+                if (term.length < 2) {
+                    results.classList.remove('show');
+                    return;
+                }
+
+                const matches = citiesData.filter(c =>
+                    c.city.toLowerCase().includes(term) ||
+                    c.country.toLowerCase().includes(term) ||
+                    (c.state && c.state.toLowerCase().includes(term))
+                ).slice(0, 10);
+
+                if (matches.length === 0) {
+                    results.classList.remove('show');
+                    return;
+                }
+
+                results.innerHTML = matches.map(c => {
+                    const cityLabel = c.state
+                        ? `${c.city}, ${c.state}, ${c.country}`
+                        : `${c.city}, ${c.country}`;
+                    return `
+                        <div class="autocomplete-item" data-city-id="${citiesData.indexOf(c)}">
+                            <div class="city-name">${c.city}</div>
+                            <div class="city-details">${c.country}${c.state ? ', ' + c.state : ''}</div>
+                        </div>
+                    `;
+                }).join('');
+
+                results.classList.add('show');
+
+                // Add click handlers
+                results.querySelectorAll('.autocomplete-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const cityId = parseInt(item.dataset.cityId);
+                        selectedHomeCity = citiesData[cityId];
+                        const label = selectedHomeCity.state
+                            ? `${selectedHomeCity.city}, ${selectedHomeCity.state}, ${selectedHomeCity.country}`
+                            : `${selectedHomeCity.city}, ${selectedHomeCity.country}`;
+                        input.value = label;
+                        results.classList.remove('show');
+                    });
+                });
+            });
+
+            // Close autocomplete when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.autocomplete-container')) {
+                    results.classList.remove('show');
+                }
+            });
+        }
+
+        // Set savings preset
+        function setSavings(amount) {
+            document.getElementById('savings').value = amount;
         }
 
         // Get color based on percentage difference
         function getColor(percentDiff) {
-            if (percentDiff <= -40) return '#4CAF50'; // Green - very cheap
-            if (percentDiff <= -10) return '#FF9800'; // Amber - moderately cheap
-            if (percentDiff < 10) return '#9E9E9E';   // Gray - similar
-            return '#f44336';                          // Red - expensive
+            if (percentDiff <= -40) return '#4CAF50';
+            if (percentDiff <= -10) return '#FF9800';
+            if (percentDiff < 10) return '#9E9E9E';
+            return '#f44336';
         }
 
-        // Get label class based on percentage difference
+        // Get marker class based on percentage difference
         function getMarkerClass(percentDiff) {
             if (percentDiff <= -40) return 'marker-green';
             if (percentDiff <= -10) return 'marker-amber';
             if (percentDiff < 10) return 'marker-gray';
             return 'marker-red';
+        }
+
+        // Get geopolitical risk badge
+        function getRiskBadge(risk) {
+            if (risk <= 2) return '<span class="risk-badge risk-low">Low Risk</span>';
+            if (risk <= 5) return '<span class="risk-badge risk-medium">Medium Risk</span>';
+            return '<span class="risk-badge risk-high">High Risk</span>';
+        }
+
+        // Get visa information for city
+        function getVisaInfo(city) {
+            if (selectedPassports.size === 0) return null;
+
+            const visaInfoList = [];
+            selectedPassports.forEach(passport => {
+                const countryVisa = visaData.visaRequirements?.[passport]?.[city.country];
+                if (countryVisa) {
+                    visaInfoList.push({
+                        passport: passport,
+                        ...countryVisa
+                    });
+                }
+            });
+
+            return visaInfoList;
+        }
+
+        // Format visa badge
+        function getVisaBadge(category) {
+            const badges = {
+                'visa-free': '<span class="visa-badge visa-free">Visa Free</span>',
+                'visa-on-arrival': '<span class="visa-badge visa-on-arrival">Visa on Arrival</span>',
+                'visa-required': '<span class="visa-badge visa-required">Visa Required</span>',
+                'e-visa': '<span class="visa-badge visa-eta">e-Visa</span>',
+                'eTA': '<span class="visa-badge visa-eta">eTA</span>',
+                'ESTA': '<span class="visa-badge visa-eta">ESTA</span>',
+                'citizen': '<span class="visa-badge visa-free">Citizen</span>',
+                'citizen-rights': '<span class="visa-badge visa-free">Citizen Rights</span>',
+                'CTA': '<span class="visa-badge visa-free">CTA Member</span>'
+            };
+            return badges[category] || `<span class="visa-badge visa-required">${category}</span>`;
         }
 
         // Clear all markers
@@ -346,22 +821,16 @@
 
         // Calculate and display results
         function calculateAndDisplay() {
-            const homeCityName = document.getElementById('homeCity').value;
-            const budget = parseFloat(document.getElementById('budget').value);
-
-            if (!homeCityName) {
+            if (!selectedHomeCity) {
                 alert('Please select your home city');
                 return;
             }
 
+            const budget = parseFloat(document.getElementById('budget').value);
+            const savings = parseFloat(document.getElementById('savings').value) || 0;
+
             if (!budget || budget <= 0) {
                 alert('Please enter a valid monthly budget');
-                return;
-            }
-
-            const homeCity = citiesData.find(c => c.city === homeCityName);
-            if (!homeCity) {
-                alert('City not found');
                 return;
             }
 
@@ -371,20 +840,29 @@
             // Show info box
             const infoBox = document.getElementById('infoBox');
             const infoText = document.getElementById('infoText');
-            const homeCityLabel = homeCity.state
-                ? `${homeCity.city}, ${homeCity.state}, ${homeCity.country}`
-                : `${homeCity.city}, ${homeCity.country}`;
-            infoText.textContent = `Comparing costs relative to ${homeCityLabel} with a $${budget.toLocaleString()}/month budget`;
+            const homeCityLabel = selectedHomeCity.state
+                ? `${selectedHomeCity.city}, ${selectedHomeCity.state}, ${selectedHomeCity.country}`
+                : `${selectedHomeCity.city}, ${selectedHomeCity.country}`;
+
+            let infoMsg = `Comparing costs relative to ${homeCityLabel} with $${budget.toLocaleString()}/month budget`;
+            if (savings > 0) {
+                infoMsg += ` and $${savings.toLocaleString()} in savings`;
+            }
+            if (selectedPassports.size > 0) {
+                infoMsg += `. Showing visa info for: ${Array.from(selectedPassports).join(', ')}`;
+            }
+            infoText.textContent = infoMsg;
             infoBox.style.display = 'block';
 
             // Center map on home city
-            map.setView([homeCity.lat, homeCity.lon], 3);
+            map.setView([selectedHomeCity.lat, selectedHomeCity.lon], 3);
 
             // Add markers for all cities
             citiesData.forEach(city => {
-                const percentDiff = ((city.costOfLivingIndex - homeCity.costOfLivingIndex) / homeCity.costOfLivingIndex) * 100;
-                const equivalentBudget = (budget * city.costOfLivingIndex) / homeCity.costOfLivingIndex;
-                const savings = budget - equivalentBudget;
+                const percentDiff = ((city.costOfLivingIndex - selectedHomeCity.costOfLivingIndex) / selectedHomeCity.costOfLivingIndex) * 100;
+                const equivalentBudget = (budget * city.costOfLivingIndex) / selectedHomeCity.costOfLivingIndex;
+                const monthlySavings = budget - equivalentBudget;
+                const runwayMonths = savings > 0 ? (savings / equivalentBudget).toFixed(1) : 0;
 
                 const color = getColor(percentDiff);
                 const markerClass = getMarkerClass(percentDiff);
@@ -393,27 +871,82 @@
                 const icon = L.divIcon({
                     className: 'custom-div-icon',
                     html: `<div class="custom-marker ${markerClass}">${percentDiff >= 0 ? '+' : ''}${Math.round(percentDiff)}%</div>`,
-                    iconSize: [40, 40],
-                    iconAnchor: [20, 20],
-                    popupAnchor: [0, -20]
+                    iconSize: [45, 45],
+                    iconAnchor: [22, 22],
+                    popupAnchor: [0, -22]
                 });
 
                 const cityLabel = city.state
                     ? `${city.city}, ${city.state}, ${city.country}`
                     : `${city.city}, ${city.country}`;
 
-                const popupContent = `
-                    <div style="min-width: 200px;">
-                        <h3 style="margin: 0 0 10px 0; color: #333;">${cityLabel}</h3>
-                        <p style="margin: 5px 0; color: #666;"><strong>Cost of Living:</strong> ${percentDiff >= 0 ? '+' : ''}${percentDiff.toFixed(1)}%</p>
-                        <p style="margin: 5px 0; color: #666;"><strong>Equivalent Budget:</strong> $${equivalentBudget.toLocaleString(undefined, {maximumFractionDigits: 0})}/month</p>
-                        <p style="margin: 5px 0; color: ${savings > 0 ? '#4CAF50' : '#f44336'};"><strong>${savings > 0 ? 'Savings' : 'Extra Cost'}:</strong> $${Math.abs(savings).toLocaleString(undefined, {maximumFractionDigits: 0})}/month</p>
-                    </div>
+                // Build popup content
+                let popupHTML = `
+                    <div class="popup-content">
+                        <div class="popup-header">
+                            <h3>${city.city}</h3>
+                            <div class="country">${city.country}${city.state ? ', ' + city.state : ''}</div>
+                        </div>
+
+                        <div class="popup-section">
+                            <h4><span class="icon">💵</span> Cost of Living</h4>
+                            <div class="popup-row">
+                                <span class="label">Compared to home:</span>
+                                <span class="value ${percentDiff < 0 ? 'positive' : 'negative'}">${percentDiff >= 0 ? '+' : ''}${percentDiff.toFixed(1)}%</span>
+                            </div>
+                            <div class="popup-row">
+                                <span class="label">Equivalent budget:</span>
+                                <span class="value">$${equivalentBudget.toLocaleString(undefined, {maximumFractionDigits: 0})}/mo</span>
+                            </div>
+                            <div class="popup-row">
+                                <span class="label">Monthly ${monthlySavings > 0 ? 'savings' : 'extra cost'}:</span>
+                                <span class="value ${monthlySavings > 0 ? 'positive' : 'negative'}">$${Math.abs(monthlySavings).toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
+                            </div>
                 `;
+
+                if (savings > 0) {
+                    popupHTML += `
+                            <div class="popup-row">
+                                <span class="label">Runway:</span>
+                                <span class="value runway-display">${runwayMonths} months</span>
+                            </div>
+                    `;
+                }
+
+                popupHTML += `</div>`;
+
+                // Geopolitical risk
+                popupHTML += `
+                        <div class="popup-section">
+                            <h4><span class="icon">⚠️</span> Geopolitical Risk</h4>
+                            <div>${getRiskBadge(city.geopoliticalRisk)}</div>
+                        </div>
+                `;
+
+                // Visa information
+                const visaInfo = getVisaInfo(city);
+                if (visaInfo && visaInfo.length > 0) {
+                    popupHTML += `<div class="popup-section"><h4><span class="icon">🛂</span> Visa Information</h4>`;
+                    visaInfo.forEach(info => {
+                        popupHTML += `
+                            <div class="visa-info">
+                                <strong>${info.passport}:</strong> ${getVisaBadge(info.category)}
+                                ${info.visaFree > 0 ? `<div style="margin-top: 4px; font-size: 0.85em;">Stay: ${info.visaFree} days visa-free</div>` : ''}
+                                ${info.residencyPath ? `<div style="margin-top: 4px; font-size: 0.85em; color: #666;">Residency: ${info.residencyPath}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                    popupHTML += `</div>`;
+                }
+
+                popupHTML += `</div>`;
 
                 const marker = L.marker([city.lat, city.lon], { icon: icon })
                     .addTo(map)
-                    .bindPopup(popupContent);
+                    .bindPopup(popupHTML, {
+                        maxWidth: 450,
+                        className: 'custom-popup'
+                    });
 
                 markers.push(marker);
             });
@@ -423,6 +956,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
             loadCitiesData();
+            loadVisaData();
         });
     </script>
 </body>
