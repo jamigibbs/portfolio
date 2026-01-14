@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design 4: Compact Horizontal</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            color: #333;
+        }
+
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            display: inline-block;
+            margin-right: 20px;
+        }
+
+        .subtitle {
+            display: inline-block;
+            font-size: 0.9em;
+            opacity: 0.85;
+        }
+
+        .controls {
+            background: #ecf0f1;
+            padding: 20px 30px;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1.5fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+            border-bottom: 2px solid #bdc3c7;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #2c3e50;
+        }
+
+        input, select {
+            padding: 10px 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 0.95em;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        select[multiple] {
+            min-height: 42px;
+        }
+
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #bdc3c7;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .autocomplete-results.show { display: block; }
+
+        .autocomplete-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .autocomplete-item:hover {
+            background: #ecf0f1;
+        }
+
+        .city-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .city-details {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            margin-top: 2px;
+        }
+
+        .btn-primary {
+            padding: 10px 24px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            height: 42px;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .info-box {
+            background: #d5e8f7;
+            padding: 12px 30px;
+            border-bottom: 2px solid #3498db;
+            font-size: 0.9em;
+            color: #2c3e50;
+        }
+
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .legend-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            color: #2c3e50;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 0.85em;
+        }
+
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .custom-marker {
+            background: white;
+            border: 3px solid;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .marker-green { border-color: #4CAF50; color: #4CAF50; }
+        .marker-amber { border-color: #FF9800; color: #FF9800; }
+        .marker-red { border-color: #f44336; color: #f44336; }
+        .marker-gray { border-color: #9E9E9E; color: #9E9E9E; }
+
+        .popup-content { min-width: 350px; max-width: 450px; }
+        .popup-header { margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; }
+        .popup-header h3 { margin: 0 0 5px 0; color: #333; font-size: 1.3em; }
+        .popup-header .country { color: #666; font-size: 0.95em; }
+        .popup-section { margin-bottom: 15px; padding: 12px; background: #f9f9f9; border-radius: 6px; }
+        .popup-section:last-child { margin-bottom: 0; }
+        .popup-section h4 { margin: 0 0 8px 0; color: #333; font-size: 1em; display: flex; align-items: center; }
+        .popup-section h4 .icon { margin-right: 6px; }
+        .popup-row { display: flex; justify-content: space-between; margin: 6px 0; font-size: 0.9em; }
+        .popup-row .label { color: #666; font-weight: 500; }
+        .popup-row .value { color: #333; font-weight: 600; }
+        .popup-row .value.positive { color: #4CAF50; }
+        .popup-row .value.negative { color: #f44336; }
+        .risk-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600; }
+        .risk-low { background: #E8F5E9; color: #2E7D32; }
+        .risk-medium { background: #FFF3E0; color: #F57C00; }
+        .risk-high { background: #FFEBEE; color: #C62828; }
+        .visa-info { padding: 8px; background: #E3F2FD; border-radius: 4px; margin-top: 8px; }
+        .visa-badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 0.8em; font-weight: 600; margin-right: 6px; }
+        .visa-free { background: #4CAF50; color: white; }
+        .visa-on-arrival { background: #FF9800; color: white; }
+        .visa-required { background: #f44336; color: white; }
+        .visa-eta { background: #2196F3; color: white; }
+        .runway-display { font-size: 1.1em; font-weight: 700; color: #4CAF50; }
+
+        @media (max-width: 1200px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            .legend {
+                bottom: 10px;
+                right: 10px;
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌍 Cost of Living Explorer</h1>
+            <span class="subtitle">Discover affordable destinations worldwide</span>
+        </header>
+
+        <div class="controls">
+            <div class="form-group">
+                <label for="homeCity">Home City</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="homeCity" placeholder="Search for your city...">
+                    <div class="autocomplete-results" id="homeCityResults"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="budget">Budget ($)</label>
+                <input type="number" id="budget" placeholder="6000" min="0" step="100">
+            </div>
+
+            <div class="form-group">
+                <label for="passports">Passports</label>
+                <select id="passports" multiple></select>
+            </div>
+
+            <div class="form-group">
+                <label for="savings">Savings</label>
+                <select id="savings">
+                    <option value="">None</option>
+                    <option value="1000">$1K</option>
+                    <option value="5000">$5K</option>
+                    <option value="10000">$10K</option>
+                    <option value="20000">$20K</option>
+                    <option value="30000">$30K</option>
+                    <option value="50000">$50K</option>
+                    <option value="100000">$100K</option>
+                    <option value="200000">$200K</option>
+                </select>
+            </div>
+
+            <button class="btn-primary" onclick="calculateAndDisplay()">Explore</button>
+        </div>
+
+        <div class="info-box" id="infoBox" style="display: none;">
+            <p id="infoText"></p>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="legend">
+                <div class="legend-title">Cost Difference</div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4CAF50;"></div>
+                    <div>40%+ cheaper</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #FF9800;"></div>
+                    <div>10-40% cheaper</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #9E9E9E;"></div>
+                    <div>±10% similar</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f44336;"></div>
+                    <div>More expensive</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="cost-of-living-map-script.js"></script>
+</body>
+</html>
