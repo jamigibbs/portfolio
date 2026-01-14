@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cost of Living Explorer - Interactive Map</title>
+    <title>Design 4: Compact Horizontal</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <style>
@@ -11,77 +11,77 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #1e1e1e;
-            color: #fff;
-            overflow-x: hidden;
+            background: #ffffff;
+            color: #333;
         }
 
-        .app-container {
-            display: flex;
+        .container {
             height: 100vh;
-        }
-
-        .sidebar {
-            width: 380px;
-            background: #2d2d2d;
-            padding: 30px 25px;
-            overflow-y: auto;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.3);
-            z-index: 1000;
+            display: flex;
+            flex-direction: column;
         }
 
         header {
-            margin-bottom: 30px;
+            background: #2c3e50;
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
         h1 {
             font-size: 1.8em;
             font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #00d4ff 0%, #0096ff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            display: inline-block;
+            margin-right: 20px;
         }
 
         .subtitle {
-            color: #aaa;
+            display: inline-block;
             font-size: 0.9em;
+            opacity: 0.85;
+        }
+
+        .controls {
+            background: #ecf0f1;
+            padding: 20px 30px;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1.5fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+            border-bottom: 2px solid #bdc3c7;
         }
 
         .form-group {
-            margin-bottom: 22px;
+            display: flex;
+            flex-direction: column;
         }
 
         label {
-            display: block;
             font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 0.85em;
+            margin-bottom: 6px;
+            font-size: 0.8em;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #00d4ff;
+            color: #2c3e50;
         }
 
         input, select {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #444;
-            border-radius: 6px;
+            padding: 10px 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 4px;
             font-size: 0.95em;
-            transition: all 0.3s;
-            background: #1e1e1e;
-            color: #fff;
+            transition: all 0.2s;
+            background: white;
         }
 
         input:focus, select:focus {
             outline: none;
-            border-color: #00d4ff;
-            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15);
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
         }
 
         select[multiple] {
-            min-height: 120px;
+            min-height: 42px;
         }
 
         .autocomplete-container {
@@ -93,58 +93,58 @@
             top: 100%;
             left: 0;
             right: 0;
-            background: #1e1e1e;
-            border: 1px solid #444;
+            background: white;
+            border: 2px solid #bdc3c7;
             border-top: none;
-            border-radius: 0 0 6px 6px;
-            max-height: 250px;
+            border-radius: 0 0 4px 4px;
+            max-height: 300px;
             overflow-y: auto;
             z-index: 1000;
             display: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .autocomplete-results.show { display: block; }
 
         .autocomplete-item {
-            padding: 12px 14px;
+            padding: 10px 12px;
             cursor: pointer;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #ecf0f1;
         }
 
         .autocomplete-item:hover {
-            background: #2d2d2d;
+            background: #ecf0f1;
         }
 
         .city-name {
             font-weight: 600;
-            color: #fff;
+            color: #2c3e50;
         }
 
         .city-details {
             font-size: 0.85em;
-            color: #aaa;
+            color: #7f8c8d;
             margin-top: 2px;
         }
 
         .btn-primary {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #00d4ff 0%, #0096ff 100%);
-            color: #1e1e1e;
+            padding: 10px 24px;
+            background: #3498db;
+            color: white;
             border: none;
-            border-radius: 6px;
-            font-size: 1em;
-            font-weight: 700;
+            border-radius: 4px;
+            font-size: 0.95em;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            white-space: nowrap;
+            height: 42px;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.5);
+            background: #2980b9;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
         }
 
         .btn-primary:active {
@@ -152,43 +152,11 @@
         }
 
         .info-box {
-            background: rgba(0, 212, 255, 0.1);
-            padding: 14px;
-            border-radius: 6px;
-            border-left: 3px solid #00d4ff;
-            margin-top: 20px;
-            font-size: 0.85em;
-            color: #00d4ff;
-        }
-
-        .legend {
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #444;
-        }
-
-        .legend-title {
-            font-size: 0.85em;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #aaa;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
+            background: #d5e8f7;
+            padding: 12px 30px;
+            border-bottom: 2px solid #3498db;
             font-size: 0.9em;
-        }
-
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            flex-shrink: 0;
+            color: #2c3e50;
         }
 
         .map-container {
@@ -199,6 +167,43 @@
         #map {
             height: 100%;
             width: 100%;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .legend-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            color: #2c3e50;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 0.85em;
+        }
+
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
         }
 
         .custom-marker {
@@ -245,29 +250,26 @@
         .visa-eta { background: #2196F3; color: white; }
         .runway-display { font-size: 1.1em; font-weight: 700; color: #4CAF50; }
 
-        @media (max-width: 768px) {
-            .app-container {
-                flex-direction: column;
+        @media (max-width: 1200px) {
+            .controls {
+                grid-template-columns: 1fr;
             }
-            .sidebar {
-                width: 100%;
-                height: auto;
-                max-height: 50vh;
-            }
-            .map-container {
-                height: 50vh;
+            .legend {
+                bottom: 10px;
+                right: 10px;
+                padding: 10px 15px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="sidebar">
-            <header>
-                <h1>🌍 Cost of Living</h1>
-                <p class="subtitle">Explorer</p>
-            </header>
+    <div class="container">
+        <header>
+            <h1>🌍 Cost of Living Explorer</h1>
+            <span class="subtitle">Discover affordable destinations worldwide</span>
+        </header>
 
+        <div class="controls">
             <div class="form-group">
                 <label for="homeCity">Home City</label>
                 <div class="autocomplete-container">
@@ -277,38 +279,41 @@
             </div>
 
             <div class="form-group">
-                <label for="budget">Monthly Budget ($)</label>
+                <label for="budget">Budget ($)</label>
                 <input type="number" id="budget" placeholder="6000" min="0" step="100">
             </div>
 
             <div class="form-group">
-                <label for="passports">Your Passports</label>
+                <label for="passports">Passports</label>
                 <select id="passports" multiple></select>
             </div>
 
             <div class="form-group">
-                <label for="savings">Savings Runway</label>
+                <label for="savings">Savings</label>
                 <select id="savings">
-                    <option value="">No savings</option>
-                    <option value="1000">$1,000</option>
-                    <option value="5000">$5,000</option>
-                    <option value="10000">$10,000</option>
-                    <option value="20000">$20,000</option>
-                    <option value="30000">$30,000</option>
-                    <option value="50000">$50,000</option>
-                    <option value="100000">$100,000</option>
-                    <option value="200000">$200,000</option>
+                    <option value="">None</option>
+                    <option value="1000">$1K</option>
+                    <option value="5000">$5K</option>
+                    <option value="10000">$10K</option>
+                    <option value="20000">$20K</option>
+                    <option value="30000">$30K</option>
+                    <option value="50000">$50K</option>
+                    <option value="100000">$100K</option>
+                    <option value="200000">$200K</option>
                 </select>
             </div>
 
             <button class="btn-primary" onclick="calculateAndDisplay()">Explore</button>
+        </div>
 
-            <div class="info-box" id="infoBox" style="display: none;">
-                <p id="infoText"></p>
-            </div>
+        <div class="info-box" id="infoBox" style="display: none;">
+            <p id="infoText"></p>
+        </div>
 
+        <div class="map-container">
+            <div id="map"></div>
             <div class="legend">
-                <div class="legend-title">Legend</div>
+                <div class="legend-title">Cost Difference</div>
                 <div class="legend-item">
                     <div class="legend-color" style="background: #4CAF50;"></div>
                     <div>40%+ cheaper</div>
@@ -326,10 +331,6 @@
                     <div>More expensive</div>
                 </div>
             </div>
-        </div>
-
-        <div class="map-container">
-            <div id="map"></div>
         </div>
     </div>
 
