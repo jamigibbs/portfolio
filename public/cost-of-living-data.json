@@ -4,7 +4,8 @@
     "baseline": "New York City, NY, USA = 100",
     "note": "Index includes rent, food, transportation, and utilities",
     "lastUpdated": "2026-01",
-    "sources": "Compiled from Numbeo, AdvisorSmith, and public cost of living indices"
+    "sources": "Compiled from Numbeo, AdvisorSmith, and public cost of living indices",
+    "geopoliticalRiskNote": "Risk score from 1 (safest) to 10 (highest risk) based on political stability, safety, economic factors"
   },
   "cities": [
     {
@@ -12,8 +13,14 @@
       "state": "NY",
       "country": "USA",
       "lat": 40.7128,
-      "lon": -74.0060,
-      "costOfLivingIndex": 100.0
+      "lon": -74.006,
+      "costOfLivingIndex": 100.0,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "new york",
+        "new york, ny",
+        "new york, usa"
+      ]
     },
     {
       "city": "San Francisco",
@@ -21,7 +28,13 @@
       "country": "USA",
       "lat": 37.7749,
       "lon": -122.4194,
-      "costOfLivingIndex": 104.2
+      "costOfLivingIndex": 104.2,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "san francisco",
+        "san francisco, ca",
+        "san francisco, usa"
+      ]
     },
     {
       "city": "Los Angeles",
@@ -29,7 +42,13 @@
       "country": "USA",
       "lat": 34.0522,
       "lon": -118.2437,
-      "costOfLivingIndex": 87.5
+      "costOfLivingIndex": 87.5,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "los angeles",
+        "los angeles, ca",
+        "los angeles, usa"
+      ]
     },
     {
       "city": "Philadelphia",
@@ -37,7 +56,13 @@
       "country": "USA",
       "lat": 39.9526,
       "lon": -75.1652,
-      "costOfLivingIndex": 80.3
+      "costOfLivingIndex": 80.3,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "philadelphia",
+        "philadelphia, pa",
+        "philadelphia, usa"
+      ]
     },
     {
       "city": "Boston",
@@ -45,7 +70,13 @@
       "country": "USA",
       "lat": 42.3601,
       "lon": -71.0589,
-      "costOfLivingIndex": 93.8
+      "costOfLivingIndex": 93.8,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "boston",
+        "boston, ma",
+        "boston, usa"
+      ]
     },
     {
       "city": "Chicago",
@@ -53,7 +84,13 @@
       "country": "USA",
       "lat": 41.8781,
       "lon": -87.6298,
-      "costOfLivingIndex": 82.1
+      "costOfLivingIndex": 82.1,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "chicago",
+        "chicago, il",
+        "chicago, usa"
+      ]
     },
     {
       "city": "Seattle",
@@ -61,7 +98,13 @@
       "country": "USA",
       "lat": 47.6062,
       "lon": -122.3321,
-      "costOfLivingIndex": 91.7
+      "costOfLivingIndex": 91.7,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "seattle",
+        "seattle, wa",
+        "seattle, usa"
+      ]
     },
     {
       "city": "Miami",
@@ -69,7 +112,13 @@
       "country": "USA",
       "lat": 25.7617,
       "lon": -80.1918,
-      "costOfLivingIndex": 85.4
+      "costOfLivingIndex": 85.4,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "miami",
+        "miami, fl",
+        "miami, usa"
+      ]
     },
     {
       "city": "Austin",
@@ -77,7 +126,13 @@
       "country": "USA",
       "lat": 30.2672,
       "lon": -97.7431,
-      "costOfLivingIndex": 78.9
+      "costOfLivingIndex": 78.9,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "austin",
+        "austin, tx",
+        "austin, usa"
+      ]
     },
     {
       "city": "Denver",
@@ -85,7 +140,13 @@
       "country": "USA",
       "lat": 39.7392,
       "lon": -104.9903,
-      "costOfLivingIndex": 79.4
+      "costOfLivingIndex": 79.4,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "denver",
+        "denver, co",
+        "denver, usa"
+      ]
     },
     {
       "city": "Portland",
@@ -93,15 +154,27 @@
       "country": "USA",
       "lat": 45.5152,
       "lon": -122.6784,
-      "costOfLivingIndex": 83.6
+      "costOfLivingIndex": 83.6,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "portland",
+        "portland, or",
+        "portland, usa"
+      ]
     },
     {
       "city": "Atlanta",
       "state": "GA",
       "country": "USA",
-      "lat": 33.7490,
-      "lon": -84.3880,
-      "costOfLivingIndex": 74.2
+      "lat": 33.749,
+      "lon": -84.388,
+      "costOfLivingIndex": 74.2,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "atlanta",
+        "atlanta, ga",
+        "atlanta, usa"
+      ]
     },
     {
       "city": "Nashville",
@@ -109,7 +182,13 @@
       "country": "USA",
       "lat": 36.1627,
       "lon": -86.7816,
-      "costOfLivingIndex": 76.8
+      "costOfLivingIndex": 76.8,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "nashville",
+        "nashville, tn",
+        "nashville, usa"
+      ]
     },
     {
       "city": "Raleigh",
@@ -117,378 +196,649 @@
       "country": "USA",
       "lat": 35.7796,
       "lon": -78.6382,
-      "costOfLivingIndex": 72.5
+      "costOfLivingIndex": 72.5,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "raleigh",
+        "raleigh, nc",
+        "raleigh, usa"
+      ]
     },
     {
       "city": "London",
       "country": "UK",
       "lat": 51.5074,
       "lon": -0.1278,
-      "costOfLivingIndex": 91.3
+      "costOfLivingIndex": 91.3,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "london",
+        "london, uk"
+      ]
     },
     {
       "city": "Paris",
       "country": "France",
       "lat": 48.8566,
       "lon": 2.3522,
-      "costOfLivingIndex": 89.7
+      "costOfLivingIndex": 89.7,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "paris",
+        "paris, france"
+      ]
     },
     {
       "city": "Berlin",
       "country": "Germany",
-      "lat": 52.5200,
-      "lon": 13.4050,
-      "costOfLivingIndex": 72.8
+      "lat": 52.52,
+      "lon": 13.405,
+      "costOfLivingIndex": 72.8,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "berlin",
+        "berlin, germany"
+      ]
     },
     {
       "city": "Amsterdam",
       "country": "Netherlands",
       "lat": 52.3676,
       "lon": 4.9041,
-      "costOfLivingIndex": 84.2
+      "costOfLivingIndex": 84.2,
+      "geopoliticalRisk": 1,
+      "searchAliases": [
+        "amsterdam",
+        "amsterdam, netherlands"
+      ]
     },
     {
       "city": "Barcelona",
       "country": "Spain",
       "lat": 41.3851,
       "lon": 2.1734,
-      "costOfLivingIndex": 68.5
+      "costOfLivingIndex": 68.5,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "barcelona",
+        "barcelona, spain"
+      ]
     },
     {
       "city": "Madrid",
       "country": "Spain",
       "lat": 40.4168,
       "lon": -3.7038,
-      "costOfLivingIndex": 66.9
+      "costOfLivingIndex": 66.9,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "madrid",
+        "madrid, spain"
+      ]
     },
     {
       "city": "Rome",
       "country": "Italy",
       "lat": 41.9028,
       "lon": 12.4964,
-      "costOfLivingIndex": 71.4
+      "costOfLivingIndex": 71.4,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "rome",
+        "rome, italy"
+      ]
     },
     {
       "city": "Milan",
       "country": "Italy",
       "lat": 45.4642,
-      "lon": 9.1900,
-      "costOfLivingIndex": 75.3
+      "lon": 9.19,
+      "costOfLivingIndex": 75.3,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "milan",
+        "milan, italy"
+      ]
     },
     {
       "city": "Lisbon",
       "country": "Portugal",
       "lat": 38.7223,
       "lon": -9.1393,
-      "costOfLivingIndex": 60.8
+      "costOfLivingIndex": 60.8,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "lisbon",
+        "lisbon, portugal"
+      ]
     },
     {
       "city": "Prague",
       "country": "Czech Republic",
       "lat": 50.0755,
       "lon": 14.4378,
-      "costOfLivingIndex": 56.2
+      "costOfLivingIndex": 56.2,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "prague",
+        "prague, czech republic"
+      ]
     },
     {
       "city": "Budapest",
       "country": "Hungary",
       "lat": 47.4979,
       "lon": 19.0402,
-      "costOfLivingIndex": 50.3
+      "costOfLivingIndex": 50.3,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "budapest",
+        "budapest, hungary"
+      ]
     },
     {
       "city": "Warsaw",
       "country": "Poland",
       "lat": 52.2297,
       "lon": 21.0122,
-      "costOfLivingIndex": 52.7
+      "costOfLivingIndex": 52.7,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "warsaw",
+        "warsaw, poland"
+      ]
     },
     {
       "city": "Zurich",
       "country": "Switzerland",
       "lat": 47.3769,
       "lon": 8.5417,
-      "costOfLivingIndex": 126.4
+      "costOfLivingIndex": 126.4,
+      "geopoliticalRisk": 1,
+      "searchAliases": [
+        "zurich",
+        "zurich, switzerland"
+      ]
     },
     {
       "city": "Geneva",
       "country": "Switzerland",
       "lat": 46.2044,
       "lon": 6.1432,
-      "costOfLivingIndex": 122.8
+      "costOfLivingIndex": 122.8,
+      "geopoliticalRisk": 1,
+      "searchAliases": [
+        "geneva",
+        "geneva, switzerland"
+      ]
     },
     {
       "city": "Dublin",
       "country": "Ireland",
       "lat": 53.3498,
       "lon": -6.2603,
-      "costOfLivingIndex": 88.9
+      "costOfLivingIndex": 88.9,
+      "geopoliticalRisk": 1,
+      "searchAliases": [
+        "dublin",
+        "dublin, ireland"
+      ]
     },
     {
       "city": "Stockholm",
       "country": "Sweden",
       "lat": 59.3293,
       "lon": 18.0686,
-      "costOfLivingIndex": 81.5
+      "costOfLivingIndex": 81.5,
+      "geopoliticalRisk": 1,
+      "searchAliases": [
+        "stockholm",
+        "stockholm, sweden"
+      ]
     },
     {
       "city": "Copenhagen",
       "country": "Denmark",
       "lat": 55.6761,
       "lon": 12.5683,
-      "costOfLivingIndex": 92.4
+      "costOfLivingIndex": 92.4,
+      "geopoliticalRisk": 1,
+      "searchAliases": [
+        "copenhagen",
+        "copenhagen, denmark"
+      ]
     },
     {
       "city": "Oslo",
       "country": "Norway",
       "lat": 59.9139,
       "lon": 10.7522,
-      "costOfLivingIndex": 95.6
+      "costOfLivingIndex": 95.6,
+      "geopoliticalRisk": 1,
+      "searchAliases": [
+        "oslo",
+        "oslo, norway"
+      ]
     },
     {
       "city": "Tokyo",
       "country": "Japan",
       "lat": 35.6762,
       "lon": 139.6503,
-      "costOfLivingIndex": 83.4
+      "costOfLivingIndex": 83.4,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "tokyo",
+        "tokyo, japan"
+      ]
     },
     {
       "city": "Osaka",
       "country": "Japan",
       "lat": 34.6937,
       "lon": 135.5023,
-      "costOfLivingIndex": 76.8
+      "costOfLivingIndex": 76.8,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "osaka",
+        "osaka, japan"
+      ]
     },
     {
       "city": "Seoul",
       "country": "South Korea",
       "lat": 37.5665,
-      "lon": 126.9780,
-      "costOfLivingIndex": 82.3
+      "lon": 126.978,
+      "costOfLivingIndex": 82.3,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "seoul",
+        "seoul, south korea"
+      ]
     },
     {
       "city": "Singapore",
       "country": "Singapore",
       "lat": 1.3521,
       "lon": 103.8198,
-      "costOfLivingIndex": 95.2
+      "costOfLivingIndex": 95.2,
+      "geopoliticalRisk": 1,
+      "searchAliases": [
+        "singapore",
+        "singapore, singapore"
+      ]
     },
     {
       "city": "Hong Kong",
       "country": "Hong Kong",
       "lat": 22.3193,
       "lon": 114.1694,
-      "costOfLivingIndex": 98.7
+      "costOfLivingIndex": 98.7,
+      "geopoliticalRisk": 4,
+      "searchAliases": [
+        "hong kong",
+        "hong kong, hong kong"
+      ]
     },
     {
       "city": "Sydney",
       "country": "Australia",
       "lat": -33.8688,
       "lon": 151.2093,
-      "costOfLivingIndex": 87.9
+      "costOfLivingIndex": 87.9,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "sydney",
+        "sydney, australia"
+      ]
     },
     {
       "city": "Melbourne",
       "country": "Australia",
       "lat": -37.8136,
       "lon": 144.9631,
-      "costOfLivingIndex": 82.6
+      "costOfLivingIndex": 82.6,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "melbourne",
+        "melbourne, australia"
+      ]
     },
     {
       "city": "Toronto",
       "country": "Canada",
       "lat": 43.6532,
       "lon": -79.3832,
-      "costOfLivingIndex": 76.4
+      "costOfLivingIndex": 76.4,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "toronto",
+        "toronto, canada"
+      ]
     },
     {
       "city": "Vancouver",
       "country": "Canada",
       "lat": 49.2827,
       "lon": -123.1207,
-      "costOfLivingIndex": 79.8
+      "costOfLivingIndex": 79.8,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "vancouver",
+        "vancouver, canada"
+      ]
     },
     {
       "city": "Montreal",
       "country": "Canada",
       "lat": 45.5017,
       "lon": -73.5673,
-      "costOfLivingIndex": 68.3
+      "costOfLivingIndex": 68.3,
+      "geopoliticalRisk": 2,
+      "searchAliases": [
+        "montreal",
+        "montreal, canada"
+      ]
     },
     {
       "city": "Mexico City",
       "country": "Mexico",
       "lat": 19.4326,
       "lon": -99.1332,
-      "costOfLivingIndex": 44.7
+      "costOfLivingIndex": 44.7,
+      "geopoliticalRisk": 5,
+      "searchAliases": [
+        "mexico city",
+        "mexico city, mexico"
+      ]
     },
     {
       "city": "Buenos Aires",
       "country": "Argentina",
       "lat": -34.6037,
       "lon": -58.3816,
-      "costOfLivingIndex": 38.2
+      "costOfLivingIndex": 38.2,
+      "geopoliticalRisk": 7,
+      "searchAliases": [
+        "buenos aires",
+        "buenos aires, argentina"
+      ]
     },
     {
-      "city": "São Paulo",
+      "city": "S\u00e3o Paulo",
       "country": "Brazil",
       "lat": -23.5505,
       "lon": -46.6333,
-      "costOfLivingIndex": 42.8
+      "costOfLivingIndex": 42.8,
+      "geopoliticalRisk": 6,
+      "searchAliases": [
+        "s\u00e3o paulo",
+        "s\u00e3o paulo, brazil"
+      ]
     },
     {
       "city": "Rio de Janeiro",
       "country": "Brazil",
       "lat": -22.9068,
       "lon": -43.1729,
-      "costOfLivingIndex": 41.5
+      "costOfLivingIndex": 41.5,
+      "geopoliticalRisk": 6,
+      "searchAliases": [
+        "rio de janeiro",
+        "rio de janeiro, brazil"
+      ]
     },
     {
-      "city": "Bogotá",
+      "city": "Bogot\u00e1",
       "country": "Colombia",
-      "lat": 4.7110,
+      "lat": 4.711,
       "lon": -74.0721,
-      "costOfLivingIndex": 35.6
+      "costOfLivingIndex": 35.6,
+      "geopoliticalRisk": 6,
+      "searchAliases": [
+        "bogot\u00e1",
+        "bogot\u00e1, colombia"
+      ]
     },
     {
       "city": "Lima",
       "country": "Peru",
       "lat": -12.0464,
       "lon": -77.0428,
-      "costOfLivingIndex": 39.4
+      "costOfLivingIndex": 39.4,
+      "geopoliticalRisk": 5,
+      "searchAliases": [
+        "lima",
+        "lima, peru"
+      ]
     },
     {
       "city": "Santiago",
       "country": "Chile",
       "lat": -33.4489,
       "lon": -70.6693,
-      "costOfLivingIndex": 48.9
+      "costOfLivingIndex": 48.9,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "santiago",
+        "santiago, chile"
+      ]
     },
     {
       "city": "Dubai",
       "country": "UAE",
       "lat": 25.2048,
       "lon": 55.2708,
-      "costOfLivingIndex": 76.5
+      "costOfLivingIndex": 76.5,
+      "geopoliticalRisk": 4,
+      "searchAliases": [
+        "dubai",
+        "dubai, uae"
+      ]
     },
     {
       "city": "Tel Aviv",
       "country": "Israel",
       "lat": 32.0853,
       "lon": 34.7818,
-      "costOfLivingIndex": 95.8
+      "costOfLivingIndex": 95.8,
+      "geopoliticalRisk": 6,
+      "searchAliases": [
+        "tel aviv",
+        "tel aviv, israel"
+      ]
     },
     {
       "city": "Istanbul",
       "country": "Turkey",
       "lat": 41.0082,
       "lon": 28.9784,
-      "costOfLivingIndex": 37.9
+      "costOfLivingIndex": 37.9,
+      "geopoliticalRisk": 7,
+      "searchAliases": [
+        "istanbul",
+        "istanbul, turkey"
+      ]
     },
     {
       "city": "Bangkok",
       "country": "Thailand",
       "lat": 13.7563,
       "lon": 100.5018,
-      "costOfLivingIndex": 42.3
+      "costOfLivingIndex": 42.3,
+      "geopoliticalRisk": 4,
+      "searchAliases": [
+        "bangkok",
+        "bangkok, thailand"
+      ]
     },
     {
       "city": "Ho Chi Minh City",
       "country": "Vietnam",
       "lat": 10.8231,
       "lon": 106.6297,
-      "costOfLivingIndex": 38.5
+      "costOfLivingIndex": 38.5,
+      "geopoliticalRisk": 5,
+      "searchAliases": [
+        "ho chi minh city",
+        "ho chi minh city, vietnam"
+      ]
     },
     {
       "city": "Hanoi",
       "country": "Vietnam",
       "lat": 21.0285,
       "lon": 105.8542,
-      "costOfLivingIndex": 36.8
+      "costOfLivingIndex": 36.8,
+      "geopoliticalRisk": 5,
+      "searchAliases": [
+        "hanoi",
+        "hanoi, vietnam"
+      ]
     },
     {
       "city": "Kuala Lumpur",
       "country": "Malaysia",
-      "lat": 3.1390,
+      "lat": 3.139,
       "lon": 101.6869,
-      "costOfLivingIndex": 39.2
+      "costOfLivingIndex": 39.2,
+      "geopoliticalRisk": 3,
+      "searchAliases": [
+        "kuala lumpur",
+        "kuala lumpur, malaysia"
+      ]
     },
     {
       "city": "Manila",
       "country": "Philippines",
       "lat": 14.5995,
       "lon": 120.9842,
-      "costOfLivingIndex": 41.6
+      "costOfLivingIndex": 41.6,
+      "geopoliticalRisk": 5,
+      "searchAliases": [
+        "manila",
+        "manila, philippines"
+      ]
     },
     {
       "city": "Jakarta",
       "country": "Indonesia",
       "lat": -6.2088,
       "lon": 106.8456,
-      "costOfLivingIndex": 40.7
+      "costOfLivingIndex": 40.7,
+      "geopoliticalRisk": 5,
+      "searchAliases": [
+        "jakarta",
+        "jakarta, indonesia"
+      ]
     },
     {
       "city": "Beijing",
       "country": "China",
       "lat": 39.9042,
       "lon": 116.4074,
-      "costOfLivingIndex": 54.8
+      "costOfLivingIndex": 54.8,
+      "geopoliticalRisk": 5,
+      "searchAliases": [
+        "beijing",
+        "beijing, china"
+      ]
     },
     {
       "city": "Shanghai",
       "country": "China",
       "lat": 31.2304,
       "lon": 121.4737,
-      "costOfLivingIndex": 59.3
+      "costOfLivingIndex": 59.3,
+      "geopoliticalRisk": 5,
+      "searchAliases": [
+        "shanghai",
+        "shanghai, china"
+      ]
     },
     {
       "city": "Mumbai",
       "country": "India",
-      "lat": 19.0760,
+      "lat": 19.076,
       "lon": 72.8777,
-      "costOfLivingIndex": 32.4
+      "costOfLivingIndex": 32.4,
+      "geopoliticalRisk": 5,
+      "searchAliases": [
+        "mumbai",
+        "mumbai, india"
+      ]
     },
     {
       "city": "Bangalore",
       "country": "India",
       "lat": 12.9716,
       "lon": 77.5946,
-      "costOfLivingIndex": 28.9
+      "costOfLivingIndex": 28.9,
+      "geopoliticalRisk": 5,
+      "searchAliases": [
+        "bangalore",
+        "bangalore, india"
+      ]
     },
     {
       "city": "Delhi",
       "country": "India",
       "lat": 28.7041,
       "lon": 77.1025,
-      "costOfLivingIndex": 27.6
+      "costOfLivingIndex": 27.6,
+      "geopoliticalRisk": 5,
+      "searchAliases": [
+        "delhi",
+        "delhi, india"
+      ]
     },
     {
       "city": "Cape Town",
       "country": "South Africa",
       "lat": -33.9249,
       "lon": 18.4241,
-      "costOfLivingIndex": 45.3
+      "costOfLivingIndex": 45.3,
+      "geopoliticalRisk": 6,
+      "searchAliases": [
+        "cape town",
+        "cape town, south africa"
+      ]
     },
     {
       "city": "Johannesburg",
       "country": "South Africa",
       "lat": -26.2041,
       "lon": 28.0473,
-      "costOfLivingIndex": 43.8
+      "costOfLivingIndex": 43.8,
+      "geopoliticalRisk": 6,
+      "searchAliases": [
+        "johannesburg",
+        "johannesburg, south africa"
+      ]
     },
     {
       "city": "Nairobi",
       "country": "Kenya",
       "lat": -1.2921,
       "lon": 36.8219,
-      "costOfLivingIndex": 41.2
+      "costOfLivingIndex": 41.2,
+      "geopoliticalRisk": 6,
+      "searchAliases": [
+        "nairobi",
+        "nairobi, kenya"
+      ]
     },
     {
       "city": "Cairo",
       "country": "Egypt",
       "lat": 30.0444,
       "lon": 31.2357,
-      "costOfLivingIndex": 29.8
+      "costOfLivingIndex": 29.8,
+      "geopoliticalRisk": 7,
+      "searchAliases": [
+        "cairo",
+        "cairo, egypt"
+      ]
     }
   ]
 }
