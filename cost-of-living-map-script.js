@@ -40,25 +40,59 @@ async function loadVisaData() {
     }
 }
 
-// Populate passport dropdown (works for both multi-select and custom implementations)
+// Populate passport checkboxes
 function populatePassportDropdown(passports) {
-    const passportSelect = document.getElementById('passports');
-    if (!passportSelect) return;
+    const passportContainer = document.getElementById('passportCheckboxes');
+    const countDisplay = document.getElementById('passportCount');
 
-    passports.forEach(passport => {
-        const option = document.createElement('option');
-        option.value = passport;
-        option.textContent = passport;
-        passportSelect.appendChild(option);
-    });
+    if (!passportContainer) return;
 
-    // Handle multi-select changes
-    passportSelect.addEventListener('change', () => {
-        selectedPassports.clear();
-        Array.from(passportSelect.selectedOptions).forEach(option => {
-            selectedPassports.add(option.value);
+    // Create checkbox for each passport
+    passports.forEach((passport, index) => {
+        const checkboxItem = document.createElement('div');
+        checkboxItem.className = 'passport-checkbox-item';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `passport-${index}`;
+        checkbox.value = passport;
+
+        const label = document.createElement('label');
+        label.htmlFor = `passport-${index}`;
+        label.textContent = passport;
+
+        checkboxItem.appendChild(checkbox);
+        checkboxItem.appendChild(label);
+        passportContainer.appendChild(checkboxItem);
+
+        // Handle checkbox changes
+        checkbox.addEventListener('change', () => {
+            if (checkbox.checked) {
+                selectedPassports.add(passport);
+            } else {
+                selectedPassports.delete(passport);
+            }
+            updatePassportCount();
+        });
+
+        // Also allow clicking the whole item to toggle
+        checkboxItem.addEventListener('click', (e) => {
+            if (e.target !== checkbox) {
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change'));
+            }
         });
     });
+
+    // Update selected count display
+    function updatePassportCount() {
+        const count = selectedPassports.size;
+        if (countDisplay) {
+            countDisplay.textContent = count === 0 ? '0 selected' :
+                                       count === 1 ? '1 selected' :
+                                       `${count} selected`;
+        }
+    }
 }
 
 // Setup autocomplete for city search
