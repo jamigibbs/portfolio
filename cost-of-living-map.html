@@ -121,34 +121,80 @@
             font-weight: 600;
         }
 
-        .passport-checkboxes {
-            max-height: 200px;
-            overflow-y: auto;
+        .passport-selector {
             background: #252525;
             border: 2px solid #3a3a3a;
             border-radius: 8px;
-            padding: 12px;
+            overflow: hidden;
+        }
+
+        .passport-search {
+            width: 100%;
+            padding: 10px 12px;
+            border: none;
+            border-bottom: 1px solid #3a3a3a;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 0.9em;
+        }
+
+        .passport-search:focus {
+            outline: none;
+            background: #2d2d2d;
+        }
+
+        .passport-search::placeholder {
+            color: #888;
+        }
+
+        .passport-checkboxes {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 8px;
         }
 
         .passport-checkbox-item {
             display: flex;
             align-items: center;
-            padding: 8px;
-            margin-bottom: 6px;
-            border-radius: 6px;
+            padding: 10px 8px;
+            margin-bottom: 2px;
+            border-radius: 4px;
             cursor: pointer;
             transition: background 0.2s;
         }
 
         .passport-checkbox-item:hover {
-            background: #2a2a2a;
+            background: #2d2d2d;
         }
 
         .passport-checkbox-item input[type="checkbox"] {
-            width: auto;
-            margin-right: 10px;
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #555;
+            border-radius: 4px;
+            margin-right: 12px;
             cursor: pointer;
-            accent-color: #00d4ff;
+            position: relative;
+            background: #1e1e1e;
+            flex-shrink: 0;
+        }
+
+        .passport-checkbox-item input[type="checkbox"]:checked {
+            background: #2196F3;
+            border-color: #2196F3;
+        }
+
+        .passport-checkbox-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .passport-checkbox-item label {
@@ -158,19 +204,28 @@
             font-size: 0.9em;
             text-transform: none;
             letter-spacing: normal;
-            color: #fff;
+            color: #ddd;
             font-weight: 400;
+            user-select: none;
         }
 
         .passport-checkbox-item input[type="checkbox"]:checked + label {
-            color: #00d4ff;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .passport-select-all {
+            padding: 10px 8px;
+            border-bottom: 1px solid #3a3a3a;
+            background: #2a2a2a;
             font-weight: 600;
         }
 
         .passport-selected-count {
-            font-size: 0.8em;
+            font-size: 0.85em;
             color: #00d4ff;
             margin-top: 8px;
+            padding: 8px 0;
         }
 
         .autocomplete-container {
@@ -395,8 +450,15 @@
 
             <div class="form-group">
                 <label>Your Passports</label>
-                <div class="passport-checkboxes" id="passportCheckboxes">
-                    <!-- Checkboxes will be populated by JavaScript -->
+                <div class="passport-selector">
+                    <input type="text" class="passport-search" id="passportSearch" placeholder="Search passports...">
+                    <div class="passport-select-all passport-checkbox-item">
+                        <input type="checkbox" id="selectAllPassports">
+                        <label for="selectAllPassports">Select All</label>
+                    </div>
+                    <div class="passport-checkboxes" id="passportCheckboxes">
+                        <!-- Checkboxes will be populated by JavaScript -->
+                    </div>
                 </div>
                 <div class="passport-selected-count" id="passportCount">0 selected</div>
             </div>
