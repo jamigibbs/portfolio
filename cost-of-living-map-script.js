@@ -96,17 +96,39 @@ function populatePassportDropdown(passports) {
     // Search functionality
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
+            const searchTerm = e.target.value.toLowerCase().trim();
             const items = passportContainer.querySelectorAll('.passport-checkbox-item');
 
             items.forEach(item => {
                 const passportName = item.dataset.passport;
-                if (passportName.includes(searchTerm)) {
-                    item.style.display = 'flex';
+
+                // Check if search term matches
+                // Support partial matches and common abbreviations
+                let matches = false;
+
+                if (searchTerm === '') {
+                    // Show all if search is empty
+                    matches = true;
+                } else if (passportName.includes(searchTerm)) {
+                    // Direct substring match
+                    matches = true;
                 } else {
-                    item.style.display = 'none';
+                    // Check if each word in passport name starts with search term
+                    const words = passportName.split(' ');
+                    matches = words.some(word => word.startsWith(searchTerm));
+
+                    // Check if initials match (e.g., "uk" matches "United Kingdom")
+                    if (!matches && searchTerm.length <= 4) {
+                        const initials = words.map(w => w[0]).join('');
+                        matches = initials === searchTerm;
+                    }
                 }
+
+                item.style.display = matches ? 'flex' : 'none';
             });
+
+            // Update select all state after filtering
+            updateSelectAllState();
         });
     }
 
