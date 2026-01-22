@@ -351,16 +351,24 @@ function getVisaInfo(city) {
 
     const visaInfoList = [];
     selectedPassports.forEach(passport => {
-        const countryVisa = visaData.visaRequirements?.[passport]?.[city.country];
+        const passportData = visaData.visaRequirements?.[passport];
+
+        if (!passportData) {
+            // No data for this passport - skip it
+            return;
+        }
+
+        const countryVisa = passportData[city.country];
         if (countryVisa) {
             visaInfoList.push({
                 passport: passport,
                 ...countryVisa
             });
         }
+        // If no data for this destination, simply don't add it (clean UX)
     });
 
-    return visaInfoList;
+    return visaInfoList.length > 0 ? visaInfoList : null;
 }
 
 // Format visa badge
