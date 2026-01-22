@@ -44,18 +44,24 @@ async function loadVisaData() {
 function populatePassportDropdown(passports) {
     const passportContainer = document.getElementById('passportCheckboxes');
     const countDisplay = document.getElementById('passportCount');
+    const searchInput = document.getElementById('passportSearch');
+    const selectAllCheckbox = document.getElementById('selectAllPassports');
 
     if (!passportContainer) return;
+
+    let allCheckboxes = [];
 
     // Create checkbox for each passport
     passports.forEach((passport, index) => {
         const checkboxItem = document.createElement('div');
         checkboxItem.className = 'passport-checkbox-item';
+        checkboxItem.dataset.passport = passport.toLowerCase();
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.id = `passport-${index}`;
         checkbox.value = passport;
+        checkbox.className = 'passport-checkbox';
 
         const label = document.createElement('label');
         label.htmlFor = `passport-${index}`;
@@ -65,6 +71,8 @@ function populatePassportDropdown(passports) {
         checkboxItem.appendChild(label);
         passportContainer.appendChild(checkboxItem);
 
+        allCheckboxes.push(checkbox);
+
         // Handle checkbox changes
         checkbox.addEventListener('change', () => {
             if (checkbox.checked) {
@@ -73,16 +81,54 @@ function populatePassportDropdown(passports) {
                 selectedPassports.delete(passport);
             }
             updatePassportCount();
+            updateSelectAllState();
         });
 
         // Also allow clicking the whole item to toggle
         checkboxItem.addEventListener('click', (e) => {
-            if (e.target !== checkbox) {
+            if (e.target !== checkbox && e.target !== label) {
                 checkbox.checked = !checkbox.checked;
                 checkbox.dispatchEvent(new Event('change'));
             }
         });
     });
+
+    // Search functionality
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const items = passportContainer.querySelectorAll('.passport-checkbox-item');
+
+            items.forEach(item => {
+                const passportName = item.dataset.passport;
+                if (passportName.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Select All functionality
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', () => {
+            const visibleCheckboxes = Array.from(allCheckboxes).filter(cb => {
+                return cb.parentElement.style.display !== 'none';
+            });
+
+            visibleCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+                const passport = checkbox.value;
+                if (selectAllCheckbox.checked) {
+                    selectedPassports.add(passport);
+                } else {
+                    selectedPassports.delete(passport);
+                }
+            });
+            updatePassportCount();
+        });
+    }
 
     // Update selected count display
     function updatePassportCount() {
@@ -91,6 +137,18 @@ function populatePassportDropdown(passports) {
             countDisplay.textContent = count === 0 ? '0 selected' :
                                        count === 1 ? '1 selected' :
                                        `${count} selected`;
+        }
+    }
+
+    // Update select all checkbox state
+    function updateSelectAllState() {
+        if (selectAllCheckbox) {
+            const visibleCheckboxes = Array.from(allCheckboxes).filter(cb => {
+                return cb.parentElement.style.display !== 'none';
+            });
+            const checkedVisible = visibleCheckboxes.filter(cb => cb.checked);
+            selectAllCheckbox.checked = visibleCheckboxes.length > 0 &&
+                                       checkedVisible.length === visibleCheckboxes.length;
         }
     }
 }
