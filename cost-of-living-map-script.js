@@ -180,7 +180,12 @@ function populatePassportDropdown(passports) {
 // Toggle step sections (for collapsible steps)
 function toggleStep(stepId) {
     const step = document.getElementById(stepId);
-    if (!step) return;
+    if (!step) {
+        console.error('Step not found:', stepId);
+        return;
+    }
+
+    console.log('Toggling step:', stepId, 'Current classes:', step.className);
 
     if (step.classList.contains('expanded')) {
         step.classList.remove('expanded');
@@ -189,6 +194,8 @@ function toggleStep(stepId) {
         step.classList.remove('collapsed');
         step.classList.add('expanded');
     }
+
+    console.log('After toggle, classes:', step.className);
 }
 
 // Apply passport filter
