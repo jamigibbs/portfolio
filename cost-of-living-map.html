@@ -306,6 +306,166 @@
             line-height: 1.5;
         }
 
+        /* Progressive disclosure sections */
+        .step-section {
+            margin-bottom: 25px;
+            border: 2px solid #3a3a3a;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #252525;
+        }
+
+        .step-header {
+            padding: 18px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #2a2a2a;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .step-header:hover {
+            background: #2d2d2d;
+        }
+
+        .step-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4ff 0%, #0096ff 100%);
+            color: #1e1e1e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1em;
+            flex-shrink: 0;
+        }
+
+        .step-title-group {
+            flex: 1;
+        }
+
+        .step-title {
+            font-size: 1.05em;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 3px;
+        }
+
+        .step-description {
+            font-size: 0.8em;
+            color: #999;
+            line-height: 1.3;
+        }
+
+        .step-toggle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #3a3a3a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: #00d4ff;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .step-section.collapsed .step-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .step-section.active .step-header {
+            background: rgba(0, 212, 255, 0.08);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .step-section.active .step-number {
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        }
+
+        .step-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            background: #00d4ff;
+            color: #1e1e1e;
+            margin-left: 8px;
+        }
+
+        .step-content {
+            padding: 20px;
+            display: none;
+        }
+
+        .step-section.expanded .step-content {
+            display: block;
+        }
+
+        .step-section.always-on .step-content {
+            display: block;
+        }
+
+        .step-section.always-on .step-toggle {
+            display: none;
+        }
+
+        .step-section.always-on .step-header {
+            cursor: default;
+            background: rgba(0, 212, 255, 0.08);
+        }
+
+        .step-explainer {
+            font-size: 0.85em;
+            color: #aaa;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #2a2a2a;
+            border-radius: 6px;
+            border-left: 3px solid #00d4ff;
+        }
+
+        .city-count-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4CAF50;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #4CAF50;
+            margin-top: 15px;
+        }
+
+        .filter-active-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background: rgba(0, 212, 255, 0.15);
+            border: 1px solid #00d4ff;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: #00d4ff;
+        }
+
         .legend {
             margin-top: 25px;
             padding-top: 20px;
@@ -435,50 +595,120 @@
                 </div>
             </header>
 
-            <div class="form-group">
-                <label for="homeCity">Home City</label>
-                <div class="autocomplete-container">
-                    <input type="text" id="homeCity" placeholder="Search for your city...">
-                    <div class="autocomplete-results" id="homeCityResults"></div>
+            <!-- STEP 1: Cost of Living (Always On) -->
+            <div class="step-section always-on active expanded" id="step1">
+                <div class="step-header">
+                    <div class="step-header-left">
+                        <div class="step-number">1</div>
+                        <div class="step-title-group">
+                            <div class="step-title">Cost of Living Comparison</div>
+                            <div class="step-description">Compare your budget across cities worldwide</div>
+                        </div>
+                    </div>
+                    <div class="step-toggle">▼</div>
+                </div>
+                <div class="step-content">
+                    <div class="step-explainer">
+                        See how far your budget goes in different cities. Green markers show cheaper cities, red shows more expensive.
+                    </div>
+                    <div class="form-group">
+                        <label for="homeCity">Home City</label>
+                        <div class="autocomplete-container">
+                            <input type="text" id="homeCity" placeholder="Search for your city...">
+                            <div class="autocomplete-results" id="homeCityResults"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="budget">Monthly Budget ($)</label>
+                        <input type="number" id="budget" placeholder="6000" min="0" step="100">
+                    </div>
+                    <button class="btn-primary" onclick="calculateAndDisplay()">Show All Cities</button>
+                    <div class="city-count-badge" id="cityCountBadge">
+                        <span>🌍</span>
+                        <span id="visibleCityCount">67 cities</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="budget">Monthly Budget ($)</label>
-                <input type="number" id="budget" placeholder="6000" min="0" step="100">
-            </div>
-
-            <div class="form-group">
-                <label>Your Passports</label>
-                <div class="passport-selector">
-                    <input type="text" class="passport-search" id="passportSearch" placeholder="Search passports...">
-                    <div class="passport-select-all passport-checkbox-item">
-                        <input type="checkbox" id="selectAllPassports">
-                        <label for="selectAllPassports">Select All</label>
+            <!-- STEP 2: Passport Filter (Optional) -->
+            <div class="step-section collapsed" id="step2">
+                <div class="step-header" onclick="toggleStep('step2')">
+                    <div class="step-header-left">
+                        <div class="step-number">2</div>
+                        <div class="step-title-group">
+                            <div class="step-title">
+                                Filter by Visa Access
+                                <span class="filter-active-indicator" id="passportFilterBadge" style="display: none;">
+                                    <span>✓</span>
+                                    <span>Active</span>
+                                </span>
+                            </div>
+                            <div class="step-description">Show only places you can visit with your passport(s)</div>
+                        </div>
                     </div>
-                    <div class="passport-checkboxes" id="passportCheckboxes">
-                        <!-- Checkboxes will be populated by JavaScript -->
-                    </div>
+                    <div class="step-toggle">▼</div>
                 </div>
-                <div class="passport-selected-count" id="passportCount">0 selected</div>
+                <div class="step-content">
+                    <div class="step-explainer">
+                        Select your passport(s) to filter cities by visa requirements. Markers will show visa types (visa-free, e-visa, etc.) and stay duration.
+                    </div>
+                    <div class="form-group">
+                        <label>Your Passports</label>
+                        <div class="passport-selector">
+                            <input type="text" class="passport-search" id="passportSearch" placeholder="Search passports...">
+                            <div class="passport-select-all passport-checkbox-item">
+                                <input type="checkbox" id="selectAllPassports">
+                                <label for="selectAllPassports">Select All</label>
+                            </div>
+                            <div class="passport-checkboxes" id="passportCheckboxes">
+                                <!-- Checkboxes will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="passport-selected-count" id="passportCount">0 selected</div>
+                    </div>
+                    <button class="btn-primary" onclick="applyPassportFilter()">Apply Passport Filter</button>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="savings">Savings Runway</label>
-                <select id="savings">
-                    <option value="">No savings</option>
-                    <option value="1000">$1,000</option>
-                    <option value="5000">$5,000</option>
-                    <option value="10000">$10,000</option>
-                    <option value="20000">$20,000</option>
-                    <option value="30000">$30,000</option>
-                    <option value="50000">$50,000</option>
-                    <option value="100000">$100,000</option>
-                    <option value="200000">$200,000</option>
-                </select>
+            <!-- STEP 3: Savings Runway (Optional) -->
+            <div class="step-section collapsed" id="step3">
+                <div class="step-header" onclick="toggleStep('step3')">
+                    <div class="step-header-left">
+                        <div class="step-number">3</div>
+                        <div class="step-title-group">
+                            <div class="step-title">
+                                Calculate Savings Runway
+                                <span class="filter-active-indicator" id="runwayFilterBadge" style="display: none;">
+                                    <span>✓</span>
+                                    <span>Active</span>
+                                </span>
+                            </div>
+                            <div class="step-description">See how long you can afford to live in each city</div>
+                        </div>
+                    </div>
+                    <div class="step-toggle">▼</div>
+                </div>
+                <div class="step-content">
+                    <div class="step-explainer">
+                        Enter your savings to see how many months you can afford to live in each city, factoring in visa duration limits.
+                    </div>
+                    <div class="form-group">
+                        <label for="savings">Total Savings ($)</label>
+                        <select id="savings">
+                            <option value="">Select amount</option>
+                            <option value="1000">$1,000</option>
+                            <option value="5000">$5,000</option>
+                            <option value="10000">$10,000</option>
+                            <option value="20000">$20,000</option>
+                            <option value="30000">$30,000</option>
+                            <option value="50000">$50,000</option>
+                            <option value="100000">$100,000</option>
+                            <option value="200000">$200,000</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" onclick="applyRunwayCalculation()">Calculate Runway</button>
+                </div>
             </div>
-
-            <button class="btn-primary" onclick="calculateAndDisplay()">Explore</button>
 
             <div class="info-box" id="infoBox" style="display: none;">
                 <p id="infoText"></p>

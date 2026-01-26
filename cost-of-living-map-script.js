@@ -4,6 +4,8 @@ let citiesData = [];
 let visaData = {};
 let selectedHomeCity = null;
 let selectedPassports = new Set();
+let passportFilterActive = false;
+let runwayCalculationActive = false;
 
 // Initialize the map
 function initMap() {
@@ -171,6 +173,64 @@ function populatePassportDropdown(passports) {
             const checkedVisible = visibleCheckboxes.filter(cb => cb.checked);
             selectAllCheckbox.checked = visibleCheckboxes.length > 0 &&
                                        checkedVisible.length === visibleCheckboxes.length;
+        }
+    }
+}
+
+// Toggle step sections (for collapsible steps)
+function toggleStep(stepId) {
+    const step = document.getElementById(stepId);
+    if (!step) return;
+
+    if (step.classList.contains('expanded')) {
+        step.classList.remove('expanded');
+        step.classList.add('collapsed');
+    } else {
+        step.classList.remove('collapsed');
+        step.classList.add('expanded');
+    }
+}
+
+// Apply passport filter
+function applyPassportFilter() {
+    if (selectedPassports.size === 0) {
+        alert('Please select at least one passport');
+        return;
+    }
+
+    passportFilterActive = true;
+    document.getElementById('passportFilterBadge').style.display = 'inline-flex';
+    document.getElementById('step2').classList.add('active');
+
+    // Re-render the map with filter active
+    calculateAndDisplay();
+}
+
+// Apply runway calculation
+function applyRunwayCalculation() {
+    const savings = parseFloat(document.getElementById('savings').value);
+
+    if (!savings || savings <= 0) {
+        alert('Please select a savings amount');
+        return;
+    }
+
+    runwayCalculationActive = true;
+    document.getElementById('runwayFilterBadge').style.display = 'inline-flex';
+    document.getElementById('step3').classList.add('active');
+
+    // Re-render the map with runway calculations
+    calculateAndDisplay();
+}
+
+// Update city count badge
+function updateCityCountBadge(visibleCount, totalCount) {
+    const badge = document.getElementById('visibleCityCount');
+    if (badge) {
+        if (visibleCount === totalCount) {
+            badge.textContent = `${totalCount} cities`;
+        } else {
+            badge.textContent = `${visibleCount} of ${totalCount} cities`;
         }
     }
 }
@@ -423,11 +483,11 @@ function calculateAndDisplay() {
     if (selectedHomeCity._isNearestMatch) {
         infoMsg = `⚠️ Using ${homeCityLabel} as nearest available data point (${selectedHomeCity._distance} km from your search). ` + infoMsg;
     }
-    if (savings > 0) {
+    if (runwayCalculationActive && savings > 0) {
         infoMsg += ` and $${savings.toLocaleString()} in savings`;
     }
-    if (selectedPassports.size > 0) {
-        infoMsg += `. Showing visa info for: ${Array.from(selectedPassports).join(', ')}`;
+    if (passportFilterActive && selectedPassports.size > 0) {
+        infoMsg += `. Filtering by: ${Array.from(selectedPassports).join(', ')}`;
     }
     infoText.textContent = infoMsg;
     infoBox.style.display = 'block';
@@ -435,8 +495,20 @@ function calculateAndDisplay() {
     // Center map on home city
     map.setView([selectedHomeCity.lat, selectedHomeCity.lon], 3);
 
-    // Add markers for all cities
-    citiesData.forEach(city => {
+    // Filter cities based on passport filter if active
+    let citiesToDisplay = citiesData;
+    if (passportFilterActive && selectedPassports.size > 0) {
+        citiesToDisplay = citiesData.filter(city => {
+            const visaInfo = getVisaInfo(city);
+            return visaInfo && visaInfo.length > 0;
+        });
+    }
+
+    // Update city count badge
+    updateCityCountBadge(citiesToDisplay.length, citiesData.length);
+
+    // Add markers for filtered cities
+    citiesToDisplay.forEach(city => {
         const percentDiff = ((city.costOfLivingIndex - selectedHomeCity.costOfLivingIndex) / selectedHomeCity.costOfLivingIndex) * 100;
         const equivalentBudget = (budget * city.costOfLivingIndex) / selectedHomeCity.costOfLivingIndex;
         const monthlySavings = budget - equivalentBudget;
@@ -492,9 +564,9 @@ function calculateAndDisplay() {
                 </div>
         `;
 
-        // Visa information
-        const visaInfo = getVisaInfo(city);
-        if (visaInfo && visaInfo.length > 0) {
+        // Visa information (only if passport filter is active)
+        const visaInfo = passportFilterActive ? getVisaInfo(city) : null;
+        if (passportFilterActive && visaInfo && visaInfo.length > 0) {
             popupHTML += `<div class="popup-section"><h4><span class="icon">🛂</span> Visa Information</h4>`;
             visaInfo.forEach(info => {
                 popupHTML += `
@@ -508,43 +580,42 @@ function calculateAndDisplay() {
             popupHTML += `</div>`;
         }
 
-        // Savings runway section (redesigned for better readability)
-        if (savings > 0 && visaInfo && visaInfo.length > 0) {
+        // Savings runway section (only if runway calculation is active)
+        if (runwayCalculationActive && savings > 0) {
             popupHTML += `<div class="popup-section"><h4><span class="icon">⏱️</span> Savings Runway</h4>`;
 
-            // For each passport, show the runway calculation
-            visaInfo.forEach(info => {
-                const visaType = info.category === 'visa-free' ? 'visa-free entry' :
-                                 info.category === 'visa-on-arrival' ? 'visa on arrival' :
-                                 info.category === 'e-visa' ? 'e-Visa' :
-                                 info.category === 'citizen' ? 'citizenship rights' :
-                                 info.category;
+            if (passportFilterActive && visaInfo && visaInfo.length > 0) {
+                // With passport filter: show runway per passport
+                visaInfo.forEach(info => {
+                    const visaType = info.category === 'visa-free' ? 'visa-free entry' :
+                                     info.category === 'visa-on-arrival' ? 'visa on arrival' :
+                                     info.category === 'e-visa' ? 'e-Visa' :
+                                     info.category === 'citizen' ? 'citizenship rights' :
+                                     info.category;
 
-                popupHTML += `
-                    <div style="background: #f0f9ff; padding: 12px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #0096ff;">
-                        <div style="font-size: 0.9em; color: #333; line-height: 1.6;">
-                            Based on your <strong>$${savings.toLocaleString()}</strong> savings, you can live here for
-                            <strong style="color: #4CAF50; font-size: 1.1em;">${runwayMonths} months</strong>
-                            with <strong>${visaType}</strong>, which is supported by your <strong>${info.passport}</strong> passport.
+                    popupHTML += `
+                        <div style="background: #f0f9ff; padding: 12px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #0096ff;">
+                            <div style="font-size: 0.9em; color: #333; line-height: 1.6;">
+                                Based on your <strong>$${savings.toLocaleString()}</strong> savings, you can live here for
+                                <strong style="color: #4CAF50; font-size: 1.1em;">${runwayMonths} months</strong>
+                                with <strong>${visaType}</strong>, which is supported by your <strong>${info.passport}</strong> passport.
+                            </div>
                         </div>
-                    </div>
-                `;
-            });
-
-            popupHTML += `</div>`;
-        } else if (savings > 0) {
-            // Show runway even without visa info
-            popupHTML += `
-                <div class="popup-section">
-                    <h4><span class="icon">⏱️</span> Savings Runway</h4>
+                    `;
+                });
+            } else {
+                // Without passport filter: show general runway
+                popupHTML += `
                     <div style="background: #f0f9ff; padding: 12px; border-radius: 6px; border-left: 3px solid #0096ff;">
                         <div style="font-size: 0.9em; color: #333; line-height: 1.6;">
                             Based on your <strong>$${savings.toLocaleString()}</strong> savings, you can live here for
                             <strong style="color: #4CAF50; font-size: 1.1em;">${runwayMonths} months</strong>.
                         </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
+
+            popupHTML += `</div>`;
         }
 
         popupHTML += `</div>`;
