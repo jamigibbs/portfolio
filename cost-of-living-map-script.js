@@ -569,10 +569,16 @@ function calculateAndDisplay() {
         if (passportFilterActive && visaInfo && visaInfo.length > 0) {
             popupHTML += `<div class="popup-section"><h4><span class="icon">🛂</span> Visa Information</h4>`;
             visaInfo.forEach(info => {
+                const workStatus = info.canWork !== undefined ?
+                    (info.canWork ? '✅ Remote work allowed' : '❌ No work on tourist visa') :
+                    '';
+
                 popupHTML += `
                     <div class="visa-info">
                         <strong>${info.passport}:</strong> ${getVisaBadge(info.category)}
-                        ${info.visaFree > 0 ? `<div style="margin-top: 4px; font-size: 0.85em;">Stay: ${info.visaFree} days visa-free</div>` : ''}
+                        ${info.visaFree > 0 ? `<div style="margin-top: 4px; font-size: 0.85em;">Stay: ${info.visaFree} days</div>` : ''}
+                        ${workStatus ? `<div style="margin-top: 4px; font-size: 0.85em; color: #666;">${workStatus}</div>` : ''}
+                        ${info.digitalNomadVisa ? `<div style="margin-top: 4px; font-size: 0.85em; color: #4CAF50;"><strong>Digital Nomad:</strong> ${info.digitalNomadVisa}</div>` : ''}
                         ${info.residencyPath ? `<div style="margin-top: 4px; font-size: 0.85em; color: #666;">Residency: ${info.residencyPath}</div>` : ''}
                     </div>
                 `;
@@ -593,12 +599,64 @@ function calculateAndDisplay() {
                                      info.category === 'citizen' ? 'citizenship rights' :
                                      info.category;
 
+                    // Calculate visa duration in months
+                    const visaDurationDays = info.visaFree || 0;
+                    const visaDurationMonths = (visaDurationDays / 30).toFixed(1);
+                    const affordableMonths = parseFloat(runwayMonths);
+                    const actualRunway = Math.min(affordableMonths, visaDurationMonths);
+                    const exceedsVisa = affordableMonths > visaDurationMonths && visaDurationDays > 0;
+
                     popupHTML += `
-                        <div style="background: #f0f9ff; padding: 12px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #0096ff;">
-                            <div style="font-size: 0.9em; color: #333; line-height: 1.6;">
-                                Based on your <strong>$${savings.toLocaleString()}</strong> savings, you can live here for
-                                <strong style="color: #4CAF50; font-size: 1.1em;">${runwayMonths} months</strong>
-                                with <strong>${visaType}</strong>, which is supported by your <strong>${info.passport}</strong> passport.
+                        <div style="background: #f0f9ff; padding: 14px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #0096ff;">
+                            <div style="font-size: 0.9em; color: #333; line-height: 1.7;">
+                                Based on your <strong>$${savings.toLocaleString()}</strong> savings, you can afford
+                                <strong style="color: #4CAF50; font-size: 1.1em;">${affordableMonths} months</strong> here.
+                    `;
+
+                    if (exceedsVisa) {
+                        popupHTML += `
+                                <div style="margin-top: 8px; padding: 8px; background: #fff3cd; border-radius: 4px; border-left: 3px solid #ff9800;">
+                                    ⚠️ Your <strong>${info.passport}</strong> passport allows <strong>${visaDurationDays} days (${visaDurationMonths} months)</strong> of ${visaType}.
+                                </div>
+                        `;
+                    } else {
+                        popupHTML += `
+                                <div style="margin-top: 6px;">
+                                    Your <strong>${info.passport}</strong> passport supports ${visaType} for up to ${visaDurationDays} days.
+                                </div>
+                        `;
+                    }
+
+                    // Digital nomad visa info
+                    if (info.digitalNomadVisa) {
+                        popupHTML += `
+                                <div style="margin-top: 8px; padding: 8px; background: #e8f5e9; border-radius: 4px; border-left: 3px solid #4CAF50;">
+                                    ✅ <strong>Digital Nomad Option:</strong> ${info.digitalNomadVisa}
+                                </div>
+                        `;
+                    }
+
+                    // Visa run possibility
+                    if (exceedsVisa && info.visaRunPossible) {
+                        popupHTML += `
+                                <div style="margin-top: 6px; font-size: 0.85em; color: #666;">
+                                    💡 Visa runs may be possible (exit and re-enter for another ${visaDurationDays} days)
+                                </div>
+                        `;
+                    }
+
+                    // Work permission
+                    const workStatus = info.canWork !== undefined ?
+                        (info.canWork ? '✅ Remote work allowed' : '❌ No work permission on tourist visa') :
+                        '❓ Work permission unclear';
+
+                    popupHTML += `
+                                <div style="margin-top: 6px; font-size: 0.85em; color: #666;">
+                                    ${workStatus}
+                                </div>
+                    `;
+
+                    popupHTML += `
                             </div>
                         </div>
                     `;
@@ -608,8 +666,11 @@ function calculateAndDisplay() {
                 popupHTML += `
                     <div style="background: #f0f9ff; padding: 12px; border-radius: 6px; border-left: 3px solid #0096ff;">
                         <div style="font-size: 0.9em; color: #333; line-height: 1.6;">
-                            Based on your <strong>$${savings.toLocaleString()}</strong> savings, you can live here for
+                            Based on your <strong>$${savings.toLocaleString()}</strong> savings, you can afford to live here for
                             <strong style="color: #4CAF50; font-size: 1.1em;">${runwayMonths} months</strong>.
+                            <div style="margin-top: 8px; font-size: 0.85em; color: #666;">
+                                💡 Enable passport filter to see visa duration limits and options
+                            </div>
                         </div>
                     </div>
                 `;
