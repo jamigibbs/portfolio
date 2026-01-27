@@ -7,6 +7,103 @@ let selectedPassports = new Set();
 let passportFilterActive = false;
 let runwayCalculationActive = false;
 
+// RapidAPI Configuration
+// ⚠️ WARNING: API key is exposed in client-side code. Anyone can view this in browser dev tools.
+// Consider implementing a backend proxy for production use.
+const RAPIDAPI_CONFIG = {
+    key: '2742336cd3msh55a5ee1c51ed74bp1f23b9jsn1e3bc3864364',
+    host: 'visa-requirement.p.rapidapi.com',
+    endpoint: 'https://visa-requirement.p.rapidapi.com/v2/visa/check'
+};
+
+// Visa data cache (in memory + localStorage)
+let visaCache = {};
+
+// Load visa cache from localStorage on startup
+function loadVisaCache() {
+    try {
+        const cached = localStorage.getItem('visaCache');
+        if (cached) {
+            visaCache = JSON.parse(cached);
+            console.log('Loaded visa cache with', Object.keys(visaCache).length, 'entries');
+        }
+    } catch (e) {
+        console.error('Error loading visa cache:', e);
+    }
+}
+
+// Save visa cache to localStorage
+function saveVisaCache() {
+    try {
+        localStorage.setItem('visaCache', JSON.stringify(visaCache));
+    } catch (e) {
+        console.error('Error saving visa cache:', e);
+    }
+}
+
+// Fetch visa data from RapidAPI
+async function fetchVisaFromAPI(passport, destination) {
+    const cacheKey = `${passport}:${destination}`;
+
+    // Check cache first
+    if (visaCache[cacheKey]) {
+        return visaCache[cacheKey];
+    }
+
+    try {
+        const response = await fetch(RAPIDAPI_CONFIG.endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-rapidapi-key': RAPIDAPI_CONFIG.key,
+                'x-rapidapi-host': RAPIDAPI_CONFIG.host
+            },
+            body: JSON.stringify({
+                passport: passport,
+                destination: destination
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Convert API response to our format
+        const visaInfo = {
+            visaFree: data.durationDays || 0,
+            category: convertVisaCategory(data.visaType || 'visa-required')
+        };
+
+        // Cache the result
+        visaCache[cacheKey] = visaInfo;
+        saveVisaCache();
+
+        return visaInfo;
+    } catch (error) {
+        console.error(`Error fetching visa data for ${passport} -> ${destination}:`, error);
+        return null;
+    }
+}
+
+// Convert API visa types to our categories
+function convertVisaCategory(apiType) {
+    const mapping = {
+        'visa-free': 'visa-free',
+        'visa free': 'visa-free',
+        'visa on arrival': 'visa-on-arrival',
+        'visa-on-arrival': 'visa-on-arrival',
+        'evisa': 'e-visa',
+        'e-visa': 'e-visa',
+        'eta': 'eTA',
+        'visa required': 'visa-required',
+        'visa-required': 'visa-required',
+        'no admission': 'no-admission'
+    };
+    return mapping[apiType.toLowerCase()] || 'visa-required';
+}
+
 // Initialize the map
 function initMap() {
     map = L.map('map').setView([20, 0], 2);
@@ -192,18 +289,92 @@ function toggleStep(stepId) {
 }
 
 // Apply passport filter
-function applyPassportFilter() {
+async function applyPassportFilter() {
     if (selectedPassports.size === 0) {
         alert('Please select at least one passport');
         return;
     }
 
-    passportFilterActive = true;
-    document.getElementById('passportFilterBadge').style.display = 'inline-flex';
-    document.getElementById('step2').classList.add('active');
+    // Show loading state
+    const button = event.target;
+    const originalText = button.textContent;
+    button.textContent = 'Fetching visa data...';
+    button.disabled = true;
 
-    // Re-render the map with filter active
-    calculateAndDisplay();
+    try {
+        // Pre-fetch visa data for all selected passports and cities
+        await prefetchVisaData();
+
+        passportFilterActive = true;
+        document.getElementById('passportFilterBadge').style.display = 'inline-flex';
+        document.getElementById('step2').classList.add('active');
+
+        // Re-render the map with filter active
+        calculateAndDisplay();
+    } catch (error) {
+        console.error('Error fetching visa data:', error);
+        alert('Error fetching visa data. Please try again.');
+    } finally {
+        button.textContent = originalText;
+        button.disabled = false;
+    }
+}
+
+// Pre-fetch visa data for selected passports and all cities
+async function prefetchVisaData() {
+    const passports = Array.from(selectedPassports);
+    const countries = [...new Set(citiesData.map(city => city.country))];
+
+    console.log(`Pre-fetching visa data for ${passports.length} passports × ${countries.length} countries...`);
+
+    // Fetch in batches to avoid overwhelming the API
+    const batchSize = 10;
+    let fetchCount = 0;
+
+    for (const passport of passports) {
+        // Check if we already have this data in our static JSON
+        if (!visaData.visaRequirements) {
+            visaData.visaRequirements = {};
+        }
+        if (!visaData.visaRequirements[passport]) {
+            visaData.visaRequirements[passport] = {};
+        }
+
+        for (let i = 0; i < countries.length; i += batchSize) {
+            const batch = countries.slice(i, i + batchSize);
+            const promises = batch.map(async country => {
+                // Skip if we already have data
+                if (visaData.visaRequirements[passport][country]) {
+                    return;
+                }
+
+                // Skip self (citizen)
+                if (passport === country) {
+                    visaData.visaRequirements[passport][country] = {
+                        visaFree: 0,
+                        category: 'citizen'
+                    };
+                    return;
+                }
+
+                // Fetch from API
+                const visaInfo = await fetchVisaFromAPI(passport, country);
+                if (visaInfo) {
+                    visaData.visaRequirements[passport][country] = visaInfo;
+                    fetchCount++;
+                }
+            });
+
+            await Promise.all(promises);
+
+            // Small delay between batches to respect rate limits
+            if (i + batchSize < countries.length) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+        }
+    }
+
+    console.log(`Fetched ${fetchCount} new visa requirements. Total cached: ${Object.keys(visaCache).length}`);
 }
 
 // Apply runway calculation
@@ -694,6 +865,7 @@ function calculateAndDisplay() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+    loadVisaCache();  // Load cached visa data from localStorage
     initMap();
     loadCitiesData();
     loadVisaData();

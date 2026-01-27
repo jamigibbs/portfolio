@@ -6,6 +6,7 @@
     <title>Where Can I Move? - Global Relocation Planner</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -656,10 +657,6 @@
                         <label>Your Passports</label>
                         <div class="passport-selector">
                             <input type="text" class="passport-search" id="passportSearch" placeholder="Search passports...">
-                            <div class="passport-select-all passport-checkbox-item">
-                                <input type="checkbox" id="selectAllPassports">
-                                <label for="selectAllPassports">Select All</label>
-                            </div>
                             <div class="passport-checkboxes" id="passportCheckboxes">
                                 <!-- Checkboxes will be populated by JavaScript -->
                             </div>
