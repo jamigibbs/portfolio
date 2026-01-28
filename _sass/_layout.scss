@@ -27,6 +27,65 @@
   }
 }
 
+// Tools Section
+.tools-section {
+  margin: 3em 0;
+  padding-top: 2em;
+  border-top: 1px solid #eee;
+
+  h2 {
+    margin-bottom: 0.5em;
+    font-size: 22px;
+  }
+
+  > p {
+    color: #666;
+    margin-bottom: 1.5em;
+  }
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5em;
+}
+
+.tool-card {
+  display: block;
+  padding: 1.5em;
+  background: #f9f9f9;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #eee;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+  }
+
+  .tool-icon {
+    font-size: 2.5em;
+    display: block;
+    margin-bottom: 0.5em;
+  }
+
+  h3 {
+    font-size: 1.1em;
+    margin-bottom: 0.5em;
+    color: #333;
+  }
+
+  p {
+    font-size: 0.9em;
+    color: #666;
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
 footer {
   margin: 2em 0;
   h2 {

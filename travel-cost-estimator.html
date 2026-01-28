@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Cost Estimator - Where Should I Go?</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #1e1e1e;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 400px;
+            min-width: 400px;
+            background: #2d2d2d;
+            padding: 24px;
+            overflow-y: auto;
+            border-right: 1px solid #404040;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #00d4ff 0%, #0096ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        /* Step sections */
+        .step-section {
+            background: #363636;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .step-header:hover {
+            background: #404040;
+        }
+
+        .step-number {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #00d4ff 0%, #0096ff 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            margin-right: 12px;
+            color: #fff;
+        }
+
+        .step-title {
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .step-toggle {
+            color: #888;
+            transition: transform 0.2s;
+        }
+
+        .step-section.collapsed .step-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .step-content {
+            padding: 0 16px 16px;
+        }
+
+        .step-section.collapsed .step-content {
+            display: none;
+        }
+
+        .step-section.always-on .step-header {
+            cursor: default;
+        }
+
+        .step-section.always-on .step-header:hover {
+            background: transparent;
+        }
+
+        /* Form elements */
+        label {
+            display: block;
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 6px;
+            margin-top: 12px;
+        }
+
+        label:first-child {
+            margin-top: 0;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 12px;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        /* Autocomplete dropdown */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .autocomplete-results.show {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .autocomplete-item:hover {
+            background: #404040;
+        }
+
+        /* Date type toggle */
+        .date-type-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .date-type-btn {
+            flex: 1;
+            padding: 10px;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            color: #888;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .date-type-btn.active {
+            background: linear-gradient(135deg, #00d4ff 0%, #0096ff 100%);
+            border-color: transparent;
+            color: #fff;
+        }
+
+        .date-fields {
+            display: none;
+        }
+
+        .date-fields.active {
+            display: block;
+        }
+
+        .date-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .date-row > div {
+            flex: 1;
+        }
+
+        /* Travel mode toggle */
+        .travel-mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .travel-mode-btn {
+            flex: 1;
+            padding: 12px;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            color: #888;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .travel-mode-btn.active {
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+
+        .travel-mode-btn:hover:not(.active) {
+            background: #404040;
+        }
+
+        /* Budget range */
+        .budget-inputs {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .budget-inputs input {
+            flex: 1;
+        }
+
+        .budget-separator {
+            color: #666;
+        }
+
+        /* Action button */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #00d4ff 0%, #0096ff 100%);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Info box */
+        .info-box {
+            background: rgba(0, 212, 255, 0.1);
+            border-left: 3px solid #00d4ff;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #aaa;
+            margin-top: 12px;
+        }
+
+        /* Results panel */
+        .results-panel {
+            background: #363636;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .results-panel.show {
+            display: block;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .results-title {
+            font-weight: 600;
+            color: #00d4ff;
+        }
+
+        .results-count {
+            background: #00d4ff;
+            color: #1e1e1e;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .alternative-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .alternative-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #2d2d2d;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .alternative-item:hover {
+            background: #404040;
+        }
+
+        .alternative-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .alternative-info {
+            flex: 1;
+        }
+
+        .alternative-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .alternative-details {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .alternative-price {
+            font-weight: 600;
+            color: #4CAF50;
+        }
+
+        /* Map container */
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Custom markers */
+        .custom-marker {
+            width: 50px;
+            height: 50px;
+            border: 3px solid;
+            border-radius: 50%;
+            background: rgba(30, 30, 30, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .marker-cheap {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+
+        .marker-moderate {
+            border-color: #FF9800;
+            color: #FF9800;
+        }
+
+        .marker-expensive {
+            border-color: #f44336;
+            color: #f44336;
+        }
+
+        .marker-budget-match {
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+
+        .marker-drive {
+            border-style: dashed;
+        }
+
+        .marker-price {
+            font-size: 12px;
+        }
+
+        .marker-type {
+            font-size: 9px;
+            opacity: 0.8;
+        }
+
+        /* Popup styles */
+        .leaflet-popup-content-wrapper {
+            background: #2d2d2d;
+            border-radius: 12px;
+            padding: 0;
+        }
+
+        .leaflet-popup-content {
+            margin: 0;
+            min-width: 280px;
+        }
+
+        .leaflet-popup-tip {
+            background: #2d2d2d;
+        }
+
+        .popup-content {
+            padding: 16px;
+            color: #fff;
+        }
+
+        .popup-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .popup-subheader {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .popup-section {
+            margin-bottom: 16px;
+        }
+
+        .popup-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .popup-section h4 {
+            font-size: 13px;
+            color: #00d4ff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .popup-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 4px 0;
+            border-bottom: 1px solid #404040;
+        }
+
+        .popup-row:last-child {
+            border-bottom: none;
+        }
+
+        .popup-row-label {
+            color: #888;
+        }
+
+        .popup-row-value {
+            font-weight: 600;
+        }
+
+        .popup-total {
+            background: linear-gradient(135deg, #00d4ff 0%, #0096ff 100%);
+            margin: 16px -16px -16px;
+            padding: 16px;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .popup-total-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .popup-total-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .popup-total-per-day {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Weather badge */
+        .weather-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #404040;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        /* Loading state */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(30, 30, 30, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #404040;
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 16px;
+            color: #888;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                min-width: 100%;
+                max-height: 50vh;
+                border-right: none;
+                border-bottom: 1px solid #404040;
+            }
+
+            .map-container {
+                height: 50vh;
+            }
+        }
+
+        /* Travelers input */
+        .travelers-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .travelers-row > div {
+            flex: 1;
+        }
+
+        /* Month selector for flexible dates */
+        .month-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .month-btn {
+            padding: 8px;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 6px;
+            color: #888;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .month-btn.active {
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+
+        .month-btn:hover:not(.active) {
+            background: #404040;
+        }
+
+        /* Link back */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #888;
+            text-decoration: none;
+            font-size: 13px;
+            margin-bottom: 16px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #00d4ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <a href="index.html" class="back-link">← Back to Home</a>
+            <h1 class="logo">✈️ Travel Cost Estimator</h1>
+            <p class="tagline">Find the perfect trip within your budget</p>
+
+            <!-- Step 1: Trip Details -->
+            <div class="step-section always-on" id="step1">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Trip Details</div>
+                </div>
+                <div class="step-content">
+                    <label>Where are you traveling from?</label>
+                    <div class="autocomplete-container">
+                        <input type="text" id="homeCity" placeholder="e.g., New York, NY">
+                        <div class="autocomplete-results" id="homeCityResults"></div>
+                    </div>
+
+                    <label>How many travelers?</label>
+                    <div class="travelers-row">
+                        <div>
+                            <input type="number" id="travelers" value="2" min="1" max="10">
+                        </div>
+                        <div>
+                            <select id="accommodationType">
+                                <option value="budget">Budget ($)</option>
+                                <option value="mid" selected>Mid-range ($$)</option>
+                                <option value="luxury">Luxury ($$$)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <label>Trip duration (nights)</label>
+                    <input type="number" id="tripDuration" value="7" min="1" max="30">
+
+                    <label>How do you want to travel?</label>
+                    <div class="travel-mode-toggle">
+                        <button class="travel-mode-btn active" data-mode="both" onclick="setTravelMode('both')">
+                            🚗✈️ Both
+                        </button>
+                        <button class="travel-mode-btn" data-mode="fly" onclick="setTravelMode('fly')">
+                            ✈️ Fly Only
+                        </button>
+                        <button class="travel-mode-btn" data-mode="drive" onclick="setTravelMode('drive')">
+                            🚗 Drive Only
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Dates -->
+            <div class="step-section always-on" id="step2">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">When do you want to go?</div>
+                </div>
+                <div class="step-content">
+                    <div class="date-type-toggle">
+                        <button class="date-type-btn active" onclick="setDateType('specific')">Specific Dates</button>
+                        <button class="date-type-btn" onclick="setDateType('flexible')">Flexible</button>
+                    </div>
+
+                    <div class="date-fields active" id="specificDates">
+                        <div class="date-row">
+                            <div>
+                                <label>Check-in</label>
+                                <input type="date" id="startDate">
+                            </div>
+                            <div>
+                                <label>Check-out</label>
+                                <input type="date" id="endDate">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="date-fields" id="flexibleDates">
+                        <label>Select months you're flexible with:</label>
+                        <div class="month-selector" id="monthSelector">
+                            <!-- Months will be populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Budget -->
+            <div class="step-section" id="step3">
+                <div class="step-header" onclick="toggleStep('step3')">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Budget (Optional)</div>
+                    <span class="step-toggle">▼</span>
+                </div>
+                <div class="step-content">
+                    <label>Total budget range (USD)</label>
+                    <div class="budget-inputs">
+                        <input type="number" id="budgetMin" placeholder="Min" value="">
+                        <span class="budget-separator">—</span>
+                        <input type="number" id="budgetMax" placeholder="Max" value="">
+                    </div>
+                    <div class="info-box">
+                        Leave empty to see all destinations. Set a budget to filter and find alternatives.
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="searchBtn" onclick="searchDestinations()">
+                🔍 Find Destinations
+            </button>
+
+            <!-- Results Panel -->
+            <div class="results-panel" id="resultsPanel">
+                <div class="results-header">
+                    <span class="results-title">Within Your Budget</span>
+                    <span class="results-count" id="resultsCount">0</span>
+                </div>
+                <div class="alternative-list" id="alternativeList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </aside>
+
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+                <div class="loading-text">Calculating travel costs...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="travel-cost-estimator-script.js"></script>
+</body>
+</html>
