@@ -11,7 +11,7 @@ let dateType = 'specific';
 let travelRadiusLayer = null; // For visualizing travel radius on map
 let homeMarker = null; // Marker for home city
 let selectedMonths = [];
-let maxTravelTime = 8; // hours
+let maxTravelTime = 3; // hours
 let hasSearched = false;
 let lastSearchBounds = null;
 
