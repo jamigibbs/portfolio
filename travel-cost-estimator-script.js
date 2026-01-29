@@ -561,6 +561,232 @@ async function fetchWikipediaImage(cityName, countryName) {
 }
 
 // ============================================
+// GEONAMES API - Dynamic City Discovery
+// Fetches cities within map bounds
+// ============================================
+
+// Default pricing by region (used for GeoNames cities without curated data)
+const REGION_PRICING = {
+    // North America
+    'US': { accommodation: { budget: 80, mid: 150, luxury: 350 }, activities: 50, food: 55, flightBase: 200 },
+    'CA': { accommodation: { budget: 70, mid: 140, luxury: 320 }, activities: 45, food: 50, flightBase: 250 },
+    'MX': { accommodation: { budget: 35, mid: 70, luxury: 180 }, activities: 30, food: 30, flightBase: 200 },
+    // Central America
+    'CR': { accommodation: { budget: 40, mid: 90, luxury: 220 }, activities: 50, food: 35, flightBase: 300 },
+    'PA': { accommodation: { budget: 45, mid: 100, luxury: 250 }, activities: 45, food: 35, flightBase: 280 },
+    'GT': { accommodation: { budget: 30, mid: 65, luxury: 160 }, activities: 35, food: 25, flightBase: 250 },
+    'BZ': { accommodation: { budget: 50, mid: 120, luxury: 300 }, activities: 60, food: 40, flightBase: 350 },
+    'HN': { accommodation: { budget: 30, mid: 60, luxury: 150 }, activities: 35, food: 25, flightBase: 300 },
+    'NI': { accommodation: { budget: 25, mid: 55, luxury: 140 }, activities: 30, food: 20, flightBase: 320 },
+    'SV': { accommodation: { budget: 30, mid: 60, luxury: 150 }, activities: 30, food: 25, flightBase: 300 },
+    // Caribbean
+    'CU': { accommodation: { budget: 35, mid: 80, luxury: 200 }, activities: 35, food: 30, flightBase: 280 },
+    'DO': { accommodation: { budget: 40, mid: 100, luxury: 280 }, activities: 45, food: 35, flightBase: 250 },
+    'JM': { accommodation: { budget: 50, mid: 120, luxury: 320 }, activities: 50, food: 45, flightBase: 280 },
+    'BS': { accommodation: { budget: 80, mid: 180, luxury: 450 }, activities: 60, food: 60, flightBase: 250 },
+    'PR': { accommodation: { budget: 70, mid: 150, luxury: 380 }, activities: 50, food: 50, flightBase: 150 },
+    'TT': { accommodation: { budget: 50, mid: 110, luxury: 280 }, activities: 45, food: 40, flightBase: 350 },
+    // South America
+    'BR': { accommodation: { budget: 40, mid: 100, luxury: 280 }, activities: 50, food: 40, flightBase: 500 },
+    'AR': { accommodation: { budget: 35, mid: 80, luxury: 200 }, activities: 40, food: 45, flightBase: 550 },
+    'CO': { accommodation: { budget: 30, mid: 70, luxury: 180 }, activities: 35, food: 30, flightBase: 250 },
+    'PE': { accommodation: { budget: 30, mid: 70, luxury: 180 }, activities: 35, food: 40, flightBase: 400 },
+    'CL': { accommodation: { budget: 40, mid: 90, luxury: 220 }, activities: 45, food: 40, flightBase: 500 },
+    'EC': { accommodation: { budget: 30, mid: 65, luxury: 160 }, activities: 40, food: 25, flightBase: 380 },
+    'BO': { accommodation: { budget: 25, mid: 50, luxury: 130 }, activities: 30, food: 20, flightBase: 450 },
+    'UY': { accommodation: { budget: 40, mid: 90, luxury: 220 }, activities: 40, food: 45, flightBase: 600 },
+    'PY': { accommodation: { budget: 30, mid: 60, luxury: 150 }, activities: 30, food: 25, flightBase: 550 },
+    'VE': { accommodation: { budget: 35, mid: 70, luxury: 180 }, activities: 35, food: 30, flightBase: 400 },
+    // Europe - Western
+    'GB': { accommodation: { budget: 80, mid: 180, luxury: 450 }, activities: 60, food: 65, flightBase: 400 },
+    'FR': { accommodation: { budget: 70, mid: 160, luxury: 400 }, activities: 55, food: 60, flightBase: 380 },
+    'DE': { accommodation: { budget: 60, mid: 140, luxury: 340 }, activities: 50, food: 50, flightBase: 400 },
+    'IT': { accommodation: { budget: 65, mid: 140, luxury: 350 }, activities: 50, food: 55, flightBase: 420 },
+    'ES': { accommodation: { budget: 55, mid: 120, luxury: 300 }, activities: 45, food: 45, flightBase: 380 },
+    'PT': { accommodation: { budget: 50, mid: 110, luxury: 280 }, activities: 40, food: 45, flightBase: 350 },
+    'NL': { accommodation: { budget: 70, mid: 150, luxury: 350 }, activities: 50, food: 55, flightBase: 400 },
+    'BE': { accommodation: { budget: 65, mid: 140, luxury: 340 }, activities: 50, food: 55, flightBase: 420 },
+    'AT': { accommodation: { budget: 55, mid: 130, luxury: 320 }, activities: 50, food: 50, flightBase: 450 },
+    'CH': { accommodation: { budget: 100, mid: 200, luxury: 500 }, activities: 70, food: 80, flightBase: 480 },
+    'IE': { accommodation: { budget: 65, mid: 150, luxury: 350 }, activities: 45, food: 50, flightBase: 350 },
+    // Europe - Northern
+    'SE': { accommodation: { budget: 70, mid: 160, luxury: 400 }, activities: 55, food: 60, flightBase: 480 },
+    'NO': { accommodation: { budget: 90, mid: 180, luxury: 450 }, activities: 65, food: 70, flightBase: 500 },
+    'DK': { accommodation: { budget: 70, mid: 160, luxury: 400 }, activities: 55, food: 60, flightBase: 450 },
+    'FI': { accommodation: { budget: 65, mid: 150, luxury: 380 }, activities: 55, food: 55, flightBase: 500 },
+    'IS': { accommodation: { budget: 80, mid: 180, luxury: 400 }, activities: 100, food: 70, flightBase: 350 },
+    // Europe - Eastern
+    'PL': { accommodation: { budget: 35, mid: 80, luxury: 200 }, activities: 35, food: 30, flightBase: 420 },
+    'CZ': { accommodation: { budget: 45, mid: 100, luxury: 250 }, activities: 40, food: 35, flightBase: 450 },
+    'HU': { accommodation: { budget: 40, mid: 90, luxury: 220 }, activities: 40, food: 35, flightBase: 480 },
+    'HR': { accommodation: { budget: 50, mid: 110, luxury: 280 }, activities: 45, food: 40, flightBase: 500 },
+    'GR': { accommodation: { budget: 50, mid: 110, luxury: 280 }, activities: 45, food: 40, flightBase: 480 },
+    'RO': { accommodation: { budget: 30, mid: 70, luxury: 180 }, activities: 30, food: 25, flightBase: 500 },
+    'BG': { accommodation: { budget: 30, mid: 65, luxury: 160 }, activities: 30, food: 25, flightBase: 520 },
+    'RS': { accommodation: { budget: 30, mid: 70, luxury: 180 }, activities: 30, food: 25, flightBase: 550 },
+    // Middle East & North Africa
+    'TR': { accommodation: { budget: 40, mid: 90, luxury: 220 }, activities: 40, food: 35, flightBase: 550 },
+    'MA': { accommodation: { budget: 35, mid: 80, luxury: 250 }, activities: 40, food: 30, flightBase: 500 },
+    'EG': { accommodation: { budget: 30, mid: 70, luxury: 200 }, activities: 40, food: 25, flightBase: 600 },
+    'AE': { accommodation: { budget: 70, mid: 160, luxury: 450 }, activities: 60, food: 50, flightBase: 650 },
+    'IL': { accommodation: { budget: 70, mid: 150, luxury: 380 }, activities: 50, food: 55, flightBase: 700 },
+    'JO': { accommodation: { budget: 45, mid: 100, luxury: 260 }, activities: 50, food: 35, flightBase: 750 },
+    // Asia
+    'JP': { accommodation: { budget: 50, mid: 120, luxury: 350 }, activities: 50, food: 50, flightBase: 700 },
+    'KR': { accommodation: { budget: 45, mid: 100, luxury: 280 }, activities: 45, food: 40, flightBase: 700 },
+    'CN': { accommodation: { budget: 40, mid: 90, luxury: 250 }, activities: 40, food: 30, flightBase: 650 },
+    'TH': { accommodation: { budget: 25, mid: 60, luxury: 180 }, activities: 25, food: 20, flightBase: 600 },
+    'VN': { accommodation: { budget: 25, mid: 60, luxury: 150 }, activities: 30, food: 20, flightBase: 650 },
+    'ID': { accommodation: { budget: 30, mid: 80, luxury: 250 }, activities: 30, food: 25, flightBase: 750 },
+    'PH': { accommodation: { budget: 30, mid: 70, luxury: 180 }, activities: 35, food: 25, flightBase: 700 },
+    'MY': { accommodation: { budget: 35, mid: 80, luxury: 200 }, activities: 40, food: 30, flightBase: 700 },
+    'SG': { accommodation: { budget: 60, mid: 150, luxury: 400 }, activities: 55, food: 40, flightBase: 750 },
+    'IN': { accommodation: { budget: 25, mid: 60, luxury: 180 }, activities: 30, food: 20, flightBase: 700 },
+    'NP': { accommodation: { budget: 20, mid: 45, luxury: 120 }, activities: 35, food: 15, flightBase: 800 },
+    'LK': { accommodation: { budget: 30, mid: 70, luxury: 200 }, activities: 35, food: 25, flightBase: 850 },
+    'TW': { accommodation: { budget: 40, mid: 90, luxury: 250 }, activities: 40, food: 35, flightBase: 750 },
+    'HK': { accommodation: { budget: 70, mid: 160, luxury: 400 }, activities: 50, food: 45, flightBase: 700 },
+    // Oceania
+    'AU': { accommodation: { budget: 70, mid: 160, luxury: 400 }, activities: 60, food: 60, flightBase: 900 },
+    'NZ': { accommodation: { budget: 60, mid: 140, luxury: 350 }, activities: 60, food: 55, flightBase: 950 },
+    'FJ': { accommodation: { budget: 70, mid: 180, luxury: 500 }, activities: 60, food: 50, flightBase: 900 },
+    // Africa
+    'ZA': { accommodation: { budget: 40, mid: 100, luxury: 280 }, activities: 50, food: 35, flightBase: 800 },
+    'KE': { accommodation: { budget: 45, mid: 110, luxury: 300 }, activities: 80, food: 35, flightBase: 850 },
+    'TZ': { accommodation: { budget: 50, mid: 120, luxury: 350 }, activities: 100, food: 35, flightBase: 900 },
+    'GH': { accommodation: { budget: 40, mid: 90, luxury: 220 }, activities: 40, food: 30, flightBase: 800 },
+    'NG': { accommodation: { budget: 50, mid: 110, luxury: 280 }, activities: 40, food: 35, flightBase: 850 },
+    // Default fallback
+    'DEFAULT': { accommodation: { budget: 50, mid: 100, luxury: 250 }, activities: 40, food: 40, flightBase: 500 }
+};
+
+// Cache for GeoNames results
+if (!apiCache.geonames) apiCache.geonames = {};
+
+// Fetch cities from GeoNames within a bounding box
+async function fetchGeoNamesCities(bounds, maxRows = 50) {
+    if (!API_KEYS.geonames.username) {
+        console.warn('GeoNames username not configured');
+        return [];
+    }
+
+    const cacheKey = `${bounds.north.toFixed(1)},${bounds.south.toFixed(1)},${bounds.east.toFixed(1)},${bounds.west.toFixed(1)}`;
+    if (apiCache.geonames[cacheKey]) {
+        return apiCache.geonames[cacheKey];
+    }
+
+    try {
+        // Use citiesJSON endpoint for populated places within bounds
+        const url = `https://secure.geonames.org/citiesJSON?north=${bounds.north}&south=${bounds.south}&east=${bounds.east}&west=${bounds.west}&maxRows=${maxRows}&username=${API_KEYS.geonames.username}`;
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('GeoNames API failed');
+
+        const data = await response.json();
+
+        if (data.geonames && data.geonames.length > 0) {
+            const cities = data.geonames.map(city => {
+                const countryCode = city.countrycode || 'DEFAULT';
+                const pricing = REGION_PRICING[countryCode] || REGION_PRICING['DEFAULT'];
+
+                // Estimate flight price based on distance from NYC (rough approximation)
+                const distanceFromNYC = calculateDistance(40.71, -74.01, city.lat, city.lng);
+                const flightMultiplier = Math.max(0.8, Math.min(2.5, distanceFromNYC / 3000));
+
+                return {
+                    city: city.name,
+                    region: city.adminName1 || getCountryName(city.countrycode),
+                    country: getCountryName(city.countrycode), // Full country name for display
+                    countryCode: city.countrycode, // ISO code for API lookups
+                    lat: city.lat,
+                    lon: city.lng,
+                    population: city.population,
+                    type: 'fly', // Dynamic cities are fly destinations
+                    flightFromNYC: {
+                        low: Math.round(pricing.flightBase * flightMultiplier * 0.7),
+                        mid: Math.round(pricing.flightBase * flightMultiplier),
+                        high: Math.round(pricing.flightBase * flightMultiplier * 1.5)
+                    },
+                    accommodation: pricing.accommodation,
+                    activities: pricing.activities,
+                    food: pricing.food,
+                    description: null, // Will be fetched from Wikivoyage
+                    seasonality: { winter: 1.0, spring: 1.0, summer: 1.0, fall: 1.0 },
+                    isGeoNames: true // Flag to identify dynamically fetched cities
+                };
+            });
+
+            // Sort by population (larger cities first)
+            cities.sort((a, b) => (b.population || 0) - (a.population || 0));
+
+            apiCache.geonames[cacheKey] = cities;
+            return cities;
+        }
+        return [];
+    } catch (error) {
+        console.error('GeoNames error:', error);
+        return [];
+    }
+}
+
+// Helper to get country name from code
+function getCountryName(code) {
+    const countryNames = {
+        'US': 'USA', 'CA': 'Canada', 'MX': 'Mexico', 'GB': 'UK', 'FR': 'France',
+        'DE': 'Germany', 'IT': 'Italy', 'ES': 'Spain', 'PT': 'Portugal', 'NL': 'Netherlands',
+        'BE': 'Belgium', 'AT': 'Austria', 'CH': 'Switzerland', 'IE': 'Ireland',
+        'SE': 'Sweden', 'NO': 'Norway', 'DK': 'Denmark', 'FI': 'Finland', 'IS': 'Iceland',
+        'PL': 'Poland', 'CZ': 'Czech Republic', 'HU': 'Hungary', 'HR': 'Croatia', 'GR': 'Greece',
+        'RO': 'Romania', 'BG': 'Bulgaria', 'RS': 'Serbia',
+        'TR': 'Turkey', 'MA': 'Morocco', 'EG': 'Egypt', 'AE': 'UAE', 'IL': 'Israel', 'JO': 'Jordan',
+        'JP': 'Japan', 'KR': 'South Korea', 'CN': 'China', 'TH': 'Thailand', 'VN': 'Vietnam',
+        'ID': 'Indonesia', 'PH': 'Philippines', 'MY': 'Malaysia', 'SG': 'Singapore',
+        'IN': 'India', 'NP': 'Nepal', 'LK': 'Sri Lanka', 'TW': 'Taiwan', 'HK': 'Hong Kong',
+        'AU': 'Australia', 'NZ': 'New Zealand', 'FJ': 'Fiji',
+        'BR': 'Brazil', 'AR': 'Argentina', 'CO': 'Colombia', 'PE': 'Peru', 'CL': 'Chile',
+        'EC': 'Ecuador', 'BO': 'Bolivia', 'UY': 'Uruguay', 'PY': 'Paraguay', 'VE': 'Venezuela',
+        'CR': 'Costa Rica', 'PA': 'Panama', 'GT': 'Guatemala', 'BZ': 'Belize',
+        'HN': 'Honduras', 'NI': 'Nicaragua', 'SV': 'El Salvador',
+        'CU': 'Cuba', 'DO': 'Dominican Republic', 'JM': 'Jamaica', 'BS': 'Bahamas', 'PR': 'Puerto Rico', 'TT': 'Trinidad and Tobago',
+        'ZA': 'South Africa', 'KE': 'Kenya', 'TZ': 'Tanzania', 'GH': 'Ghana', 'NG': 'Nigeria'
+    };
+    return countryNames[code] || code;
+}
+
+// Helper to get currency code from country code
+function getCurrencyForCountry(code) {
+    const currencies = {
+        'US': 'USD', 'CA': 'CAD', 'MX': 'MXN', 'GB': 'GBP', 'FR': 'EUR', 'DE': 'EUR',
+        'IT': 'EUR', 'ES': 'EUR', 'PT': 'EUR', 'NL': 'EUR', 'BE': 'EUR', 'AT': 'EUR',
+        'CH': 'CHF', 'IE': 'EUR', 'SE': 'SEK', 'NO': 'NOK', 'DK': 'DKK', 'FI': 'EUR',
+        'IS': 'ISK', 'PL': 'PLN', 'CZ': 'CZK', 'HU': 'HUF', 'HR': 'EUR', 'GR': 'EUR',
+        'RO': 'RON', 'BG': 'BGN', 'RS': 'RSD', 'TR': 'TRY', 'MA': 'MAD', 'EG': 'EGP',
+        'AE': 'AED', 'IL': 'ILS', 'JO': 'JOD', 'JP': 'JPY', 'KR': 'KRW', 'CN': 'CNY',
+        'TH': 'THB', 'VN': 'VND', 'ID': 'IDR', 'PH': 'PHP', 'MY': 'MYR', 'SG': 'SGD',
+        'IN': 'INR', 'NP': 'NPR', 'LK': 'LKR', 'TW': 'TWD', 'HK': 'HKD',
+        'AU': 'AUD', 'NZ': 'NZD', 'FJ': 'FJD',
+        'BR': 'BRL', 'AR': 'ARS', 'CO': 'COP', 'PE': 'PEN', 'CL': 'CLP',
+        'EC': 'USD', 'BO': 'BOB', 'UY': 'UYU', 'PY': 'PYG', 'VE': 'VES',
+        'CR': 'CRC', 'PA': 'USD', 'GT': 'GTQ', 'BZ': 'BZD', 'HN': 'HNL', 'NI': 'NIO', 'SV': 'USD',
+        'CU': 'CUP', 'DO': 'DOP', 'JM': 'JMD', 'BS': 'BSD', 'PR': 'USD', 'TT': 'TTD',
+        'ZA': 'ZAR', 'KE': 'KES', 'TZ': 'TZS', 'GH': 'GHS', 'NG': 'NGN'
+    };
+    return currencies[code] || 'USD';
+}
+
+// Calculate distance between two points (Haversine formula)
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 3959; // Earth's radius in miles
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+// ============================================
 // WIKIVOYAGE API (No key needed!)
 // Fetches travel descriptions from Wikivoyage
 // ============================================
@@ -608,13 +834,21 @@ async function fetchWikivoyageDescription(cityName) {
 // ============================================
 // Fetch all external data for a destination
 async function fetchDestinationData(dest, startDate, endDate, travelers) {
-    const countryData = COUNTRY_DATA[dest.country] || {};
+    // Look up country data - try by name first, then by code for GeoNames cities
+    let countryData = COUNTRY_DATA[dest.country] || {};
+    if (!countryData.currency && dest.countryCode) {
+        // For GeoNames cities, look up by ISO code in REGION_PRICING
+        const regionPricing = REGION_PRICING[dest.countryCode];
+        if (regionPricing) {
+            countryData = { currency: getCurrencyForCountry(dest.countryCode), iso2: dest.countryCode };
+        }
+    }
 
     // Fetch data in parallel (including optional image and description)
     const [weather, exchangeRate, advisory, image, wikiDescription] = await Promise.all([
         fetchWeatherOpenMeteo(dest.lat, dest.lon, startDate, endDate),
         countryData.currency ? fetchExchangeRate('USD', countryData.currency) : Promise.resolve(1),
-        countryData.iso2 ? fetchTravelAdvisory(countryData.iso2) : Promise.resolve(null),
+        countryData.iso2 || dest.countryCode ? fetchTravelAdvisory(countryData.iso2 || dest.countryCode) : Promise.resolve(null),
         fetchWikipediaImage(dest.city, dest.country),
         fetchWikivoyageDescription(dest.city)
     ]);
@@ -1931,10 +2165,47 @@ async function searchDestinations(searchInArea = false) {
         // Clear existing markers
         clearMarkers();
 
+        // Fetch dynamic cities from GeoNames based on map bounds or travel radius
+        let geonamesCities = [];
+        if (API_KEYS.geonames.username) {
+            let fetchBounds;
+            if (searchInArea && map.getBounds()) {
+                // Use current map bounds
+                const b = map.getBounds();
+                fetchBounds = {
+                    north: b.getNorth(),
+                    south: b.getSouth(),
+                    east: b.getEast(),
+                    west: b.getWest()
+                };
+            } else {
+                // Calculate bounds based on travel radius from home city
+                const maxDistance = maxHours > 0 ? maxHours * 500 : 4000; // Rough miles based on hours
+                const latOffset = maxDistance / 69; // ~69 miles per degree of latitude
+                const lonOffset = maxDistance / (69 * Math.cos(selectedHomeCity.lat * Math.PI / 180));
+                fetchBounds = {
+                    north: Math.min(85, selectedHomeCity.lat + latOffset),
+                    south: Math.max(-85, selectedHomeCity.lat - latOffset),
+                    east: Math.min(180, selectedHomeCity.lon + lonOffset),
+                    west: Math.max(-180, selectedHomeCity.lon - lonOffset)
+                };
+            }
+            geonamesCities = await fetchGeoNamesCities(fetchBounds, 100);
+        }
+
+        // Merge curated destinations with GeoNames cities
+        // Curated destinations take priority (don't duplicate)
+        const curatedCityNames = new Set(destinationsData.map(d => d.city.toLowerCase()));
+        const uniqueGeonamesCities = geonamesCities.filter(gc =>
+            !curatedCityNames.has(gc.city.toLowerCase())
+        );
+
+        const allDestinations = [...destinationsData, ...uniqueGeonamesCities];
+
         // Calculate costs for each destination
         const results = [];
 
-        for (const dest of destinationsData) {
+        for (const dest of allDestinations) {
             // Filter by travel mode
             if (travelMode === 'fly' && dest.type === 'drive') continue;
             if (travelMode === 'drive' && dest.type === 'fly') continue;
