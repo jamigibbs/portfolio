@@ -2716,13 +2716,16 @@ async function searchDestinations(searchInArea = false) {
         const results = [];
         const DRIVE_THRESHOLD = 500; // Miles - destinations under this are drivable
         const filterStats = { total: 0, sameCity: 0, modeFilter: 0, timeFilter: 0, boundsFilter: 0, budgetFilter: 0, cantDrive: 0, passed: 0 };
+        const ukFilterDebug = []; // Track UK destinations through filtering
 
         for (const dest of allDestinations) {
             filterStats.total++;
+            const isUK = dest.country === 'UK' || dest.country === 'United Kingdom';
 
             // Skip if destination is the same as home city
             if (dest.city.toLowerCase() === selectedHomeCity.city.toLowerCase()) {
                 filterStats.sameCity++;
+                if (isUK) ukFilterDebug.push({ city: dest.city, filteredBy: 'sameCity' });
                 continue;
             }
 
@@ -2741,10 +2744,12 @@ async function searchDestinations(searchInArea = false) {
             );
 
             // Debug: Log UK destinations specifically
-            if (dest.country === 'UK' && !canDrive) {
-                console.log('UK dest marked as not drivable:', dest.city, {
+            if (isUK) {
+                ukFilterDebug.push({
+                    city: dest.city,
+                    country: dest.country,
                     homeCountry: selectedHomeCity.country,
-                    destCountry: dest.country,
+                    distance: Math.round(distance),
                     canDrive
                 });
             }
@@ -2762,10 +2767,12 @@ async function searchDestinations(searchInArea = false) {
             // Filter by travel mode preference
             if (travelMode === 'fly' && effectiveType === 'drive') {
                 filterStats.modeFilter++;
+                if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = 'modeFilter (drive in fly mode)';
                 continue;
             }
             if (travelMode === 'drive' && effectiveType === 'fly') {
                 filterStats.modeFilter++;
+                if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = `modeFilter (effectiveType=${effectiveType}, canDrive=${canDrive})`;
                 continue;
             }
 
@@ -2781,6 +2788,7 @@ async function searchDestinations(searchInArea = false) {
             const filterBuffer = effectiveType === 'drive' ? 1.3 : 1.0;
             if (maxHours > 0 && roughTravelTime > maxHours * filterBuffer) {
                 filterStats.timeFilter++;
+                if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = `timeFilter (${roughTravelTime.toFixed(1)}h > ${(maxHours * filterBuffer).toFixed(1)}h)`;
                 continue;
             }
 
@@ -2788,6 +2796,7 @@ async function searchDestinations(searchInArea = false) {
             if (searchInArea && mapBounds) {
                 if (!mapBounds.contains([dest.lat, dest.lon])) {
                     filterStats.boundsFilter++;
+                    if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = 'boundsFilter';
                     continue;
                 }
             }
@@ -2806,11 +2815,13 @@ async function searchDestinations(searchInArea = false) {
             if (budgetMin > 0 || budgetMax < Infinity) {
                 if (costs.total < budgetMin || costs.total > budgetMax) {
                     filterStats.budgetFilter++;
+                    if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = `budgetFilter ($${costs.total})`;
                     continue;
                 }
             }
 
             filterStats.passed++;
+            if (isUK) ukFilterDebug[ukFilterDebug.length - 1].passed = true;
             results.push({
                 ...destWithType,
                 costs,
@@ -2820,6 +2831,7 @@ async function searchDestinations(searchInArea = false) {
             });
         }
 
+        console.log('UK destinations debug:', ukFilterDebug);
         console.log('Filter statistics:', filterStats);
         console.log('Initial filter results:', {
             totalAfterFilters: results.length,
