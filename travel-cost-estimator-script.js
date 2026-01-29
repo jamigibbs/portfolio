@@ -140,22 +140,44 @@ async function fetchWeatherOpenMeteo(lat, lon, startDate, endDate) {
     }
 
     try {
-        // Get forecast for next 16 days
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&temperature_unit=fahrenheit&timezone=auto&forecast_days=16`;
+        // Get current weather + 7-day forecast
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code&temperature_unit=fahrenheit&timezone=auto&forecast_days=7`;
 
         const response = await fetch(url);
         if (!response.ok) throw new Error('Weather API failed');
 
         const data = await response.json();
 
+        // Process current weather
+        const current = {
+            temp: Math.round(data.current.temperature_2m),
+            conditions: getWeatherDescription(data.current.weather_code),
+            isDay: data.current.is_day === 1
+        };
+
+        // Process 7-day forecast
+        const forecast = [];
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(data.daily.time[i]);
+            forecast.push({
+                day: i === 0 ? 'Today' : dayNames[date.getDay()],
+                high: Math.round(data.daily.temperature_2m_max[i]),
+                low: Math.round(data.daily.temperature_2m_min[i]),
+                rainChance: data.daily.precipitation_probability_max[i],
+                conditions: getWeatherDescription(data.daily.weather_code[i])
+            });
+        }
+
         // Process weather data
         const weather = {
             type: 'forecast',
-            forecast: data.daily,
+            current,
+            forecast,
             avgHigh: Math.round(data.daily.temperature_2m_max.reduce((a, b) => a + b, 0) / data.daily.temperature_2m_max.length),
             avgLow: Math.round(data.daily.temperature_2m_min.reduce((a, b) => a + b, 0) / data.daily.temperature_2m_min.length),
             rainChance: Math.round(data.daily.precipitation_probability_max.reduce((a, b) => a + b, 0) / data.daily.precipitation_probability_max.length),
-            conditions: getWeatherDescription(data.daily.weathercode[0])
+            conditions: getWeatherDescription(data.daily.weather_code[0])
         };
 
         apiCache.weather[cacheKey] = weather;
@@ -2747,23 +2769,61 @@ function createPopupContent(dest, travelers, nights) {
     let weatherHtml = '';
     if (dest.weather) {
         const isClimate = dest.weather.type === 'climate';
-        const weatherEmoji = dest.weather.conditions.split(' ')[0];
-        const tempNote = isClimate ? `Typical for ${dest.weather.monthName}` : 'Forecast';
 
-        weatherHtml = `
-            <div class="popup-weather">
-                <div class="popup-weather-main">
-                    <span class="popup-weather-icon">${weatherEmoji}</span>
-                    <div>
-                        <div class="popup-weather-temp">${dest.weather.avgLow}° - ${dest.weather.avgHigh}°F</div>
-                        <div class="popup-weather-desc">${tempNote}</div>
+        if (!isClimate && dest.weather.current && dest.weather.forecast) {
+            // Enhanced weather display with current + 7-day forecast
+            const currentEmoji = dest.weather.current.conditions.split(' ')[0];
+            const forecastHtml = dest.weather.forecast.map(day => {
+                const emoji = day.conditions.split(' ')[0];
+                return `
+                    <div class="forecast-day">
+                        <div class="forecast-day-name">${day.day}</div>
+                        <div class="forecast-day-icon">${emoji}</div>
+                        <div class="forecast-day-temps">
+                            <span class="forecast-high">${day.high}°</span>
+                            <span class="forecast-low">${day.low}°</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            weatherHtml = `
+                <div class="popup-weather-enhanced">
+                    <div class="popup-weather-current">
+                        <div class="weather-current-left">
+                            <span class="weather-current-icon">${currentEmoji}</span>
+                            <div class="weather-current-temp">${dest.weather.current.temp}°F</div>
+                        </div>
+                        <div class="weather-current-right">
+                            <div class="weather-current-label">Right now</div>
+                            <div class="weather-current-desc">${dest.weather.current.conditions}</div>
+                        </div>
+                    </div>
+                    <div class="popup-weather-forecast">
+                        ${forecastHtml}
                     </div>
                 </div>
-                <div class="popup-weather-details">
-                    <div>💧 ${dest.weather.rainChance}% rain</div>
+            `;
+        } else {
+            // Climate data fallback (for trips > 16 days out)
+            const weatherEmoji = dest.weather.conditions.split(' ')[0];
+            const tempNote = `Typical for ${dest.weather.monthName}`;
+
+            weatherHtml = `
+                <div class="popup-weather">
+                    <div class="popup-weather-main">
+                        <span class="popup-weather-icon">${weatherEmoji}</span>
+                        <div>
+                            <div class="popup-weather-temp">${dest.weather.avgLow}° - ${dest.weather.avgHigh}°F</div>
+                            <div class="popup-weather-desc">${tempNote}</div>
+                        </div>
+                    </div>
+                    <div class="popup-weather-details">
+                        <div>💧 ${dest.weather.rainChance}% rain</div>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
     }
 
     // Description
