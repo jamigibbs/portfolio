@@ -2746,11 +2746,14 @@ async function searchDestinations(searchInArea = false) {
             // Create a copy with the effective travel type
             const destWithType = { ...dest, type: effectiveType };
 
-            // Calculate travel time based on effective type
-            const travelTime = calculateTravelTime(selectedHomeCity, destWithType, distance);
+            // Calculate rough travel time for initial filtering
+            // Use generous estimate (faster speed) to avoid filtering out reachable destinations
+            const roughTravelTime = calculateTravelTime(selectedHomeCity, destWithType, distance);
 
-            // Filter by max travel time (if set)
-            if (maxHours > 0 && travelTime > maxHours) {
+            // For initial filter, add 30% buffer to avoid over-filtering
+            // Actual times will be calculated with ORS for driving destinations
+            const filterBuffer = effectiveType === 'drive' ? 1.3 : 1.0;
+            if (maxHours > 0 && roughTravelTime > maxHours * filterBuffer) {
                 filterStats.timeFilter++;
                 continue;
             }
@@ -2786,76 +2789,100 @@ async function searchDestinations(searchInArea = false) {
                 ...destWithType,
                 costs,
                 distance,
-                travelTime
+                travelTime: roughTravelTime,
+                needsAccurateDriveTime: effectiveType === 'drive'
             });
         }
 
         console.log('Filter statistics:', filterStats);
-        console.log('Filter results:', {
+        console.log('Initial filter results:', {
+            totalAfterFilters: results.length,
+            driveDestinations: results.filter(r => r.type === 'drive').length,
+            flyDestinations: results.filter(r => r.type === 'fly').length
+        });
+
+        // For driving destinations, fetch accurate times from OpenRouteService
+        // This is done BEFORE sorting so we get accurate times for filtering
+        if (API_KEYS.openRouteService) {
+            const driveDestinations = results.filter(r => r.type === 'drive');
+            console.log(`Fetching accurate drive times for ${driveDestinations.length} destinations...`);
+
+            // Fetch ORS data in parallel (limit to 30 to avoid hitting API limits too hard)
+            const driveBatch = driveDestinations.slice(0, 30);
+            const orsResults = await Promise.all(
+                driveBatch.map(async (dest) => {
+                    const orsData = await fetchDrivingRoute(
+                        selectedHomeCity.lat, selectedHomeCity.lon,
+                        dest.lat, dest.lon
+                    );
+                    return { dest, orsData };
+                })
+            );
+
+            // Update results with accurate driving data
+            for (const { dest, orsData } of orsResults) {
+                if (orsData && !orsData.notDrivable) {
+                    dest.travelTime = orsData.durationHours;
+                    dest.distance = orsData.distanceMiles;
+                    dest.accurateDriving = true;
+
+                    // Recalculate transport cost with accurate distance
+                    const drivingCost = orsData.distanceMiles * 2 * 0.25; // Round trip, $0.25/mile
+                    const costDiff = drivingCost - dest.costs.transport;
+                    dest.costs.transport = Math.round(drivingCost);
+                    dest.costs.total = Math.round(dest.costs.total + costDiff);
+                    dest.costs.perDay = Math.round(dest.costs.total / nights);
+                } else if (orsData && orsData.notDrivable) {
+                    dest.notDrivable = true;
+                }
+            }
+
+            // Re-filter based on actual travel times
+            const beforeRefilter = results.length;
+            for (let i = results.length - 1; i >= 0; i--) {
+                const r = results[i];
+                // Remove not-drivable destinations
+                if (r.notDrivable) {
+                    results.splice(i, 1);
+                    continue;
+                }
+                // Re-check travel time with accurate data
+                if (maxHours > 0 && r.accurateDriving && r.travelTime > maxHours) {
+                    results.splice(i, 1);
+                }
+            }
+            console.log(`Re-filtered: ${beforeRefilter} -> ${results.length} destinations`);
+        }
+
+        console.log('Final filter results:', {
             totalAfterFilters: results.length,
             sampleResults: results.slice(0, 10).map(r => ({
                 city: r.city,
                 distance: Math.round(r.distance),
                 type: r.type,
-                travelTime: r.travelTime.toFixed(1)
+                travelTime: r.travelTime.toFixed(1),
+                accurate: r.accurateDriving || false
             }))
         });
 
         // Sort by total cost
         results.sort((a, b) => a.costs.total - b.costs.total);
 
-        // Fetch real-time data for top results (limit to avoid too many API calls)
+        // Fetch real-time data for top results (weather, images, etc.)
         const topResults = results.slice(0, 15);
         const startDateStr = document.getElementById('startDate').value;
         const endDateStr = document.getElementById('endDate').value;
 
-        // Fetch external data in parallel for top results
+        // Fetch external data in parallel for top results (no need to re-fetch ORS)
         const enrichedResults = await Promise.all(
             topResults.map(async (dest) => {
                 const externalData = await fetchDestinationData(dest, startDateStr, endDateStr, travelers);
-
-                // For driving destinations, get accurate route from OpenRouteService
-                let accurateDriving = null;
-                if (dest.type === 'drive' && API_KEYS.openRouteService) {
-                    accurateDriving = await fetchDrivingRoute(
-                        selectedHomeCity.lat, selectedHomeCity.lon,
-                        dest.lat, dest.lon
-                    );
-                }
-
-                // Update travel time and costs if we got accurate driving data
-                if (accurateDriving && !accurateDriving.notDrivable) {
-                    const accurateTime = accurateDriving.durationHours;
-                    const accurateDistance = accurateDriving.distanceMiles;
-
-                    // Recalculate transport cost with accurate distance
-                    const drivingCost = accurateDistance * 2 * 0.25; // Round trip, $0.25/mile
-                    const costDiff = drivingCost - dest.costs.transport;
-
-                    return {
-                        ...dest,
-                        ...externalData,
-                        travelTime: accurateTime,
-                        distance: accurateDistance,
-                        accurateDriving: true,
-                        costs: {
-                            ...dest.costs,
-                            transport: Math.round(drivingCost),
-                            total: Math.round(dest.costs.total + costDiff),
-                            perDay: Math.round((dest.costs.total + costDiff) / nights)
-                        }
-                    };
-                } else if (accurateDriving && accurateDriving.notDrivable) {
-                    // Route not possible - should be filtered out but mark it
-                    return { ...dest, ...externalData, notDrivable: true };
-                }
-
                 return { ...dest, ...externalData };
             })
         );
 
-        // Filter out any destinations that turned out to be not drivable
-        const validEnrichedResults = enrichedResults.filter(r => !r.notDrivable);
+        // ORS data already fetched earlier, enrichedResults are ready
+        const validEnrichedResults = enrichedResults;
 
         // Combine enriched results with remaining results
         const allResults = [
