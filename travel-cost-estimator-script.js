@@ -8,6 +8,8 @@ let destinationsData = [];
 let selectedHomeCity = null;
 let travelMode = 'both';
 let dateType = 'specific';
+let travelRadiusLayer = null; // For visualizing travel radius on map
+let homeMarker = null; // Marker for home city
 let selectedMonths = [];
 let maxTravelTime = 8; // hours
 let hasSearched = false;
@@ -1068,7 +1070,46 @@ function hideSearchAreaButton() {
 // Search in current map area
 function searchInCurrentArea() {
     hideSearchAreaButton();
-    searchDestinations(true); // Pass true to indicate area-based search
+
+    // When searching current area, temporarily disable travel time filter
+    // so user can see all destinations in the visible area
+    const maxTravelTimeSelect = document.getElementById('maxTravelTime');
+    const originalValue = maxTravelTimeSelect.value;
+
+    // Calculate what travel time would be needed to reach the furthest visible point
+    if (selectedHomeCity) {
+        const bounds = map.getBounds();
+        const corners = [
+            bounds.getNorthEast(),
+            bounds.getNorthWest(),
+            bounds.getSouthEast(),
+            bounds.getSouthWest()
+        ];
+
+        // Find furthest corner from home city
+        let maxDistance = 0;
+        corners.forEach(corner => {
+            const dist = calculateDistance(
+                selectedHomeCity.lat, selectedHomeCity.lon,
+                corner.lat, corner.lng
+            );
+            maxDistance = Math.max(maxDistance, dist);
+        });
+
+        // Calculate approximate travel time to furthest point
+        // Driving: ~55mph, Flying: ~500mph + 3h airport
+        const driveTime = maxDistance / 55;
+        const flyTime = (maxDistance / 500) + 3;
+        const suggestedTime = Math.min(driveTime, flyTime);
+
+        // Update the travel time selector to encompass the visible area
+        const timeOptions = [2, 4, 6, 8, 12, 16, 24, 0];
+        const newTime = timeOptions.find(t => t === 0 || t >= suggestedTime) || 0;
+        maxTravelTimeSelect.value = newTime.toString();
+        updateTravelTimeInfo();
+    }
+
+    searchDestinations(false);
 }
 
 // Initialize date pickers with defaults
@@ -1335,13 +1376,65 @@ function autoZoomToTravelRadius(hours) {
     if (!selectedHomeCity) return;
 
     // Calculate approximate radius in miles
-    // Use the larger of drive or fly distance to ensure we show all possibilities
     const driveRadius = hours * 55; // 55 mph average
     const flyRadius = hours > 3 ? (hours - 3) * 500 : 0; // 500 mph minus airport time
     const maxRadius = Math.max(driveRadius, flyRadius);
 
-    // Convert miles to degrees (rough approximation: 1 degree ≈ 69 miles at equator)
-    // Adjust for latitude
+    // Remove existing radius layer if any
+    if (travelRadiusLayer) {
+        map.removeLayer(travelRadiusLayer);
+    }
+
+    // Remove existing home marker if any
+    if (homeMarker) {
+        map.removeLayer(homeMarker);
+    }
+
+    // Add home city marker
+    homeMarker = L.marker([selectedHomeCity.lat, selectedHomeCity.lon], {
+        icon: L.divIcon({
+            className: 'home-marker-icon',
+            html: `<div class="home-marker">📍</div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        })
+    }).addTo(map);
+    homeMarker.bindPopup(`<b>Your location</b><br>${selectedHomeCity.city}, ${selectedHomeCity.state || selectedHomeCity.country}`);
+
+    // Create travel radius visualization
+    const layers = [];
+
+    if (hours > 0) {
+        // Flight radius (larger, dashed cyan)
+        if (flyRadius > 0 && flyRadius !== driveRadius) {
+            const flyRadiusMeters = flyRadius * 1609.34;
+            layers.push(L.circle([selectedHomeCity.lat, selectedHomeCity.lon], {
+                radius: flyRadiusMeters,
+                color: '#00d4ff',
+                fillColor: '#00d4ff',
+                fillOpacity: 0.05,
+                weight: 2,
+                dashArray: '10, 10'
+            }));
+        }
+
+        // Drive radius (smaller, solid orange)
+        if (driveRadius > 0) {
+            const driveRadiusMeters = driveRadius * 1609.34;
+            layers.push(L.circle([selectedHomeCity.lat, selectedHomeCity.lon], {
+                radius: driveRadiusMeters,
+                color: '#FF9800',
+                fillColor: '#FF9800',
+                fillOpacity: 0.1,
+                weight: 2
+            }));
+        }
+
+        // Combine into a layer group
+        travelRadiusLayer = L.layerGroup(layers).addTo(map);
+    }
+
+    // Convert miles to degrees for bounds calculation
     const latDegrees = maxRadius / 69;
     const lonDegrees = maxRadius / (69 * Math.cos(selectedHomeCity.lat * Math.PI / 180));
 
@@ -1647,6 +1740,16 @@ function formatTravelTime(hours) {
     }
 }
 
+// Format price for short display (e.g., $1874 → $1.9k)
+function formatPriceShort(price) {
+    if (price >= 1000) {
+        const k = price / 1000;
+        // Round to 1 decimal place
+        return '$' + k.toFixed(1) + 'k';
+    }
+    return '$' + price;
+}
+
 // Add destination marker to map
 function addDestinationMarker(dest, travelers, nights) {
     // Determine marker class based on cost
@@ -1663,24 +1766,27 @@ function addDestinationMarker(dest, travelers, nights) {
     if (dest.weather) {
         const weatherEmoji = dest.weather.conditions.split(' ')[0]; // Get just the emoji
         const isClimate = dest.weather.type === 'climate';
-        // Add a small "~" prefix for typical/climate data to indicate it's an average
         const tempPrefix = isClimate ? '~' : '';
         weatherDisplay = `<span class="marker-weather" title="${isClimate ? 'Typical weather for ' + dest.weather.monthName : 'Forecast'}">${weatherEmoji} ${tempPrefix}${dest.weather.avgHigh}°</span>`;
     }
+
+    // Format price for display
+    const formattedPrice = formatPriceShort(dest.costs.total);
 
     const icon = L.divIcon({
         className: 'custom-div-icon',
         html: `
             <div class="custom-marker ${markerClass}">
-                <span class="marker-price">$${dest.costs.total}</span>
+                <span class="marker-city">${dest.city}</span>
+                <span class="marker-price">${formattedPrice}</span>
                 <div class="marker-details">
                     <span class="marker-type">${dest.type === 'drive' ? '🚗' : '✈️'}</span>
                     ${weatherDisplay}
                 </div>
             </div>
         `,
-        iconSize: [70, 55],
-        iconAnchor: [35, 27]
+        iconSize: [90, 60],
+        iconAnchor: [45, 30]
     });
 
     const popup = createPopupContent(dest, travelers, nights);

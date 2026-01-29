@@ -400,21 +400,36 @@
 
         /* Custom markers */
         .custom-marker {
-            min-width: 60px;
-            padding: 6px 8px;
-            border: 3px solid;
-            border-radius: 12px;
+            min-width: 70px;
+            padding: 5px 10px;
+            border: 2px solid;
+            border-radius: 10px;
             background: rgba(30, 30, 30, 0.95);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 600;
             color: #fff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
             flex-direction: column;
             line-height: 1.2;
-            gap: 2px;
+            gap: 1px;
+        }
+
+        .marker-city {
+            font-size: 10px;
+            font-weight: 500;
+            color: #ccc;
+            max-width: 85px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .marker-price {
+            font-size: 13px;
+            font-weight: 700;
         }
 
         .marker-details {
@@ -431,21 +446,33 @@
 
         .marker-cheap {
             border-color: #4CAF50;
+        }
+
+        .marker-cheap .marker-price {
             color: #4CAF50;
         }
 
         .marker-moderate {
             border-color: #FF9800;
+        }
+
+        .marker-moderate .marker-price {
             color: #FF9800;
         }
 
         .marker-expensive {
             border-color: #f44336;
+        }
+
+        .marker-expensive .marker-price {
             color: #f44336;
         }
 
         .marker-budget-match {
             border-color: #00d4ff;
+        }
+
+        .marker-budget-match .marker-price {
             color: #00d4ff;
         }
 
@@ -453,13 +480,20 @@
             border-style: dashed;
         }
 
-        .marker-price {
-            font-size: 12px;
-        }
-
         .marker-type {
             font-size: 9px;
             opacity: 0.8;
+        }
+
+        /* Home marker */
+        .home-marker {
+            font-size: 24px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .home-marker-icon {
+            background: transparent;
+            border: none;
         }
 
         /* Popup styles */
@@ -533,7 +567,8 @@
         }
 
         .popup-total {
-            background: linear-gradient(135deg, #00d4ff 0%, #0096ff 100%);
+            background: #1a1a1a;
+            border-top: 1px solid #404040;
             margin: 16px -16px -16px;
             padding: 16px;
             border-radius: 0 0 12px 12px;
@@ -541,17 +576,19 @@
 
         .popup-total-label {
             font-size: 12px;
-            opacity: 0.9;
+            color: #888;
         }
 
         .popup-total-value {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 700;
+            color: #4CAF50;
         }
 
         .popup-total-per-day {
             font-size: 12px;
-            opacity: 0.8;
+            color: #aaa;
+            margin-top: 4px;
         }
 
         /* Weather badge */
