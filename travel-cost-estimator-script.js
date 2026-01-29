@@ -948,39 +948,6 @@ const DESTINATIONS = [
       activities: 30, food: 25, description: "Beaches & spirituality",
       seasonality: { winter: 0.9, spring: 1.0, summer: 1.3, fall: 1.1 } },
 ];
-
-// Major US cities for home city selection
-const HOME_CITIES = [
-    { city: "New York", state: "NY", lat: 40.71, lon: -74.01 },
-    { city: "Los Angeles", state: "CA", lat: 34.05, lon: -118.24 },
-    { city: "Chicago", state: "IL", lat: 41.88, lon: -87.63 },
-    { city: "Houston", state: "TX", lat: 29.76, lon: -95.37 },
-    { city: "Phoenix", state: "AZ", lat: 33.45, lon: -112.07 },
-    { city: "Philadelphia", state: "PA", lat: 39.95, lon: -75.17 },
-    { city: "San Antonio", state: "TX", lat: 29.42, lon: -98.49 },
-    { city: "San Diego", state: "CA", lat: 32.72, lon: -117.16 },
-    { city: "Dallas", state: "TX", lat: 32.78, lon: -96.8 },
-    { city: "San Jose", state: "CA", lat: 37.34, lon: -121.89 },
-    { city: "Austin", state: "TX", lat: 30.27, lon: -97.74 },
-    { city: "Jacksonville", state: "FL", lat: 30.33, lon: -81.66 },
-    { city: "Fort Worth", state: "TX", lat: 32.76, lon: -97.33 },
-    { city: "Columbus", state: "OH", lat: 39.96, lon: -83.0 },
-    { city: "Charlotte", state: "NC", lat: 35.23, lon: -80.84 },
-    { city: "San Francisco", state: "CA", lat: 37.77, lon: -122.42 },
-    { city: "Indianapolis", state: "IN", lat: 39.77, lon: -86.16 },
-    { city: "Seattle", state: "WA", lat: 47.61, lon: -122.33 },
-    { city: "Denver", state: "CO", lat: 39.74, lon: -104.99 },
-    { city: "Washington", state: "DC", lat: 38.9, lon: -77.04 },
-    { city: "Boston", state: "MA", lat: 42.36, lon: -71.06 },
-    { city: "Nashville", state: "TN", lat: 36.16, lon: -86.78 },
-    { city: "Detroit", state: "MI", lat: 42.33, lon: -83.05 },
-    { city: "Portland", state: "OR", lat: 45.52, lon: -122.68 },
-    { city: "Las Vegas", state: "NV", lat: 36.17, lon: -115.14 },
-    { city: "Atlanta", state: "GA", lat: 33.75, lon: -84.39 },
-    { city: "Miami", state: "FL", lat: 25.76, lon: -80.19 },
-    { city: "Minneapolis", state: "MN", lat: 44.98, lon: -93.27 },
-];
-
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
@@ -988,9 +955,64 @@ document.addEventListener('DOMContentLoaded', () => {
     initAutocomplete();
     initMonthSelector();
     initTravelTimeSelector();
+    initSearchTriggers();
     updateApiStatus();
     destinationsData = DESTINATIONS;
 });
+
+// Track if user has made changes since last search
+let searchParamsChanged = false;
+
+// Initialize event listeners to trigger search on input changes
+function initSearchTriggers() {
+    // All input elements that should trigger search update
+    const searchInputs = [
+        'travelers',
+        'tripDuration',
+        'startDate',
+        'endDate',
+        'accommodationType',
+        'budgetMin',
+        'budgetMax',
+        'maxTravelTime'
+    ];
+
+    // Debounced auto-search function
+    const debouncedSearch = debounce(() => {
+        if (selectedHomeCity && hasSearched) {
+            searchDestinations();
+        }
+    }, 800);
+
+    // Add change listeners to all inputs
+    searchInputs.forEach(inputId => {
+        const element = document.getElementById(inputId);
+        if (element) {
+            // For select elements, use 'change' event
+            const eventType = element.tagName === 'SELECT' ? 'change' : 'input';
+
+            element.addEventListener(eventType, () => {
+                if (hasSearched) {
+                    searchParamsChanged = true;
+                    showSearchAreaButton();
+                    // Auto-search after debounce
+                    debouncedSearch();
+                }
+            });
+        }
+    });
+
+    // Travel mode buttons
+    document.querySelectorAll('.travel-mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (hasSearched) {
+                searchParamsChanged = true;
+                showSearchAreaButton();
+                debouncedSearch();
+            }
+        });
+    });
+}
 
 // Initialize Leaflet map
 function initMap() {
@@ -1023,9 +1045,16 @@ function onMapMoved() {
     }
 }
 
-// Show the "Search this area" button
-function showSearchAreaButton() {
+// Show the "Search this area" / "Update search" button
+function showSearchAreaButton(text = null) {
     const btn = document.getElementById('searchAreaBtn');
+    if (text) {
+        btn.textContent = text;
+    } else if (searchParamsChanged) {
+        btn.textContent = '🔄 Update search';
+    } else {
+        btn.textContent = '🔄 Search this area';
+    }
     btn.classList.add('show');
 }
 
@@ -1033,6 +1062,7 @@ function showSearchAreaButton() {
 function hideSearchAreaButton() {
     const btn = document.getElementById('searchAreaBtn');
     btn.classList.remove('show');
+    searchParamsChanged = false;
 }
 
 // Search in current map area
@@ -1158,40 +1188,93 @@ function calculateTravelTime(homeCity, dest, distance) {
     }
 }
 
-// Initialize autocomplete for home city
+// Debounce helper function
+let debounceTimer = null;
+function debounce(func, delay) {
+    return function(...args) {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+// Initialize autocomplete for home city using Nominatim (OpenStreetMap)
 function initAutocomplete() {
     const input = document.getElementById('homeCity');
     const results = document.getElementById('homeCityResults');
 
-    input.addEventListener('input', () => {
-        const query = input.value.toLowerCase().trim();
+    // Debounced search function (Nominatim requires max 1 req/sec)
+    const searchCities = debounce(async (query) => {
         if (query.length < 2) {
             results.classList.remove('show');
             return;
         }
 
-        const matches = HOME_CITIES.filter(c =>
-            c.city.toLowerCase().includes(query) ||
-            c.state.toLowerCase().includes(query)
-        ).slice(0, 8);
+        try {
+            // Show loading state
+            results.innerHTML = '<div class="autocomplete-item" style="color: #888;">Searching...</div>';
+            results.classList.add('show');
 
-        if (matches.length === 0) {
-            results.classList.remove('show');
-            return;
+            // Use Nominatim API for worldwide city search
+            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=8&featuretype=city&dedupe=1`;
+
+            const response = await fetch(url, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) throw new Error('Nominatim API failed');
+
+            const data = await response.json();
+
+            if (data.length === 0) {
+                results.innerHTML = '<div class="autocomplete-item" style="color: #888;">No cities found</div>';
+                return;
+            }
+
+            // Filter to only show places that are cities/towns/villages
+            const cityTypes = ['city', 'town', 'village', 'municipality', 'administrative'];
+            const cities = data.filter(place => {
+                const type = place.type || place.class;
+                return cityTypes.some(t => type?.includes(t)) || place.addresstype === 'city';
+            });
+
+            // If no city-type results, show all results
+            const displayResults = cities.length > 0 ? cities : data;
+
+            results.innerHTML = displayResults.map(place => {
+                const city = place.address?.city || place.address?.town || place.address?.village ||
+                            place.address?.municipality || place.name || '';
+                const state = place.address?.state || place.address?.region || '';
+                const country = place.address?.country || '';
+                const displayName = formatLocationDisplay(city, state, country);
+
+                return `<div class="autocomplete-item"
+                    data-city="${escapeHtml(city)}"
+                    data-state="${escapeHtml(state)}"
+                    data-country="${escapeHtml(country)}"
+                    data-lat="${place.lat}"
+                    data-lon="${place.lon}"
+                    data-display="${escapeHtml(displayName)}">
+                    ${displayName}
+                </div>`;
+            }).join('');
+
+            // Add click handlers
+            results.querySelectorAll('.autocomplete-item').forEach(item => {
+                if (item.dataset.lat) {
+                    item.onclick = () => selectHomeCity(item);
+                }
+            });
+
+        } catch (error) {
+            console.error('Nominatim error:', error);
+            results.innerHTML = '<div class="autocomplete-item" style="color: #f44;">Search failed, try again</div>';
         }
+    }, 400); // 400ms debounce to respect rate limits
 
-        results.innerHTML = matches.map(c =>
-            `<div class="autocomplete-item" data-city="${c.city}" data-state="${c.state}" data-lat="${c.lat}" data-lon="${c.lon}">
-                ${c.city}, ${c.state}
-            </div>`
-        ).join('');
-
-        results.classList.add('show');
-
-        // Add click handlers
-        results.querySelectorAll('.autocomplete-item').forEach(item => {
-            item.onclick = () => selectHomeCity(item);
-        });
+    input.addEventListener('input', (e) => {
+        searchCities(e.target.value.trim());
     });
 
     // Close dropdown when clicking outside
@@ -1202,14 +1285,31 @@ function initAutocomplete() {
     });
 }
 
+// Format location display based on what info we have
+function formatLocationDisplay(city, state, country) {
+    const parts = [city];
+    if (state && state !== city) parts.push(state);
+    if (country) parts.push(country);
+    return parts.filter(p => p).join(', ');
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 function selectHomeCity(item) {
     const city = item.dataset.city;
     const state = item.dataset.state;
+    const country = item.dataset.country || '';
     const lat = parseFloat(item.dataset.lat);
     const lon = parseFloat(item.dataset.lon);
+    const displayName = item.dataset.display;
 
-    selectedHomeCity = { city, state, lat, lon };
-    document.getElementById('homeCity').value = `${city}, ${state}`;
+    selectedHomeCity = { city, state, country, lat, lon };
+    document.getElementById('homeCity').value = displayName;
     document.getElementById('homeCityResults').classList.remove('show');
 
     // Update travel time info with new home city
