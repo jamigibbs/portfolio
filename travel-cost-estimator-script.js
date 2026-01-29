@@ -498,116 +498,116 @@ const DESTINATIONS = [
     { city: "Catskills", region: "New York", country: "USA", lat: 42.1, lon: -74.4,
       type: "drive", driveHoursFromNYC: 2.5,
       accommodation: { budget: 80, mid: 150, luxury: 350 },
-      activities: 40, food: 60, description: "Mountain cabins & hiking",
+      activities: 40, food: 60, description: "Escape to rustic mountain cabins, pristine hiking trails, and charming small towns. Perfect for a cozy weekend retreat with stunning fall foliage and winter skiing.",
       seasonality: { winter: 1.3, spring: 0.9, summer: 1.2, fall: 1.4 } },
 
     { city: "Cape Cod", region: "Massachusetts", country: "USA", lat: 41.67, lon: -70.3,
       type: "drive", driveHoursFromNYC: 5,
       accommodation: { budget: 100, mid: 180, luxury: 400 },
-      activities: 50, food: 70, description: "Beaches & seafood",
+      activities: 50, food: 70, description: "Classic New England charm with sandy beaches, fresh lobster rolls, lighthouses, and quaint seaside villages. Best enjoyed in summer but magical year-round.",
       seasonality: { winter: 0.6, spring: 0.8, summer: 1.5, fall: 1.0 } },
 
     { city: "Philadelphia", region: "Pennsylvania", country: "USA", lat: 39.95, lon: -75.17,
       type: "drive", driveHoursFromNYC: 2,
       accommodation: { budget: 70, mid: 140, luxury: 280 },
-      activities: 35, food: 55, description: "History & cheesesteaks",
+      activities: 35, food: 55, description: "Birthplace of American democracy with world-class museums, a thriving food scene, and the iconic cheesesteak. History buffs and foodies alike will love it here.",
       seasonality: { winter: 0.85, spring: 1.0, summer: 1.1, fall: 1.05 } },
 
     { city: "Washington DC", region: "DC", country: "USA", lat: 38.9, lon: -77.04,
       type: "drive", driveHoursFromNYC: 4,
       accommodation: { budget: 90, mid: 170, luxury: 350 },
-      activities: 25, food: 60, description: "Museums & monuments (free!)",
+      activities: 25, food: 60, description: "The nation's capital offers free world-class museums, iconic monuments, and vibrant neighborhoods. Cherry blossoms in spring are unforgettable.",
       seasonality: { winter: 0.8, spring: 1.3, summer: 1.0, fall: 1.0 } },
 
     { city: "Boston", region: "Massachusetts", country: "USA", lat: 42.36, lon: -71.06,
       type: "drive", driveHoursFromNYC: 4,
       accommodation: { budget: 100, mid: 190, luxury: 400 },
-      activities: 45, food: 70, description: "Historic city & lobster",
+      activities: 45, food: 70, description: "Walk the Freedom Trail through American history, catch a game at Fenway, and feast on the freshest seafood. A perfect blend of old and new.",
       seasonality: { winter: 0.75, spring: 1.0, summer: 1.2, fall: 1.3 } },
 
     { city: "Atlantic City", region: "New Jersey", country: "USA", lat: 39.36, lon: -74.42,
       type: "drive", driveHoursFromNYC: 2.5,
       accommodation: { budget: 60, mid: 120, luxury: 280 },
-      activities: 50, food: 55, description: "Casinos & boardwalk",
+      activities: 50, food: 55, description: "Vegas vibes on the East Coast with beachfront casinos, a famous boardwalk, and surprisingly good dining. Great for a quick weekend getaway.",
       seasonality: { winter: 0.7, spring: 0.9, summer: 1.4, fall: 0.9 } },
 
     { city: "Poconos", region: "Pennsylvania", country: "USA", lat: 41.1, lon: -75.3,
       type: "drive", driveHoursFromNYC: 2,
       accommodation: { budget: 70, mid: 140, luxury: 300 },
-      activities: 45, food: 50, description: "Lakes & ski resorts",
+      activities: 45, food: 50, description: "Year-round mountain escape with skiing, water parks, hiking, and romantic cabin retreats. Popular for couples and family getaways alike.",
       seasonality: { winter: 1.4, spring: 0.8, summer: 1.1, fall: 1.2 } },
 
     { city: "Hudson Valley", region: "New York", country: "USA", lat: 41.5, lon: -73.9,
       type: "drive", driveHoursFromNYC: 1.5,
       accommodation: { budget: 90, mid: 180, luxury: 400 },
-      activities: 40, food: 65, description: "Wineries & fall foliage",
+      activities: 40, food: 65, description: "Rolling hills, award-winning wineries, farm-to-table dining, and stunning fall colors. NYC's favorite escape for food and nature lovers.",
       seasonality: { winter: 0.7, spring: 1.0, summer: 1.1, fall: 1.5 } },
 
     { city: "Vermont", region: "Vermont", country: "USA", lat: 44.26, lon: -72.58,
       type: "drive", driveHoursFromNYC: 5,
       accommodation: { budget: 85, mid: 160, luxury: 350 },
-      activities: 50, food: 55, description: "Skiing & maple syrup",
+      activities: 50, food: 55, description: "Quintessential New England with covered bridges, maple syrup farms, craft breweries, and some of the best skiing on the East Coast.",
       seasonality: { winter: 1.5, spring: 0.7, summer: 1.0, fall: 1.4 } },
 
     { city: "Montreal", region: "Quebec", country: "Canada", lat: 45.5, lon: -73.57,
       type: "drive", driveHoursFromNYC: 6,
       accommodation: { budget: 70, mid: 130, luxury: 280 },
-      activities: 40, food: 50, description: "French culture & poutine",
+      activities: 40, food: 50, description: "A slice of Europe in North America. French-speaking city with incredible food scene, vibrant nightlife, beautiful architecture, and world-famous poutine.",
       seasonality: { winter: 0.8, spring: 0.9, summer: 1.3, fall: 1.1 } },
 
     // Drivable from Los Angeles (within ~6 hours)
     { city: "Palm Springs", region: "California", country: "USA", lat: 33.83, lon: -116.55,
       type: "drive",
       accommodation: { budget: 80, mid: 180, luxury: 450 },
-      activities: 40, food: 55, description: "Desert oasis & mid-century modern",
+      activities: 40, food: 55, description: "Retro desert paradise with stunning mid-century modern architecture, natural hot springs, and year-round sunshine. Great for pool parties and relaxation.",
       seasonality: { winter: 1.4, spring: 1.2, summer: 0.6, fall: 1.0 } },
 
     { city: "San Diego", region: "California", country: "USA", lat: 32.72, lon: -117.16,
       type: "drive",
       accommodation: { budget: 90, mid: 170, luxury: 380 },
-      activities: 50, food: 55, description: "Beaches, zoo & craft beer",
+      activities: 50, food: 55, description: "Perfect weather year-round with world-famous zoo, stunning beaches, vibrant Gaslamp Quarter, and an incredible craft beer scene.",
       seasonality: { winter: 1.0, spring: 1.1, summer: 1.3, fall: 1.1 } },
 
     { city: "Santa Barbara", region: "California", country: "USA", lat: 34.42, lon: -119.7,
       type: "drive",
       accommodation: { budget: 100, mid: 200, luxury: 500 },
-      activities: 45, food: 65, description: "American Riviera & wine country",
+      activities: 45, food: 65, description: "The American Riviera with Spanish colonial architecture, world-class wineries, beautiful beaches, and a sophisticated food scene.",
       seasonality: { winter: 0.9, spring: 1.1, summer: 1.4, fall: 1.1 } },
 
     { city: "Joshua Tree", region: "California", country: "USA", lat: 34.13, lon: -116.31,
       type: "drive",
       accommodation: { budget: 60, mid: 120, luxury: 280 },
-      activities: 30, food: 40, description: "Desert stargazing & hiking",
+      activities: 30, food: 40, description: "Otherworldly desert landscape with iconic twisted trees, incredible stargazing, rock climbing, and a quirky arts scene. Best avoided in summer heat.",
       seasonality: { winter: 1.2, spring: 1.3, summer: 0.5, fall: 1.1 } },
 
     { city: "Big Sur", region: "California", country: "USA", lat: 36.27, lon: -121.81,
       type: "drive",
       accommodation: { budget: 120, mid: 250, luxury: 600 },
-      activities: 35, food: 60, description: "Dramatic coastline & redwoods",
+      activities: 35, food: 60, description: "One of the world's most dramatic coastlines. Cliffs plunge into the Pacific, redwood forests tower overhead, and luxury retreats offer total escape.",
       seasonality: { winter: 0.8, spring: 1.1, summer: 1.4, fall: 1.2 } },
 
     { city: "Lake Tahoe", region: "California/Nevada", country: "USA", lat: 39.1, lon: -120.04,
       type: "drive",
       accommodation: { budget: 90, mid: 180, luxury: 450 },
-      activities: 60, food: 55, description: "Mountain lake & skiing",
+      activities: 60, food: 55, description: "Crystal-clear alpine lake straddling California and Nevada. World-class skiing in winter, hiking and water sports in summer. Stunning year-round.",
       seasonality: { winter: 1.5, spring: 0.9, summer: 1.3, fall: 1.0 } },
 
     { city: "Sedona", region: "Arizona", country: "USA", lat: 34.87, lon: -111.76,
       type: "drive",
       accommodation: { budget: 100, mid: 200, luxury: 500 },
-      activities: 50, food: 55, description: "Red rocks & spiritual vortexes",
+      activities: 50, food: 55, description: "Mystical red rock formations, spiritual vortexes, world-class hiking, and a thriving arts community. Sunsets here are legendary.",
       seasonality: { winter: 1.1, spring: 1.3, summer: 0.8, fall: 1.2 } },
 
     { city: "Grand Canyon", region: "Arizona", country: "USA", lat: 36.1, lon: -112.11,
       type: "drive",
       accommodation: { budget: 80, mid: 160, luxury: 350 },
-      activities: 40, food: 45, description: "Natural wonder of the world",
+      activities: 40, food: 45, description: "One of Earth's most awe-inspiring natural wonders. 277 miles long, up to 18 miles wide, and over a mile deep. A must-see bucket list destination.",
       seasonality: { winter: 0.8, spring: 1.2, summer: 1.3, fall: 1.1 } },
 
     { city: "Scottsdale", region: "Arizona", country: "USA", lat: 33.49, lon: -111.93,
       type: "drive",
       accommodation: { budget: 80, mid: 180, luxury: 450 },
-      activities: 55, food: 60, description: "Desert luxury & golf",
+      activities: 55, food: 60, description: "Desert luxury at its finest with championship golf courses, world-class spas, upscale dining, and vibrant nightlife. Escape the winter cold in style.",
       seasonality: { winter: 1.5, spring: 1.3, summer: 0.5, fall: 1.0 } },
 
     // Drivable from Chicago (within ~6 hours)
@@ -757,81 +757,81 @@ const DESTINATIONS = [
     { city: "Cancun", region: "Quintana Roo", country: "Mexico", lat: 21.16, lon: -86.85,
       type: "fly", flightFromNYC: { low: 250, mid: 400, high: 600 },
       accommodation: { budget: 60, mid: 150, luxury: 400 },
-      activities: 50, food: 40, description: "Beaches & Mayan ruins",
+      activities: 50, food: 40, description: "Turquoise Caribbean waters, white sand beaches, and ancient Mayan ruins at your doorstep. From all-inclusive relaxation to adventure excursions.",
       seasonality: { winter: 1.4, spring: 1.3, summer: 0.8, fall: 0.7 } },
 
     { city: "Mexico City", region: "CDMX", country: "Mexico", lat: 19.43, lon: -99.13,
       type: "fly", flightFromNYC: { low: 220, mid: 350, high: 550 },
       accommodation: { budget: 40, mid: 100, luxury: 250 },
-      activities: 30, food: 30, description: "Culture, food & history",
+      activities: 30, food: 30, description: "One of the world's great cities. Incredible food scene, world-class museums, ancient Aztec ruins, and vibrant neighborhoods. Your dollar goes far here.",
       seasonality: { winter: 1.1, spring: 1.0, summer: 0.9, fall: 0.9 } },
 
     { city: "San Juan", region: "Puerto Rico", country: "USA", lat: 18.47, lon: -66.1,
       type: "fly", flightFromNYC: { low: 150, mid: 280, high: 450 },
       accommodation: { budget: 80, mid: 160, luxury: 350 },
-      activities: 45, food: 50, description: "Beaches & Old San Juan",
+      activities: 45, food: 50, description: "No passport needed for this Caribbean gem. Colorful Old San Juan, pristine beaches, rainforest adventures, and rum distilleries await.",
       seasonality: { winter: 1.4, spring: 1.2, summer: 0.9, fall: 0.8 } },
 
     { city: "Punta Cana", region: "La Altagracia", country: "Dominican Republic", lat: 18.58, lon: -68.4,
       type: "fly", flightFromNYC: { low: 200, mid: 350, high: 500 },
       accommodation: { budget: 70, mid: 180, luxury: 450 },
-      activities: 40, food: 35, description: "All-inclusive resorts",
+      activities: 40, food: 35, description: "All-inclusive paradise with endless palm-lined beaches, golf courses, and water sports. Leave your wallet at the resort and just relax.",
       seasonality: { winter: 1.5, spring: 1.2, summer: 0.8, fall: 0.7 } },
 
     { city: "Nassau", region: "New Providence", country: "Bahamas", lat: 25.06, lon: -77.35,
       type: "fly", flightFromNYC: { low: 200, mid: 350, high: 550 },
       accommodation: { budget: 100, mid: 220, luxury: 500 },
-      activities: 60, food: 70, description: "Crystal clear waters",
+      activities: 60, food: 70, description: "Crystal-clear turquoise waters, swimming pigs, luxury resorts, and that famous Bahamian hospitality. Paradise is just a short flight away.",
       seasonality: { winter: 1.4, spring: 1.2, summer: 0.9, fall: 0.8 } },
 
     { city: "Havana", region: "La Habana", country: "Cuba", lat: 23.11, lon: -82.37,
       type: "fly", flightFromNYC: { low: 280, mid: 400, high: 600 },
       accommodation: { budget: 35, mid: 80, luxury: 200 },
-      activities: 25, food: 25, description: "Classic cars & culture",
+      activities: 25, food: 25, description: "Step back in time to classic cars, crumbling colonial architecture, live salsa music, and mojitos. A unique destination unlike anywhere else.",
       seasonality: { winter: 1.3, spring: 1.1, summer: 0.9, fall: 0.8 } },
 
     // South America
     { city: "Medellin", region: "Antioquia", country: "Colombia", lat: 6.25, lon: -75.56,
       type: "fly", flightFromNYC: { low: 280, mid: 450, high: 700 },
       accommodation: { budget: 30, mid: 70, luxury: 180 },
-      activities: 25, food: 25, description: "Eternal spring & coffee",
+      activities: 25, food: 25, description: "The 'City of Eternal Spring' has transformed into a modern, innovative city. Perfect weather year-round, amazing coffee, and incredible value.",
       seasonality: { winter: 1.1, spring: 1.0, summer: 0.95, fall: 0.95 } },
 
     { city: "Bogota", region: "Cundinamarca", country: "Colombia", lat: 4.71, lon: -74.07,
       type: "fly", flightFromNYC: { low: 260, mid: 420, high: 650 },
       accommodation: { budget: 35, mid: 80, luxury: 200 },
-      activities: 25, food: 25, description: "Mountain capital & museums",
+      activities: 25, food: 25, description: "High-altitude capital with world-class museums, vibrant street art, incredible gastronomy, and a thriving nightlife scene. Cool weather year-round.",
       seasonality: { winter: 1.0, spring: 1.0, summer: 1.0, fall: 1.0 } },
 
     { city: "Cartagena", region: "Bolivar", country: "Colombia", lat: 10.39, lon: -75.51,
       type: "fly", flightFromNYC: { low: 300, mid: 480, high: 750 },
       accommodation: { budget: 45, mid: 120, luxury: 300 },
-      activities: 35, food: 35, description: "Colonial city & beaches",
+      activities: 35, food: 35, description: "Stunning colonial walled city on the Caribbean coast. Colorful streets, romantic plazas, nearby islands, and incredible ceviche.",
       seasonality: { winter: 1.3, spring: 1.1, summer: 0.9, fall: 0.85 } },
 
     { city: "Lima", region: "Lima", country: "Peru", lat: -12.05, lon: -77.04,
       type: "fly", flightFromNYC: { low: 350, mid: 550, high: 850 },
       accommodation: { budget: 35, mid: 90, luxury: 220 },
-      activities: 30, food: 30, description: "Foodie capital & history",
+      activities: 30, food: 30, description: "The gastronomic capital of South America. World-renowned ceviche, ancient ruins, and a perfect base for Machu Picchu adventures.",
       seasonality: { winter: 0.9, spring: 1.0, summer: 1.1, fall: 1.0 } },
 
     { city: "Buenos Aires", region: "CABA", country: "Argentina", lat: -34.6, lon: -58.38,
       type: "fly", flightFromNYC: { low: 500, mid: 800, high: 1200 },
       accommodation: { budget: 30, mid: 80, luxury: 200 },
-      activities: 30, food: 35, description: "Tango, steak & wine",
+      activities: 30, food: 35, description: "The 'Paris of South America' with passionate tango, world-class steak, incredible wine, and European-style architecture. Night owls will thrive here.",
       seasonality: { winter: 0.8, spring: 1.1, summer: 1.2, fall: 1.0 } },
 
     // Europe
     { city: "Lisbon", region: "Lisboa", country: "Portugal", lat: 38.72, lon: -9.14,
       type: "fly", flightFromNYC: { low: 350, mid: 550, high: 900 },
       accommodation: { budget: 50, mid: 120, luxury: 280 },
-      activities: 35, food: 40, description: "History, beaches & pastéis",
+      activities: 35, food: 40, description: "Europe's coolest capital. Cobblestone streets, vintage trams, incredible seafood, world-famous pastéis de nata, and beaches nearby. Amazing value for Western Europe.",
       seasonality: { winter: 0.7, spring: 1.0, summer: 1.4, fall: 1.0 } },
 
     { city: "Barcelona", region: "Catalonia", country: "Spain", lat: 41.39, lon: 2.17,
       type: "fly", flightFromNYC: { low: 380, mid: 600, high: 950 },
       accommodation: { budget: 60, mid: 140, luxury: 320 },
-      activities: 40, food: 50, description: "Gaudí, tapas & beaches",
+      activities: 40, food: 50, description: "Gaudí's fantastical architecture, Mediterranean beaches, legendary nightlife, and tapas culture. A city that truly has it all.",
       seasonality: { winter: 0.7, spring: 1.0, summer: 1.5, fall: 1.1 } },
 
     { city: "London", region: "England", country: "UK", lat: 51.51, lon: -0.13,
@@ -1182,7 +1182,13 @@ function toggleMonth(btn, monthIndex) {
 // Initialize travel time selector
 function initTravelTimeSelector() {
     const select = document.getElementById('maxTravelTime');
-    select.addEventListener('change', updateTravelTimeInfo);
+    select.addEventListener('change', () => {
+        updateTravelTimeInfo();
+        // Auto-search when travel time changes (if home city is selected)
+        if (selectedHomeCity) {
+            searchDestinations();
+        }
+    });
     updateTravelTimeInfo(); // Set initial info
 }
 
@@ -1369,6 +1375,9 @@ function selectHomeCity(item) {
     } else {
         map.setView([lat, lon], 5);
     }
+
+    // Auto-search when home city is selected
+    searchDestinations();
 }
 
 // Auto-zoom map to show travel radius from home city
@@ -1454,6 +1463,11 @@ function setTravelMode(mode) {
     document.querySelectorAll('.travel-mode-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.mode === mode);
     });
+
+    // Auto-search when travel mode changes (if home city is selected)
+    if (selectedHomeCity) {
+        searchDestinations();
+    }
 }
 
 function setDateType(type) {
