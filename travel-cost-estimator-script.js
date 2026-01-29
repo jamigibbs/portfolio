@@ -74,6 +74,16 @@ async function fetchWeatherOpenMeteo(lat, lon, startDate, endDate) {
         return apiCache.weather[cacheKey];
     }
 
+    // Check if the trip is within forecast range (16 days)
+    const today = new Date();
+    const tripStart = new Date(startDate);
+    const daysUntilTrip = Math.floor((tripStart - today) / (1000 * 60 * 60 * 24));
+
+    // If trip is beyond 16 days, use climate/almanac data instead
+    if (daysUntilTrip > 16) {
+        return await fetchClimateData(lat, lon, tripStart.getMonth());
+    }
+
     try {
         // Get forecast for next 16 days
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&temperature_unit=fahrenheit&timezone=auto&forecast_days=16`;
@@ -85,6 +95,7 @@ async function fetchWeatherOpenMeteo(lat, lon, startDate, endDate) {
 
         // Process weather data
         const weather = {
+            type: 'forecast',
             forecast: data.daily,
             avgHigh: Math.round(data.daily.temperature_2m_max.reduce((a, b) => a + b, 0) / data.daily.temperature_2m_max.length),
             avgLow: Math.round(data.daily.temperature_2m_min.reduce((a, b) => a + b, 0) / data.daily.temperature_2m_min.length),
@@ -96,8 +107,139 @@ async function fetchWeatherOpenMeteo(lat, lon, startDate, endDate) {
         return weather;
     } catch (error) {
         console.error('Open-Meteo error:', error);
+        // Fall back to climate data if forecast fails
+        return await fetchClimateData(lat, lon, tripStart.getMonth());
+    }
+}
+
+// Fetch historical climate data (almanac) for a specific month
+async function fetchClimateData(lat, lon, month) {
+    const cacheKey = `climate-${lat.toFixed(2)},${lon.toFixed(2)},${month}`;
+    if (apiCache.weather[cacheKey]) {
+        return apiCache.weather[cacheKey];
+    }
+
+    try {
+        // Get historical data for the last 5 years for this month
+        const currentYear = new Date().getFullYear();
+        const years = [currentYear - 1, currentYear - 2, currentYear - 3, currentYear - 4, currentYear - 5];
+
+        // Build date ranges for the target month across multiple years
+        const monthStr = String(month + 1).padStart(2, '0');
+        const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
+
+        let allHighs = [];
+        let allLows = [];
+        let allPrecip = [];
+
+        // Fetch data for each year (we'll do this sequentially to avoid rate limits)
+        for (const year of years.slice(0, 3)) { // Limit to 3 years to reduce API calls
+            const startDate = `${year}-${monthStr}-01`;
+            const endDate = `${year}-${monthStr}-${String(daysInMonth).padStart(2, '0')}`;
+
+            const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${startDate}&end_date=${endDate}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&timezone=auto`;
+
+            const response = await fetch(url);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.daily) {
+                    allHighs.push(...data.daily.temperature_2m_max.filter(t => t !== null));
+                    allLows.push(...data.daily.temperature_2m_min.filter(t => t !== null));
+                    // Convert precipitation to rain chance estimate (days with > 0.1mm)
+                    const rainyDays = data.daily.precipitation_sum.filter(p => p > 0.1).length;
+                    allPrecip.push(rainyDays / data.daily.precipitation_sum.length * 100);
+                }
+            }
+        }
+
+        if (allHighs.length === 0) {
+            // If API fails, return null to trigger fallback
+            return null;
+        }
+
+        // Calculate averages
+        const avgHigh = Math.round(allHighs.reduce((a, b) => a + b, 0) / allHighs.length);
+        const avgLow = Math.round(allLows.reduce((a, b) => a + b, 0) / allLows.length);
+        const rainChance = Math.round(allPrecip.reduce((a, b) => a + b, 0) / allPrecip.length);
+
+        // Determine typical conditions based on temperature and precipitation
+        const conditions = getTypicalConditions(avgHigh, avgLow, rainChance, lat);
+
+        const climate = {
+            type: 'climate',
+            monthName: getMonthName(month),
+            avgHigh,
+            avgLow,
+            rainChance,
+            conditions,
+            description: getClimateDescription(avgHigh, avgLow, rainChance)
+        };
+
+        apiCache.weather[cacheKey] = climate;
+        return climate;
+    } catch (error) {
+        console.error('Climate data error:', error);
         return null;
     }
+}
+
+// Get month name
+function getMonthName(month) {
+    const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'];
+    return months[month];
+}
+
+// Determine typical weather conditions based on climate data
+function getTypicalConditions(avgHigh, avgLow, rainChance, lat) {
+    // Determine if it's likely snowy (cold + precipitation + not tropical)
+    const isCold = avgHigh < 40;
+    const isCool = avgHigh < 60;
+    const isWarm = avgHigh >= 70 && avgHigh < 85;
+    const isHot = avgHigh >= 85;
+    const isRainy = rainChance > 40;
+    const isTropical = Math.abs(lat) < 25;
+
+    if (isCold && rainChance > 30 && !isTropical) {
+        return '❄️ Cold & Snowy';
+    } else if (isCold && rainChance <= 30) {
+        return '🥶 Cold & Dry';
+    } else if (isCold) {
+        return '🌨️ Cold';
+    } else if (isCool && isRainy) {
+        return '🌧️ Cool & Rainy';
+    } else if (isCool) {
+        return '🌤️ Cool & Mild';
+    } else if (isWarm && isRainy && isTropical) {
+        return '🌴 Warm & Humid';
+    } else if (isWarm && isRainy) {
+        return '🌦️ Warm & Rainy';
+    } else if (isWarm) {
+        return '☀️ Warm & Pleasant';
+    } else if (isHot && isRainy) {
+        return '🌴 Hot & Humid';
+    } else if (isHot) {
+        return '🔥 Hot & Sunny';
+    }
+    return '🌤️ Mild';
+}
+
+// Get a descriptive text for the climate
+function getClimateDescription(avgHigh, avgLow, rainChance) {
+    let desc = '';
+
+    if (avgHigh < 32) desc = 'Expect freezing temperatures';
+    else if (avgHigh < 50) desc = 'Pack warm layers';
+    else if (avgHigh < 65) desc = 'Mild weather, light jacket recommended';
+    else if (avgHigh < 80) desc = 'Pleasant temperatures';
+    else if (avgHigh < 90) desc = 'Warm weather';
+    else desc = 'Hot temperatures, stay hydrated';
+
+    if (rainChance > 50) desc += ', frequent rain likely';
+    else if (rainChance > 30) desc += ', some rain possible';
+    else desc += ', mostly dry';
+
+    return desc;
 }
 
 // Convert WMO weather codes to descriptions
@@ -1414,7 +1556,10 @@ function addDestinationMarker(dest, travelers, nights) {
     let weatherDisplay = '';
     if (dest.weather) {
         const weatherEmoji = dest.weather.conditions.split(' ')[0]; // Get just the emoji
-        weatherDisplay = `<span class="marker-weather">${weatherEmoji} ${dest.weather.avgHigh}°</span>`;
+        const isClimate = dest.weather.type === 'climate';
+        // Add a small "~" prefix for typical/climate data to indicate it's an average
+        const tempPrefix = isClimate ? '~' : '';
+        weatherDisplay = `<span class="marker-weather" title="${isClimate ? 'Typical weather for ' + dest.weather.monthName : 'Forecast'}">${weatherEmoji} ${tempPrefix}${dest.weather.avgHigh}°</span>`;
     }
 
     const icon = L.divIcon({
@@ -1450,24 +1595,39 @@ function createPopupContent(dest, travelers, nights) {
     // Format travel time
     const travelTimeStr = formatTravelTime(dest.travelTime);
 
-    // Weather info
+    // Weather info - differentiate between forecast and climate data
     let weatherHtml = '';
     if (dest.weather) {
+        const isClimate = dest.weather.type === 'climate';
+        const weatherTitle = isClimate
+            ? `📅 Typical ${dest.weather.monthName} Weather`
+            : '🌤️ Weather Forecast';
+        const tempLabel = isClimate ? 'Typical Temps' : 'Temperature';
+        const rainLabel = isClimate ? 'Typical Rain' : 'Rain Chance';
+        const climateNote = isClimate
+            ? `<div class="popup-row"><span class="popup-row-label" style="font-style: italic; color: #888;">Based on historical averages</span></div>`
+            : '';
+        const climateDesc = isClimate && dest.weather.description
+            ? `<div class="popup-row"><span class="popup-row-label">Tip</span><span class="popup-row-value" style="font-size: 11px;">${dest.weather.description}</span></div>`
+            : '';
+
         weatherHtml = `
             <div class="popup-section">
-                <h4>🌤️ Weather Forecast</h4>
+                <h4>${weatherTitle}</h4>
                 <div class="popup-row">
                     <span class="popup-row-label">Conditions</span>
                     <span class="popup-row-value">${dest.weather.conditions}</span>
                 </div>
                 <div class="popup-row">
-                    <span class="popup-row-label">Temperature</span>
+                    <span class="popup-row-label">${tempLabel}</span>
                     <span class="popup-row-value">${dest.weather.avgLow}°F - ${dest.weather.avgHigh}°F</span>
                 </div>
                 <div class="popup-row">
-                    <span class="popup-row-label">Rain Chance</span>
+                    <span class="popup-row-label">${rainLabel}</span>
                     <span class="popup-row-value">${dest.weather.rainChance}%</span>
                 </div>
+                ${climateDesc}
+                ${climateNote}
             </div>
         `;
     }
