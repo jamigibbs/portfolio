@@ -50,6 +50,16 @@
             margin-bottom: 24px;
         }
 
+        .version {
+            background: #404040;
+            color: #00d4ff;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            font-weight: 600;
+        }
+
         /* Step sections */
         .step-section {
             background: #363636;
@@ -513,16 +523,17 @@
             border: none;
         }
 
-        /* Popup styles */
+        /* Popup styles - Wide card design */
         .leaflet-popup-content-wrapper {
             background: #2d2d2d;
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 0;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
         .leaflet-popup-content {
             margin: 0;
-            min-width: 280px;
+            width: 420px !important;
         }
 
         .leaflet-popup-tip {
@@ -534,108 +545,220 @@
             color: #fff;
         }
 
-        .popup-image {
+        /* Hero image header */
+        .popup-hero {
             position: relative;
             width: 100%;
-            height: 140px;
+            height: 160px;
             overflow: hidden;
-            border-radius: 12px 12px 0 0;
-            margin: 0;
+            border-radius: 16px 16px 0 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
         }
 
-        .popup-image img {
+        .popup-hero img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .popup-image-credit {
+        .popup-hero-overlay {
             position: absolute;
             bottom: 0;
+            left: 0;
             right: 0;
-            background: rgba(0, 0, 0, 0.7);
+            padding: 16px 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        }
+
+        .popup-hero-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .popup-hero-subtitle {
+            color: #ccc;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .popup-hero-credit {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.6);
             color: #aaa;
             font-size: 9px;
             padding: 3px 8px;
-            border-radius: 4px 0 0 0;
+            border-radius: 4px;
         }
 
-        .popup-image-credit a {
+        .popup-hero-credit a {
             color: #00d4ff;
             text-decoration: none;
         }
 
-        .popup-image-credit a:hover {
-            text-decoration: underline;
+        /* No image fallback */
+        .popup-hero-noimage {
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
         }
 
-        /* Add padding to content when image is present */
-        .popup-content > .popup-header,
-        .popup-content > .popup-subheader,
-        .popup-content > .popup-section {
-            padding-left: 16px;
-            padding-right: 16px;
+        .popup-hero-noimage .popup-hero-title {
+            text-shadow: none;
         }
 
-        .popup-content > .popup-header {
-            padding-top: 16px;
+        /* Main body */
+        .popup-body {
+            padding: 16px 20px;
         }
 
-        .popup-header {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .popup-subheader {
-            color: #888;
+        /* Description section */
+        .popup-description {
             font-size: 13px;
+            color: #bbb;
+            line-height: 1.5;
             margin-bottom: 16px;
         }
 
-        .popup-section {
+        /* Tags row */
+        .popup-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
             margin-bottom: 16px;
         }
 
-        .popup-section:last-child {
-            margin-bottom: 0;
+        .popup-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #404040;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #ddd;
         }
 
-        .popup-section h4 {
-            font-size: 13px;
-            color: #00d4ff;
-            margin-bottom: 8px;
+        .popup-tag.highlight {
+            background: #2d5a3d;
+            color: #7dcea0;
+        }
+
+        .popup-tag.warning {
+            background: #5a4a2d;
+            color: #f0c674;
+        }
+
+        /* Two column grid for costs */
+        .popup-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .popup-card {
+            background: #363636;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .popup-card-header {
             display: flex;
             align-items: center;
             gap: 6px;
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
         }
 
-        .popup-row {
+        .popup-card-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .popup-card-detail {
+            font-size: 11px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        /* Weather card - full width */
+        .popup-weather {
+            background: #363636;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
             display: flex;
             justify-content: space-between;
-            font-size: 13px;
-            padding: 4px 0;
-            border-bottom: 1px solid #404040;
+            align-items: center;
         }
 
-        .popup-row:last-child {
-            border-bottom: none;
+        .popup-weather-main {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .popup-row-label {
-            color: #888;
+        .popup-weather-icon {
+            font-size: 28px;
         }
 
-        .popup-row-value {
+        .popup-weather-temp {
+            font-size: 18px;
             font-weight: 600;
         }
 
+        .popup-weather-desc {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .popup-weather-details {
+            text-align: right;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        /* Travel info row */
+        .popup-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-top: 1px solid #404040;
+            font-size: 13px;
+        }
+
+        .popup-info-row:first-child {
+            border-top: none;
+        }
+
+        .popup-info-label {
+            color: #888;
+        }
+
+        .popup-info-value {
+            font-weight: 500;
+        }
+
+        /* Total footer */
         .popup-total {
             background: #1a1a1a;
-            border-top: 1px solid #404040;
-            margin: 16px -16px -16px;
-            padding: 16px;
-            border-radius: 0 0 12px 12px;
+            padding: 16px 20px;
+            border-radius: 0 0 16px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .popup-total-left {
+            flex: 1;
         }
 
         .popup-total-label {
@@ -644,18 +767,33 @@
         }
 
         .popup-total-value {
-            font-size: 26px;
+            font-size: 32px;
             font-weight: 700;
             color: #4CAF50;
         }
 
-        .popup-total-per-day {
+        .popup-total-breakdown {
             font-size: 12px;
-            color: #aaa;
-            margin-top: 4px;
+            color: #888;
+            margin-top: 2px;
         }
 
-        /* Weather badge */
+        .popup-total-right {
+            text-align: right;
+        }
+
+        .popup-total-perday {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .popup-total-perday-label {
+            font-size: 11px;
+            color: #888;
+        }
+
+        /* Legacy support */
         .weather-badge {
             display: inline-flex;
             align-items: center;
@@ -924,7 +1062,7 @@
         <aside class="sidebar">
             <a href="index.html" class="back-link">← Back to Home</a>
             <h1 class="logo">✈️ Travel Cost Estimator</h1>
-            <p class="tagline">Find the perfect trip within your budget</p>
+            <p class="tagline">Find the perfect trip within your budget <span class="version">v1.3.0</span></p>
 
             <!-- Step 1: Trip Details -->
             <div class="step-section always-on" id="step1">
@@ -1077,13 +1215,15 @@
                         <span>Travel Advisories</span>
                         <span class="api-badge">Live</span>
                     </div>
-                    <div class="api-item" id="amadeusStatus">
+                    <div class="api-item connected">
                         <span class="api-dot"></span>
-                        <span>Amadeus Flights</span>
-                        <span class="api-badge">Add Key</span>
+                        <span>GeoNames Cities</span>
+                        <span class="api-badge">Live</span>
                     </div>
-                    <div class="api-help">
-                        <a href="https://developers.amadeus.com" target="_blank">Get free Amadeus API key →</a>
+                    <div class="api-item connected">
+                        <span class="api-dot"></span>
+                        <span>Wikipedia Images</span>
+                        <span class="api-badge">Live</span>
                     </div>
                 </div>
             </div>

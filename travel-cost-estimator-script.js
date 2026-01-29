@@ -2473,7 +2473,7 @@ function addDestinationMarker(dest, travelers, nights) {
     const popup = createPopupContent(dest, travelers, nights);
 
     const marker = L.marker([dest.lat, dest.lon], { icon })
-        .bindPopup(popup, { maxWidth: 320 })
+        .bindPopup(popup, { maxWidth: 450, minWidth: 420 })
         .addTo(map);
 
     markers.push(marker);
@@ -2482,157 +2482,143 @@ function addDestinationMarker(dest, travelers, nights) {
 // Create popup content for destination
 function createPopupContent(dest, travelers, nights) {
     const costs = dest.costs;
-    const seasonLabel = costs.seasonMultiplier > 1.1 ? '🔥 Peak Season' :
-                       costs.seasonMultiplier < 0.9 ? '💰 Off-Season' : '📅 Shoulder Season';
-
-    // Format travel time
     const travelTimeStr = formatTravelTime(dest.travelTime);
 
-    // Weather info - differentiate between forecast and climate data
-    let weatherHtml = '';
-    if (dest.weather) {
-        const isClimate = dest.weather.type === 'climate';
-        const weatherTitle = isClimate
-            ? `📅 Typical ${dest.weather.monthName} Weather`
-            : '🌤️ Weather Forecast';
-        const tempLabel = isClimate ? 'Typical Temps' : 'Temperature';
-        const rainLabel = isClimate ? 'Typical Rain' : 'Rain Chance';
-        const climateNote = isClimate
-            ? `<div class="popup-row"><span class="popup-row-label" style="font-style: italic; color: #888;">Based on historical averages</span></div>`
-            : '';
-        const climateDesc = isClimate && dest.weather.description
-            ? `<div class="popup-row"><span class="popup-row-label">Tip</span><span class="popup-row-value" style="font-size: 11px;">${dest.weather.description}</span></div>`
-            : '';
+    // Season tag styling
+    const seasonTag = costs.seasonMultiplier > 1.1
+        ? '<span class="popup-tag warning">🔥 Peak Season</span>'
+        : costs.seasonMultiplier < 0.9
+            ? '<span class="popup-tag highlight">💰 Off-Season</span>'
+            : '<span class="popup-tag">📅 Shoulder Season</span>';
 
-        weatherHtml = `
-            <div class="popup-section">
-                <h4>${weatherTitle}</h4>
-                <div class="popup-row">
-                    <span class="popup-row-label">Conditions</span>
-                    <span class="popup-row-value">${dest.weather.conditions}</span>
+    // Hero section with image or fallback
+    let heroHtml = '';
+    if (dest.image && dest.image.url) {
+        heroHtml = `
+            <div class="popup-hero">
+                <img src="${dest.image.url}" alt="${dest.city}" loading="lazy">
+                <div class="popup-hero-overlay">
+                    <h2 class="popup-hero-title">${dest.city}</h2>
+                    <div class="popup-hero-subtitle">${dest.region}, ${dest.country}</div>
                 </div>
-                <div class="popup-row">
-                    <span class="popup-row-label">${tempLabel}</span>
-                    <span class="popup-row-value">${dest.weather.avgLow}°F - ${dest.weather.avgHigh}°F</span>
+                <div class="popup-hero-credit">
+                    <a href="${dest.image.credit.link}" target="_blank" rel="noopener">📷 ${dest.image.credit.name}</a>
                 </div>
-                <div class="popup-row">
-                    <span class="popup-row-label">${rainLabel}</span>
-                    <span class="popup-row-value">${dest.weather.rainChance}%</span>
+            </div>
+        `;
+    } else {
+        heroHtml = `
+            <div class="popup-hero popup-hero-noimage">
+                <div>
+                    <h2 class="popup-hero-title">${dest.city}</h2>
+                    <div class="popup-hero-subtitle">${dest.region}, ${dest.country}</div>
                 </div>
-                ${climateDesc}
-                ${climateNote}
             </div>
         `;
     }
 
-    // Advisory info
-    let advisoryHtml = '';
-    if (dest.advisory) {
-        advisoryHtml = `
-            <div class="popup-row">
-                <span class="popup-row-label">🛡️ Safety Level</span>
-                <span class="popup-row-value" style="color: ${dest.advisory.color}">
-                    Level ${dest.advisory.level}
-                </span>
+    // Weather card
+    let weatherHtml = '';
+    if (dest.weather) {
+        const isClimate = dest.weather.type === 'climate';
+        const weatherEmoji = dest.weather.conditions.split(' ')[0];
+        const tempNote = isClimate ? `Typical for ${dest.weather.monthName}` : 'Forecast';
+
+        weatherHtml = `
+            <div class="popup-weather">
+                <div class="popup-weather-main">
+                    <span class="popup-weather-icon">${weatherEmoji}</span>
+                    <div>
+                        <div class="popup-weather-temp">${dest.weather.avgLow}° - ${dest.weather.avgHigh}°F</div>
+                        <div class="popup-weather-desc">${tempNote}</div>
+                    </div>
+                </div>
+                <div class="popup-weather-details">
+                    <div>💧 ${dest.weather.rainChance}% rain</div>
+                </div>
             </div>
         `;
+    }
+
+    // Description
+    const description = dest.description || dest.wikiDescription || 'A beautiful destination worth exploring.';
+
+    // Transport details
+    const transportIcon = costs.transportType === 'drive' ? '🚗' : '✈️';
+    const transportLabel = costs.transportType === 'drive' ? 'Drive' : 'Flights';
+    const transportDetail = costs.transportType === 'drive'
+        ? `${Math.round(dest.distance)} mi`
+        : `${travelers} traveler${travelers > 1 ? 's' : ''}`;
+
+    // Advisory tag
+    let advisoryTag = '';
+    if (dest.advisory) {
+        const safetyClass = dest.advisory.level <= 2 ? 'highlight' : dest.advisory.level >= 3 ? 'warning' : '';
+        advisoryTag = `<span class="popup-tag ${safetyClass}">🛡️ Level ${dest.advisory.level}</span>`;
     }
 
     // Currency info
     let currencyHtml = '';
     if (dest.localCurrency && dest.localCurrency !== 'USD' && dest.exchangeRate) {
         currencyHtml = `
-            <div class="popup-row">
-                <span class="popup-row-label">💱 Exchange Rate</span>
-                <span class="popup-row-value">$1 = ${dest.exchangeRate.toFixed(2)} ${dest.localCurrency}</span>
+            <div class="popup-info-row">
+                <span class="popup-info-label">💱 Exchange Rate</span>
+                <span class="popup-info-value">$1 = ${dest.exchangeRate.toFixed(2)} ${dest.localCurrency}</span>
             </div>
         `;
     }
-
-    // Flight data from Amadeus (if available)
-    let flightSourceHtml = '';
-    if (dest.flightData) {
-        flightSourceHtml = `<div style="font-size: 10px; color: #888; margin-top: 4px;">
-            Real-time price from ${dest.flightData.source} (${dest.flightData.offers} offers)
-        </div>`;
-    }
-
-    // Image header (if available from Wikipedia)
-    let imageHtml = '';
-    if (dest.image && dest.image.url) {
-        imageHtml = `
-            <div class="popup-image">
-                <img src="${dest.image.thumb}" alt="${dest.city}" loading="lazy">
-                <div class="popup-image-credit">
-                    📷 <a href="${dest.image.credit.link}" target="_blank" rel="noopener">${dest.image.credit.name}</a>
-                </div>
-            </div>
-        `;
-    }
-
-    // Use Wikivoyage description as fallback if no custom description
-    const description = dest.description || dest.wikiDescription || 'A beautiful destination worth exploring.';
 
     return `
         <div class="popup-content">
-            ${imageHtml}
-            <div class="popup-header">${dest.city}</div>
-            <div class="popup-subheader">${dest.region}, ${dest.country}</div>
+            ${heroHtml}
 
-            <div class="popup-section">
-                <h4>📍 About</h4>
-                <p style="font-size: 13px; color: #ccc; margin: 0;">${description}</p>
-                <div style="margin-top: 8px;">
-                    <span class="weather-badge">${seasonLabel}</span>
-                    <span class="weather-badge" style="margin-left: 4px;">⏱️ ${travelTimeStr}</span>
+            <div class="popup-body">
+                <p class="popup-description">${description}</p>
+
+                <div class="popup-tags">
+                    ${seasonTag}
+                    <span class="popup-tag">⏱️ ${travelTimeStr}</span>
+                    ${advisoryTag}
                 </div>
-            </div>
 
-            ${weatherHtml}
+                ${weatherHtml}
 
-            <div class="popup-section">
-                <h4>${costs.transportType === 'drive' ? '🚗 Driving' : '✈️ Flights'}</h4>
-                <div class="popup-row">
-                    <span class="popup-row-label">
-                        ${costs.transportType === 'drive'
-                            ? `${Math.round(dest.distance)} mi (${travelTimeStr})`
-                            : `${travelers} traveler${travelers > 1 ? 's' : ''} (${travelTimeStr})`}
-                    </span>
-                    <span class="popup-row-value">$${dest.flightData ? dest.flightData.cheapest : costs.transport}</span>
+                <div class="popup-grid">
+                    <div class="popup-card">
+                        <div class="popup-card-header">${transportIcon} ${transportLabel}</div>
+                        <div class="popup-card-value">$${costs.transport}</div>
+                        <div class="popup-card-detail">${transportDetail}</div>
+                    </div>
+                    <div class="popup-card">
+                        <div class="popup-card-header">🏨 Accommodation</div>
+                        <div class="popup-card-value">$${costs.accommodation}</div>
+                        <div class="popup-card-detail">${nights} nights</div>
+                    </div>
+                    <div class="popup-card">
+                        <div class="popup-card-header">🍽️ Food</div>
+                        <div class="popup-card-value">$${costs.food}</div>
+                        <div class="popup-card-detail">${nights} days</div>
+                    </div>
+                    <div class="popup-card">
+                        <div class="popup-card-header">🎯 Activities</div>
+                        <div class="popup-card-value">$${costs.activities}</div>
+                        <div class="popup-card-detail">Estimated</div>
+                    </div>
                 </div>
-                ${flightSourceHtml}
-            </div>
 
-            <div class="popup-section">
-                <h4>🏨 Accommodation</h4>
-                <div class="popup-row">
-                    <span class="popup-row-label">${nights} nights</span>
-                    <span class="popup-row-value">$${costs.accommodation}</span>
-                </div>
-            </div>
-
-            <div class="popup-section">
-                <h4>🍽️ Food & Activities</h4>
-                <div class="popup-row">
-                    <span class="popup-row-label">Food (${nights} days)</span>
-                    <span class="popup-row-value">$${costs.food}</span>
-                </div>
-                <div class="popup-row">
-                    <span class="popup-row-label">Activities</span>
-                    <span class="popup-row-value">$${costs.activities}</span>
-                </div>
-            </div>
-
-            <div class="popup-section">
-                <h4>ℹ️ Travel Info</h4>
                 ${currencyHtml}
-                ${advisoryHtml}
             </div>
 
             <div class="popup-total">
-                <div class="popup-total-label">Estimated Total (${travelers} travelers)</div>
-                <div class="popup-total-value">$${costs.total}</div>
-                <div class="popup-total-per-day">$${costs.perDay}/day · $${costs.perPerson}/person</div>
+                <div class="popup-total-left">
+                    <div class="popup-total-label">Estimated Total</div>
+                    <div class="popup-total-value">$${costs.total.toLocaleString()}</div>
+                    <div class="popup-total-breakdown">${travelers} traveler${travelers > 1 ? 's' : ''} · ${nights} nights</div>
+                </div>
+                <div class="popup-total-right">
+                    <div class="popup-total-perday">$${costs.perDay}</div>
+                    <div class="popup-total-perday-label">per day</div>
+                </div>
             </div>
         </div>
     `;
