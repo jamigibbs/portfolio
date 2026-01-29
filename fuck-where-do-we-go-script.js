@@ -20,7 +20,9 @@ const apiCache = {
     weather: {},
     currency: {},
     advisories: {},
-    flights: {}
+    flights: {},
+    driving: {},
+    geonames: {}
 };
 
 // ============================================
@@ -43,8 +45,8 @@ const API_KEYS = {
     geonames: {
         username: 'dnfisher'
     },
-    // Optional: OpenRouteService for isochrones: https://openrouteservice.org
-    openRouteService: ''   // Free key, 2000 calls/day
+    // Optional: OpenRouteService for driving routes: https://openrouteservice.org
+    openRouteService: 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjA4ZGYyZTM0NWUwODRjMmE5Yjg0NThkOTdkMTcxOGE5IiwiaCI6Im11cm11cjY0In0='   // Free key, 2000 calls/day
 };
 
 // Country data for currency and safety lookups
@@ -578,6 +580,58 @@ async function fetchWikipediaImage(cityName, countryName) {
         return null;
     } catch (error) {
         console.error('Wikipedia image error:', error);
+        return null;
+    }
+}
+
+// ============================================
+// OPENROUTESERVICE API - Driving Directions
+// Get accurate driving times and distances
+// ============================================
+async function fetchDrivingRoute(homeLat, homeLon, destLat, destLon) {
+    if (!API_KEYS.openRouteService) {
+        return null;
+    }
+
+    const cacheKey = `${homeLat.toFixed(2)},${homeLon.toFixed(2)}-${destLat.toFixed(2)},${destLon.toFixed(2)}`;
+    if (apiCache.driving[cacheKey]) {
+        return apiCache.driving[cacheKey];
+    }
+
+    try {
+        const url = `https://api.openrouteservice.org/v2/directions/driving-car?start=${homeLon},${homeLat}&end=${destLon},${destLat}`;
+
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': API_KEYS.openRouteService
+            }
+        });
+
+        if (!response.ok) {
+            // If route not found (e.g., water crossing), return null
+            if (response.status === 404) {
+                apiCache.driving[cacheKey] = { notDrivable: true };
+                return { notDrivable: true };
+            }
+            throw new Error('OpenRouteService API failed');
+        }
+
+        const data = await response.json();
+
+        if (data.features && data.features[0]) {
+            const segment = data.features[0].properties.segments[0];
+            const result = {
+                durationHours: segment.duration / 3600, // Convert seconds to hours
+                distanceMiles: segment.distance / 1609.34, // Convert meters to miles
+                notDrivable: false
+            };
+            apiCache.driving[cacheKey] = result;
+            return result;
+        }
+
+        return null;
+    } catch (error) {
+        console.error('OpenRouteService error:', error);
         return null;
     }
 }
@@ -2693,13 +2747,53 @@ async function searchDestinations(searchInArea = false) {
         const enrichedResults = await Promise.all(
             topResults.map(async (dest) => {
                 const externalData = await fetchDestinationData(dest, startDateStr, endDateStr, travelers);
+
+                // For driving destinations, get accurate route from OpenRouteService
+                let accurateDriving = null;
+                if (dest.type === 'drive' && API_KEYS.openRouteService) {
+                    accurateDriving = await fetchDrivingRoute(
+                        selectedHomeCity.lat, selectedHomeCity.lon,
+                        dest.lat, dest.lon
+                    );
+                }
+
+                // Update travel time and costs if we got accurate driving data
+                if (accurateDriving && !accurateDriving.notDrivable) {
+                    const accurateTime = accurateDriving.durationHours;
+                    const accurateDistance = accurateDriving.distanceMiles;
+
+                    // Recalculate transport cost with accurate distance
+                    const drivingCost = accurateDistance * 2 * 0.25; // Round trip, $0.25/mile
+                    const costDiff = drivingCost - dest.costs.transport;
+
+                    return {
+                        ...dest,
+                        ...externalData,
+                        travelTime: accurateTime,
+                        distance: accurateDistance,
+                        accurateDriving: true,
+                        costs: {
+                            ...dest.costs,
+                            transport: Math.round(drivingCost),
+                            total: Math.round(dest.costs.total + costDiff),
+                            perDay: Math.round((dest.costs.total + costDiff) / nights)
+                        }
+                    };
+                } else if (accurateDriving && accurateDriving.notDrivable) {
+                    // Route not possible - should be filtered out but mark it
+                    return { ...dest, ...externalData, notDrivable: true };
+                }
+
                 return { ...dest, ...externalData };
             })
         );
 
+        // Filter out any destinations that turned out to be not drivable
+        const validEnrichedResults = enrichedResults.filter(r => !r.notDrivable);
+
         // Combine enriched results with remaining results
         const allResults = [
-            ...enrichedResults,
+            ...validEnrichedResults,
             ...results.slice(15)
         ];
 
