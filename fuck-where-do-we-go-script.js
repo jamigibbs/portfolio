@@ -2698,6 +2698,7 @@ async function searchDestinations(searchInArea = false) {
 
         console.log('Search debug:', {
             homeCity: selectedHomeCity.city,
+            homeCountry: selectedHomeCity.country,
             homeLat: selectedHomeCity.lat,
             homeLon: selectedHomeCity.lon,
             travelMode,
@@ -2707,10 +2708,14 @@ async function searchDestinations(searchInArea = false) {
             totalDestinations: allDestinations.length
         });
 
+        // Debug: Log first few UK destinations to check country matching
+        const ukDests = allDestinations.filter(d => d.country === 'UK' || d.country === 'United Kingdom');
+        console.log('UK destinations found:', ukDests.length, ukDests.slice(0, 3).map(d => d.city));
+
         // Calculate costs for each destination
         const results = [];
         const DRIVE_THRESHOLD = 500; // Miles - destinations under this are drivable
-        const filterStats = { total: 0, sameCity: 0, modeFilter: 0, timeFilter: 0, boundsFilter: 0, budgetFilter: 0, passed: 0 };
+        const filterStats = { total: 0, sameCity: 0, modeFilter: 0, timeFilter: 0, boundsFilter: 0, budgetFilter: 0, cantDrive: 0, passed: 0 };
 
         for (const dest of allDestinations) {
             filterStats.total++;
@@ -2735,11 +2740,21 @@ async function searchDestinations(searchInArea = false) {
                 dest.lat, dest.lon
             );
 
+            // Debug: Log UK destinations specifically
+            if (dest.country === 'UK' && !canDrive) {
+                console.log('UK dest marked as not drivable:', dest.city, {
+                    homeCountry: selectedHomeCity.country,
+                    destCountry: dest.country,
+                    canDrive
+                });
+            }
+
             // Dynamically determine travel type based on distance and drivability
             // If water crossing required, must fly regardless of distance
             let effectiveType;
             if (!canDrive) {
                 effectiveType = 'fly';
+                filterStats.cantDrive++;
             } else {
                 effectiveType = distance <= DRIVE_THRESHOLD ? 'drive' : 'fly';
             }
