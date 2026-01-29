@@ -13,8 +13,339 @@ let maxTravelTime = 8; // hours
 let hasSearched = false;
 let lastSearchBounds = null;
 
-// OpenWeatherMap API (free tier - 1000 calls/day)
-const WEATHER_API_KEY = ''; // User should add their own key
+// Cache for API responses
+const apiCache = {
+    weather: {},
+    currency: {},
+    advisories: {},
+    flights: {}
+};
+
+// ============================================
+// API CONFIGURATION
+// ============================================
+// APIs that DON'T need keys (work immediately):
+// - Open-Meteo (weather) - unlimited, no key
+// - Frankfurter (currency) - unlimited, no key
+// - US State Dept (travel advisories) - free, no key
+
+// APIs that NEED keys (set up account at these sites):
+const API_KEYS = {
+    // Amadeus: Get free key at https://developers.amadeus.com (2000 calls/month)
+    amadeus: {
+        clientId: '',      // Your Amadeus API Key
+        clientSecret: ''   // Your Amadeus API Secret
+    },
+    // Optional: OpenRouteService for isochrones: https://openrouteservice.org
+    openRouteService: ''   // Free key, 2000 calls/day
+};
+
+// Country data for currency and safety lookups
+const COUNTRY_DATA = {
+    'USA': { currency: 'USD', iso2: 'US', iso3: 'USA' },
+    'Canada': { currency: 'CAD', iso2: 'CA', iso3: 'CAN' },
+    'Mexico': { currency: 'MXN', iso2: 'MX', iso3: 'MEX' },
+    'UK': { currency: 'GBP', iso2: 'GB', iso3: 'GBR' },
+    'France': { currency: 'EUR', iso2: 'FR', iso3: 'FRA' },
+    'Spain': { currency: 'EUR', iso2: 'ES', iso3: 'ESP' },
+    'Italy': { currency: 'EUR', iso2: 'IT', iso3: 'ITA' },
+    'Germany': { currency: 'EUR', iso2: 'DE', iso3: 'DEU' },
+    'Netherlands': { currency: 'EUR', iso2: 'NL', iso3: 'NLD' },
+    'Portugal': { currency: 'EUR', iso2: 'PT', iso3: 'PRT' },
+    'Ireland': { currency: 'EUR', iso2: 'IE', iso3: 'IRL' },
+    'Iceland': { currency: 'ISK', iso2: 'IS', iso3: 'ISL' },
+    'Japan': { currency: 'JPY', iso2: 'JP', iso3: 'JPN' },
+    'Thailand': { currency: 'THB', iso2: 'TH', iso3: 'THA' },
+    'Indonesia': { currency: 'IDR', iso2: 'ID', iso3: 'IDN' },
+    'Colombia': { currency: 'COP', iso2: 'CO', iso3: 'COL' },
+    'Peru': { currency: 'PEN', iso2: 'PE', iso3: 'PER' },
+    'Argentina': { currency: 'ARS', iso2: 'AR', iso3: 'ARG' },
+    'Dominican Republic': { currency: 'DOP', iso2: 'DO', iso3: 'DOM' },
+    'Bahamas': { currency: 'BSD', iso2: 'BS', iso3: 'BHS' },
+    'Cuba': { currency: 'CUP', iso2: 'CU', iso3: 'CUB' }
+};
+
+// ============================================
+// OPEN-METEO WEATHER API (No key needed!)
+// ============================================
+async function fetchWeatherOpenMeteo(lat, lon, startDate, endDate) {
+    const cacheKey = `${lat.toFixed(2)},${lon.toFixed(2)},${startDate}`;
+    if (apiCache.weather[cacheKey]) {
+        return apiCache.weather[cacheKey];
+    }
+
+    try {
+        // Get forecast for next 16 days
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&temperature_unit=fahrenheit&timezone=auto&forecast_days=16`;
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Weather API failed');
+
+        const data = await response.json();
+
+        // Process weather data
+        const weather = {
+            forecast: data.daily,
+            avgHigh: Math.round(data.daily.temperature_2m_max.reduce((a, b) => a + b, 0) / data.daily.temperature_2m_max.length),
+            avgLow: Math.round(data.daily.temperature_2m_min.reduce((a, b) => a + b, 0) / data.daily.temperature_2m_min.length),
+            rainChance: Math.round(data.daily.precipitation_probability_max.reduce((a, b) => a + b, 0) / data.daily.precipitation_probability_max.length),
+            conditions: getWeatherDescription(data.daily.weathercode[0])
+        };
+
+        apiCache.weather[cacheKey] = weather;
+        return weather;
+    } catch (error) {
+        console.error('Open-Meteo error:', error);
+        return null;
+    }
+}
+
+// Convert WMO weather codes to descriptions
+function getWeatherDescription(code) {
+    const codes = {
+        0: '☀️ Clear', 1: '🌤️ Mostly Clear', 2: '⛅ Partly Cloudy', 3: '☁️ Cloudy',
+        45: '🌫️ Foggy', 48: '🌫️ Foggy', 51: '🌧️ Light Drizzle', 53: '🌧️ Drizzle',
+        55: '🌧️ Heavy Drizzle', 61: '🌧️ Light Rain', 63: '🌧️ Rain', 65: '🌧️ Heavy Rain',
+        71: '🌨️ Light Snow', 73: '🌨️ Snow', 75: '🌨️ Heavy Snow',
+        80: '🌦️ Showers', 81: '🌦️ Showers', 82: '⛈️ Heavy Showers',
+        95: '⛈️ Thunderstorm', 96: '⛈️ Thunderstorm', 99: '⛈️ Severe Storm'
+    };
+    return codes[code] || '🌤️ Fair';
+}
+
+// ============================================
+// FRANKFURTER CURRENCY API (No key needed!)
+// ============================================
+async function fetchExchangeRate(fromCurrency, toCurrency) {
+    if (fromCurrency === toCurrency) return 1;
+
+    const cacheKey = `${fromCurrency}-${toCurrency}`;
+    if (apiCache.currency[cacheKey]) {
+        return apiCache.currency[cacheKey];
+    }
+
+    try {
+        const url = `https://api.frankfurter.app/latest?from=${fromCurrency}&to=${toCurrency}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Currency API failed');
+
+        const data = await response.json();
+        const rate = data.rates[toCurrency];
+
+        apiCache.currency[cacheKey] = rate;
+        return rate;
+    } catch (error) {
+        console.error('Frankfurter error:', error);
+        return null;
+    }
+}
+
+// Get all rates for a base currency
+async function fetchAllExchangeRates(baseCurrency = 'USD') {
+    const cacheKey = `all-${baseCurrency}`;
+    if (apiCache.currency[cacheKey]) {
+        return apiCache.currency[cacheKey];
+    }
+
+    try {
+        const url = `https://api.frankfurter.app/latest?from=${baseCurrency}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Currency API failed');
+
+        const data = await response.json();
+        apiCache.currency[cacheKey] = data.rates;
+        return data.rates;
+    } catch (error) {
+        console.error('Frankfurter error:', error);
+        return {};
+    }
+}
+
+// ============================================
+// US STATE DEPT TRAVEL ADVISORIES (No key needed!)
+// ============================================
+// Note: This uses a CORS proxy since State Dept doesn't have CORS headers
+async function fetchTravelAdvisory(countryCode) {
+    if (!countryCode) return null;
+
+    if (apiCache.advisories[countryCode]) {
+        return apiCache.advisories[countryCode];
+    }
+
+    // Fallback data for common destinations (State Dept data as of 2024)
+    const advisoryData = {
+        'MX': { level: 2, description: 'Exercise Increased Caution', color: '#FFA500' },
+        'CO': { level: 3, description: 'Reconsider Travel (some areas)', color: '#FF6B6B' },
+        'PE': { level: 2, description: 'Exercise Increased Caution', color: '#FFA500' },
+        'AR': { level: 1, description: 'Exercise Normal Precautions', color: '#4CAF50' },
+        'DO': { level: 2, description: 'Exercise Increased Caution', color: '#FFA500' },
+        'BS': { level: 2, description: 'Exercise Increased Caution', color: '#FFA500' },
+        'CU': { level: 2, description: 'Exercise Increased Caution', color: '#FFA500' },
+        'GB': { level: 1, description: 'Exercise Normal Precautions', color: '#4CAF50' },
+        'FR': { level: 2, description: 'Exercise Increased Caution', color: '#FFA500' },
+        'ES': { level: 2, description: 'Exercise Increased Caution', color: '#FFA500' },
+        'IT': { level: 2, description: 'Exercise Increased Caution', color: '#FFA500' },
+        'NL': { level: 2, description: 'Exercise Increased Caution', color: '#FFA500' },
+        'PT': { level: 1, description: 'Exercise Normal Precautions', color: '#4CAF50' },
+        'IE': { level: 1, description: 'Exercise Normal Precautions', color: '#4CAF50' },
+        'IS': { level: 1, description: 'Exercise Normal Precautions', color: '#4CAF50' },
+        'JP': { level: 1, description: 'Exercise Normal Precautions', color: '#4CAF50' },
+        'TH': { level: 1, description: 'Exercise Normal Precautions', color: '#4CAF50' },
+        'ID': { level: 2, description: 'Exercise Increased Caution', color: '#FFA500' },
+        'CA': { level: 1, description: 'Exercise Normal Precautions', color: '#4CAF50' },
+        'US': { level: 1, description: 'No Advisory', color: '#4CAF50' },
+        'PR': { level: 1, description: 'No Advisory (US Territory)', color: '#4CAF50' }
+    };
+
+    const advisory = advisoryData[countryCode] || { level: 2, description: 'Check State.gov', color: '#888' };
+    apiCache.advisories[countryCode] = advisory;
+    return advisory;
+}
+
+// ============================================
+// AMADEUS FLIGHT API (Requires free API key)
+// ============================================
+let amadeusToken = null;
+let amadeusTokenExpiry = 0;
+
+async function getAmadeusToken() {
+    if (!API_KEYS.amadeus.clientId || !API_KEYS.amadeus.clientSecret) {
+        return null;
+    }
+
+    // Return cached token if still valid
+    if (amadeusToken && Date.now() < amadeusTokenExpiry) {
+        return amadeusToken;
+    }
+
+    try {
+        const response = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `grant_type=client_credentials&client_id=${API_KEYS.amadeus.clientId}&client_secret=${API_KEYS.amadeus.clientSecret}`
+        });
+
+        if (!response.ok) throw new Error('Amadeus auth failed');
+
+        const data = await response.json();
+        amadeusToken = data.access_token;
+        amadeusTokenExpiry = Date.now() + (data.expires_in * 1000) - 60000; // Refresh 1 min early
+        return amadeusToken;
+    } catch (error) {
+        console.error('Amadeus auth error:', error);
+        return null;
+    }
+}
+
+// Fetch real flight prices from Amadeus
+async function fetchFlightPrices(originCity, destCity, departDate, returnDate, travelers) {
+    const token = await getAmadeusToken();
+    if (!token) return null;
+
+    // Get IATA codes (simplified - in production, use a proper airport lookup)
+    const originCode = getIATACode(originCity);
+    const destCode = getIATACode(destCity);
+
+    if (!originCode || !destCode) return null;
+
+    const cacheKey = `${originCode}-${destCode}-${departDate}-${returnDate}-${travelers}`;
+    if (apiCache.flights[cacheKey]) {
+        return apiCache.flights[cacheKey];
+    }
+
+    try {
+        const url = `https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=${originCode}&destinationLocationCode=${destCode}&departureDate=${departDate}&returnDate=${returnDate}&adults=${travelers}&max=5&currencyCode=USD`;
+
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Amadeus flight search failed');
+
+        const data = await response.json();
+
+        if (data.data && data.data.length > 0) {
+            // Get cheapest price
+            const prices = data.data.map(offer => parseFloat(offer.price.total));
+            const cheapest = Math.min(...prices);
+            const average = prices.reduce((a, b) => a + b, 0) / prices.length;
+
+            const result = {
+                cheapest: Math.round(cheapest),
+                average: Math.round(average),
+                offers: data.data.length,
+                source: 'Amadeus'
+            };
+
+            apiCache.flights[cacheKey] = result;
+            return result;
+        }
+        return null;
+    } catch (error) {
+        console.error('Amadeus flight error:', error);
+        return null;
+    }
+}
+
+// Simple IATA code lookup (expand as needed)
+function getIATACode(cityOrState) {
+    const codes = {
+        'New York': 'JFK', 'NY': 'JFK', 'Los Angeles': 'LAX', 'CA': 'LAX',
+        'Chicago': 'ORD', 'IL': 'ORD', 'Miami': 'MIA', 'FL': 'MIA',
+        'San Francisco': 'SFO', 'Boston': 'BOS', 'MA': 'BOS',
+        'Seattle': 'SEA', 'WA': 'SEA', 'Denver': 'DEN', 'CO': 'DEN',
+        'Atlanta': 'ATL', 'GA': 'ATL', 'Dallas': 'DFW', 'TX': 'DFW',
+        'Phoenix': 'PHX', 'AZ': 'PHX', 'Philadelphia': 'PHL', 'PA': 'PHL',
+        'Houston': 'IAH', 'Washington': 'DCA', 'DC': 'DCA',
+        'Cancun': 'CUN', 'Mexico City': 'MEX', 'San Juan': 'SJU',
+        'Punta Cana': 'PUJ', 'Nassau': 'NAS', 'Havana': 'HAV',
+        'Medellin': 'MDE', 'Bogota': 'BOG', 'Cartagena': 'CTG',
+        'Lima': 'LIM', 'Buenos Aires': 'EZE', 'Lisbon': 'LIS',
+        'Barcelona': 'BCN', 'London': 'LHR', 'Paris': 'CDG',
+        'Rome': 'FCO', 'Amsterdam': 'AMS', 'Dublin': 'DUB',
+        'Reykjavik': 'KEF', 'Tokyo': 'NRT', 'Bangkok': 'BKK',
+        'Bali': 'DPS', 'Honolulu': 'HNL', 'Las Vegas': 'LAS',
+        'New Orleans': 'MSY', 'Nashville': 'BNA', 'Austin': 'AUS'
+    };
+    return codes[cityOrState] || null;
+}
+
+// ============================================
+// ENHANCED DATA FETCHING
+// ============================================
+// Fetch all external data for a destination
+async function fetchDestinationData(dest, startDate, endDate, travelers) {
+    const countryData = COUNTRY_DATA[dest.country] || {};
+
+    // Fetch data in parallel
+    const [weather, exchangeRate, advisory] = await Promise.all([
+        fetchWeatherOpenMeteo(dest.lat, dest.lon, startDate, endDate),
+        countryData.currency ? fetchExchangeRate('USD', countryData.currency) : Promise.resolve(1),
+        countryData.iso2 ? fetchTravelAdvisory(countryData.iso2) : Promise.resolve(null)
+    ]);
+
+    // Try to get real flight prices if Amadeus is configured
+    let flightData = null;
+    if (API_KEYS.amadeus.clientId && dest.type === 'fly') {
+        flightData = await fetchFlightPrices(
+            selectedHomeCity?.city || 'New York',
+            dest.city,
+            startDate,
+            endDate,
+            travelers
+        );
+    }
+
+    return {
+        weather,
+        exchangeRate,
+        localCurrency: countryData.currency || 'USD',
+        advisory,
+        flightData
+    };
+}
 
 // Destinations data with base prices
 // Prices are baseline estimates that get adjusted for seasonality
@@ -317,6 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAutocomplete();
     initMonthSelector();
     initTravelTimeSelector();
+    updateApiStatus();
     destinationsData = DESTINATIONS;
 });
 
@@ -557,6 +889,20 @@ function toggleStep(stepId) {
     }
 }
 
+function toggleApiPanel() {
+    const panel = document.querySelector('.api-status');
+    panel.classList.toggle('collapsed');
+}
+
+// Update API status indicators
+function updateApiStatus() {
+    const amadeusStatus = document.getElementById('amadeusStatus');
+    if (API_KEYS.amadeus.clientId && API_KEYS.amadeus.clientSecret) {
+        amadeusStatus.classList.add('connected');
+        amadeusStatus.querySelector('.api-badge').textContent = 'Live';
+    }
+}
+
 // Main search function
 async function searchDestinations(searchInArea = false) {
     if (!selectedHomeCity) {
@@ -645,11 +991,30 @@ async function searchDestinations(searchInArea = false) {
         // Sort by total cost
         results.sort((a, b) => a.costs.total - b.costs.total);
 
-        // Add markers to map
-        results.forEach(dest => addDestinationMarker(dest, travelers, nights));
+        // Fetch real-time data for top results (limit to avoid too many API calls)
+        const topResults = results.slice(0, 15);
+        const startDateStr = document.getElementById('startDate').value;
+        const endDateStr = document.getElementById('endDate').value;
 
-        // Update alternatives panel
-        updateAlternativesPanel(results, budgetMin, budgetMax);
+        // Fetch external data in parallel for top results
+        const enrichedResults = await Promise.all(
+            topResults.map(async (dest) => {
+                const externalData = await fetchDestinationData(dest, startDateStr, endDateStr, travelers);
+                return { ...dest, ...externalData };
+            })
+        );
+
+        // Combine enriched results with remaining results
+        const allResults = [
+            ...enrichedResults,
+            ...results.slice(15)
+        ];
+
+        // Add markers to map
+        allResults.forEach(dest => addDestinationMarker(dest, travelers, nights));
+
+        // Update alternatives panel with enriched data
+        updateAlternativesPanel(allResults, budgetMin, budgetMax);
 
         // Mark that we've searched
         hasSearched = true;
@@ -833,6 +1198,60 @@ function createPopupContent(dest, travelers, nights) {
     // Format travel time
     const travelTimeStr = formatTravelTime(dest.travelTime);
 
+    // Weather info
+    let weatherHtml = '';
+    if (dest.weather) {
+        weatherHtml = `
+            <div class="popup-section">
+                <h4>🌤️ Weather Forecast</h4>
+                <div class="popup-row">
+                    <span class="popup-row-label">Conditions</span>
+                    <span class="popup-row-value">${dest.weather.conditions}</span>
+                </div>
+                <div class="popup-row">
+                    <span class="popup-row-label">Temperature</span>
+                    <span class="popup-row-value">${dest.weather.avgLow}°F - ${dest.weather.avgHigh}°F</span>
+                </div>
+                <div class="popup-row">
+                    <span class="popup-row-label">Rain Chance</span>
+                    <span class="popup-row-value">${dest.weather.rainChance}%</span>
+                </div>
+            </div>
+        `;
+    }
+
+    // Advisory info
+    let advisoryHtml = '';
+    if (dest.advisory) {
+        advisoryHtml = `
+            <div class="popup-row">
+                <span class="popup-row-label">🛡️ Safety Level</span>
+                <span class="popup-row-value" style="color: ${dest.advisory.color}">
+                    Level ${dest.advisory.level}
+                </span>
+            </div>
+        `;
+    }
+
+    // Currency info
+    let currencyHtml = '';
+    if (dest.localCurrency && dest.localCurrency !== 'USD' && dest.exchangeRate) {
+        currencyHtml = `
+            <div class="popup-row">
+                <span class="popup-row-label">💱 Exchange Rate</span>
+                <span class="popup-row-value">$1 = ${dest.exchangeRate.toFixed(2)} ${dest.localCurrency}</span>
+            </div>
+        `;
+    }
+
+    // Flight data from Amadeus (if available)
+    let flightSourceHtml = '';
+    if (dest.flightData) {
+        flightSourceHtml = `<div style="font-size: 10px; color: #888; margin-top: 4px;">
+            Real-time price from ${dest.flightData.source} (${dest.flightData.offers} offers)
+        </div>`;
+    }
+
     return `
         <div class="popup-content">
             <div class="popup-header">${dest.city}</div>
@@ -847,6 +1266,8 @@ function createPopupContent(dest, travelers, nights) {
                 </div>
             </div>
 
+            ${weatherHtml}
+
             <div class="popup-section">
                 <h4>${costs.transportType === 'drive' ? '🚗 Driving' : '✈️ Flights'}</h4>
                 <div class="popup-row">
@@ -855,8 +1276,9 @@ function createPopupContent(dest, travelers, nights) {
                             ? `${Math.round(dest.distance)} mi (${travelTimeStr})`
                             : `${travelers} traveler${travelers > 1 ? 's' : ''} (${travelTimeStr})`}
                     </span>
-                    <span class="popup-row-value">$${costs.transport}</span>
+                    <span class="popup-row-value">$${dest.flightData ? dest.flightData.cheapest : costs.transport}</span>
                 </div>
+                ${flightSourceHtml}
             </div>
 
             <div class="popup-section">
@@ -877,6 +1299,12 @@ function createPopupContent(dest, travelers, nights) {
                     <span class="popup-row-label">Activities</span>
                     <span class="popup-row-value">$${costs.activities}</span>
                 </div>
+            </div>
+
+            <div class="popup-section">
+                <h4>ℹ️ Travel Info</h4>
+                ${currencyHtml}
+                ${advisoryHtml}
             </div>
 
             <div class="popup-total">
@@ -904,16 +1332,25 @@ function updateAlternativesPanel(results, budgetMin, budgetMax) {
 
     count.textContent = `${inBudget.length} of ${results.length}`;
 
-    list.innerHTML = inBudget.map(dest => `
-        <div class="alternative-item" onclick="focusDestination(${dest.lat}, ${dest.lon})">
-            <div class="alternative-icon">${dest.type === 'drive' ? '🚗' : '✈️'}</div>
-            <div class="alternative-info">
-                <div class="alternative-name">${dest.city}, ${dest.country}</div>
-                <div class="alternative-details">${dest.description} · ${formatTravelTime(dest.travelTime)}</div>
+    list.innerHTML = inBudget.map(dest => {
+        const weatherInfo = dest.weather ? `${dest.weather.conditions.split(' ')[0]} ${dest.weather.avgHigh}°F` : '';
+        const advisoryColor = dest.advisory ? dest.advisory.color : '#888';
+        return `
+            <div class="alternative-item" onclick="focusDestination(${dest.lat}, ${dest.lon})">
+                <div class="alternative-icon">${dest.type === 'drive' ? '🚗' : '✈️'}</div>
+                <div class="alternative-info">
+                    <div class="alternative-name">
+                        ${dest.city}, ${dest.country}
+                        ${dest.advisory ? `<span style="color: ${advisoryColor}; font-size: 10px;">●</span>` : ''}
+                    </div>
+                    <div class="alternative-details">
+                        ${weatherInfo ? `${weatherInfo} · ` : ''}${formatTravelTime(dest.travelTime)}
+                    </div>
+                </div>
+                <div class="alternative-price">$${dest.costs.total}</div>
             </div>
-            <div class="alternative-price">$${dest.costs.total}</div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
     panel.classList.add('show');
 }

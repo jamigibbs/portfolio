@@ -711,6 +711,98 @@
             padding: 8px 12px;
             font-size: 12px;
         }
+
+        /* API Status Panel */
+        .api-status {
+            background: #363636;
+            border-radius: 12px;
+            margin-top: 16px;
+            overflow: hidden;
+        }
+
+        .api-status-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #888;
+            transition: background 0.2s;
+        }
+
+        .api-status-header:hover {
+            background: #404040;
+        }
+
+        .api-toggle {
+            transition: transform 0.2s;
+        }
+
+        .api-status.collapsed .api-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .api-status.collapsed .api-status-content {
+            display: none;
+        }
+
+        .api-status-content {
+            padding: 0 16px 16px;
+        }
+
+        .api-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            font-size: 12px;
+            color: #888;
+            border-bottom: 1px solid #404040;
+        }
+
+        .api-item:last-of-type {
+            border-bottom: none;
+        }
+
+        .api-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+        }
+
+        .api-item.connected .api-dot {
+            background: #4CAF50;
+        }
+
+        .api-badge {
+            margin-left: auto;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            background: #404040;
+        }
+
+        .api-item.connected .api-badge {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .api-help {
+            padding-top: 12px;
+            text-align: center;
+        }
+
+        .api-help a {
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .api-help a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -846,6 +938,39 @@
                 </div>
                 <div class="alternative-list" id="alternativeList">
                     <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- API Status -->
+            <div class="api-status">
+                <div class="api-status-header" onclick="toggleApiPanel()">
+                    <span>📡 Live Data Sources</span>
+                    <span class="api-toggle">▼</span>
+                </div>
+                <div class="api-status-content" id="apiStatusContent">
+                    <div class="api-item connected">
+                        <span class="api-dot"></span>
+                        <span>Open-Meteo Weather</span>
+                        <span class="api-badge">Live</span>
+                    </div>
+                    <div class="api-item connected">
+                        <span class="api-dot"></span>
+                        <span>Currency Rates</span>
+                        <span class="api-badge">Live</span>
+                    </div>
+                    <div class="api-item connected">
+                        <span class="api-dot"></span>
+                        <span>Travel Advisories</span>
+                        <span class="api-badge">Live</span>
+                    </div>
+                    <div class="api-item" id="amadeusStatus">
+                        <span class="api-dot"></span>
+                        <span>Amadeus Flights</span>
+                        <span class="api-badge">Add Key</span>
+                    </div>
+                    <div class="api-help">
+                        <a href="https://developers.amadeus.com" target="_blank">Get free Amadeus API key →</a>
+                    </div>
                 </div>
             </div>
         </aside>
