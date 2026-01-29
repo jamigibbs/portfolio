@@ -2153,6 +2153,46 @@ function updateTravelTimeInfo() {
     }
 }
 
+// Check if driving is possible between two locations (no major water crossings)
+function isDrivingPossible(homeCountry, destCountry, homeLat, homeLon, destLat, destLon) {
+    // Island nations that cannot be driven to/from
+    const islandNations = ['Ireland', 'UK', 'United Kingdom', 'Great Britain', 'Japan', 'Philippines',
+                           'Indonesia', 'Australia', 'New Zealand', 'Taiwan', 'Singapore', 'Hong Kong',
+                           'Iceland', 'Cuba', 'Jamaica', 'Puerto Rico', 'Dominican Republic', 'Bahamas',
+                           'Hawaii', 'Sri Lanka', 'Madagascar', 'Maldives', 'Fiji', 'Malta', 'Cyprus'];
+
+    // Check if either location is an island nation
+    const homeIsIsland = islandNations.some(island =>
+        homeCountry?.toLowerCase().includes(island.toLowerCase()));
+    const destIsIsland = islandNations.some(island =>
+        destCountry?.toLowerCase().includes(island.toLowerCase()));
+
+    // If both are on the same island nation, driving might be possible
+    if (homeIsIsland && destIsIsland && homeCountry === destCountry) {
+        return true;
+    }
+
+    // If one is an island and the other isn't, no driving
+    if (homeIsIsland !== destIsIsland) {
+        return false;
+    }
+
+    // Both are islands but different countries (e.g., UK to Ireland) - no driving
+    if (homeIsIsland && destIsIsland && homeCountry !== destCountry) {
+        return false;
+    }
+
+    // Check for continental water crossings (simplified)
+    // Americas to Europe/Asia/Africa - no driving
+    const homeInAmericas = homeLon < -30;
+    const destInAmericas = destLon < -30;
+    if (homeInAmericas !== destInAmericas) {
+        return false;
+    }
+
+    return true;
+}
+
 // Calculate travel time to destination
 function calculateTravelTime(homeCity, dest, distance) {
     if (dest.type === 'drive') {
@@ -2346,32 +2386,32 @@ function autoZoomToTravelRadius(hours) {
     }).addTo(map);
     homeMarker.bindPopup(`<b>Your location</b><br>${selectedHomeCity.city}, ${selectedHomeCity.state || selectedHomeCity.country}`);
 
-    // Create travel radius visualization
+    // Create travel radius visualization based on selected travel mode
     const layers = [];
 
     if (hours > 0) {
-        // Flight radius (larger, dashed cyan)
-        if (flyRadius > 0 && flyRadius !== driveRadius) {
+        // Flight radius - only show for 'fly' or 'both' modes
+        if ((travelMode === 'fly' || travelMode === 'both') && flyRadius > 0) {
             const flyRadiusMeters = flyRadius * 1609.34;
             layers.push(L.circle([selectedHomeCity.lat, selectedHomeCity.lon], {
                 radius: flyRadiusMeters,
                 color: '#00d4ff',
                 fillColor: '#00d4ff',
                 fillOpacity: 0.05,
-                weight: 2,
-                dashArray: '10, 10'
+                weight: 3,
+                dashArray: '15, 10'
             }));
         }
 
-        // Drive radius (smaller, solid orange)
-        if (driveRadius > 0) {
+        // Drive radius - only show for 'drive' or 'both' modes
+        if ((travelMode === 'drive' || travelMode === 'both') && driveRadius > 0) {
             const driveRadiusMeters = driveRadius * 1609.34;
             layers.push(L.circle([selectedHomeCity.lat, selectedHomeCity.lon], {
                 radius: driveRadiusMeters,
                 color: '#FF9800',
                 fillColor: '#FF9800',
-                fillOpacity: 0.1,
-                weight: 2
+                fillOpacity: 0.12,
+                weight: 3
             }));
         }
 
@@ -2400,8 +2440,13 @@ function setTravelMode(mode) {
         btn.classList.toggle('active', btn.dataset.mode === mode);
     });
 
-    // Auto-search when travel mode changes (if home city is selected)
+    // Update radius visualization when travel mode changes
     if (selectedHomeCity) {
+        const hours = parseInt(document.getElementById('maxTravelTime').value) || 0;
+        if (hours > 0) {
+            autoZoomToTravelRadius(hours);
+        }
+        // Auto-search when travel mode changes
         searchDestinations();
     }
 }
@@ -2551,9 +2596,22 @@ async function searchDestinations(searchInArea = false) {
                 dest.lat, dest.lon
             );
 
-            // Dynamically determine travel type based on distance from THIS user's home
-            // (overrides the static type which was based on NYC)
-            const effectiveType = distance <= DRIVE_THRESHOLD ? 'drive' : 'fly';
+            // Check if driving is actually possible (no major water crossings)
+            const canDrive = isDrivingPossible(
+                selectedHomeCity.country,
+                dest.country,
+                selectedHomeCity.lat, selectedHomeCity.lon,
+                dest.lat, dest.lon
+            );
+
+            // Dynamically determine travel type based on distance and drivability
+            // If water crossing required, must fly regardless of distance
+            let effectiveType;
+            if (!canDrive) {
+                effectiveType = 'fly';
+            } else {
+                effectiveType = distance <= DRIVE_THRESHOLD ? 'drive' : 'fly';
+            }
 
             // Filter by travel mode preference
             if (travelMode === 'fly' && effectiveType === 'drive') {
