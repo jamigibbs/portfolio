@@ -39,13 +39,9 @@ const API_KEYS = {
         clientId: '7fvKA80GShJnStxs1wjCJO2gGRr3q7a0',
         clientSecret: 'hKXHWj1xB3fVAseN'
     },
-    // Unsplash: Get free key at https://unsplash.com/developers (50 req/hour)
-    unsplash: {
-        accessKey: ''  // Add your Unsplash Access Key here
-    },
     // GeoNames: Register free at https://www.geonames.org/login (30k credits/day)
     geonames: {
-        username: ''  // Add your GeoNames username here
+        username: 'dnfisher'
     },
     // Optional: OpenRouteService for isochrones: https://openrouteservice.org
     openRouteService: ''   // Free key, 2000 calls/day
@@ -514,52 +510,52 @@ function getIATACode(cityOrState) {
 }
 
 // ============================================
-// UNSPLASH API (Requires free API key)
-// Get key at: https://unsplash.com/developers
+// WIKIPEDIA IMAGE API (No key needed!)
+// Fetches destination images from Wikipedia
 // ============================================
-async function fetchUnsplashImage(cityName, countryName) {
-    if (!API_KEYS.unsplash.accessKey) {
-        return null;
-    }
-
-    const cacheKey = `unsplash-${cityName}`;
+async function fetchWikipediaImage(cityName, countryName) {
+    const cacheKey = `wikipedia-img-${cityName}`;
     if (apiCache.images && apiCache.images[cacheKey]) {
         return apiCache.images[cacheKey];
     }
 
     try {
-        const query = encodeURIComponent(`${cityName} ${countryName} travel`);
-        const url = `https://api.unsplash.com/search/photos?query=${query}&per_page=1&orientation=landscape`;
+        // First, get the page and its main image
+        const searchTitle = encodeURIComponent(cityName);
+        const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${searchTitle}&prop=pageimages|info&pithumbsize=800&format=json&origin=*`;
 
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `Client-ID ${API_KEYS.unsplash.accessKey}`
-            }
-        });
-
-        if (!response.ok) throw new Error('Unsplash API failed');
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Wikipedia API failed');
 
         const data = await response.json();
+        const pages = data.query?.pages;
 
-        if (data.results && data.results.length > 0) {
-            const photo = data.results[0];
-            const result = {
-                url: photo.urls.regular,
-                thumb: photo.urls.small,
-                credit: {
-                    name: photo.user.name,
-                    link: photo.user.links.html
-                }
-            };
+        if (pages) {
+            const pageId = Object.keys(pages)[0];
+            if (pageId !== '-1' && pages[pageId].thumbnail) {
+                const thumb = pages[pageId].thumbnail;
+                // Get a larger version by modifying the URL
+                const largeUrl = thumb.source.replace(/\/\d+px-/, '/800px-');
+                const smallUrl = thumb.source.replace(/\/\d+px-/, '/200px-');
 
-            // Cache the result
-            if (!apiCache.images) apiCache.images = {};
-            apiCache.images[cacheKey] = result;
-            return result;
+                const result = {
+                    url: largeUrl,
+                    thumb: smallUrl,
+                    credit: {
+                        name: 'Wikipedia',
+                        link: `https://en.wikipedia.org/wiki/${searchTitle}`
+                    }
+                };
+
+                // Cache the result
+                if (!apiCache.images) apiCache.images = {};
+                apiCache.images[cacheKey] = result;
+                return result;
+            }
         }
         return null;
     } catch (error) {
-        console.error('Unsplash error:', error);
+        console.error('Wikipedia image error:', error);
         return null;
     }
 }
@@ -619,7 +615,7 @@ async function fetchDestinationData(dest, startDate, endDate, travelers) {
         fetchWeatherOpenMeteo(dest.lat, dest.lon, startDate, endDate),
         countryData.currency ? fetchExchangeRate('USD', countryData.currency) : Promise.resolve(1),
         countryData.iso2 ? fetchTravelAdvisory(countryData.iso2) : Promise.resolve(null),
-        fetchUnsplashImage(dest.city, dest.country),
+        fetchWikipediaImage(dest.city, dest.country),
         fetchWikivoyageDescription(dest.city)
     ]);
 
@@ -2290,14 +2286,14 @@ function createPopupContent(dest, travelers, nights) {
         </div>`;
     }
 
-    // Image header (if available from Unsplash)
+    // Image header (if available from Wikipedia)
     let imageHtml = '';
     if (dest.image && dest.image.url) {
         imageHtml = `
             <div class="popup-image">
                 <img src="${dest.image.thumb}" alt="${dest.city}" loading="lazy">
                 <div class="popup-image-credit">
-                    📷 <a href="${dest.image.credit.link}?utm_source=travel_estimator&utm_medium=referral" target="_blank" rel="noopener">${dest.image.credit.name}</a> / Unsplash
+                    📷 <a href="${dest.image.credit.link}" target="_blank" rel="noopener">${dest.image.credit.name}</a>
                 </div>
             </div>
         `;
