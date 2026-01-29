@@ -6,7 +6,7 @@ let map;
 let markers = [];
 let destinationsData = [];
 let selectedHomeCity = null;
-let travelMode = 'both';
+let travelMode = 'drive';
 let dateType = 'specific';
 let travelRadiusLayer = null; // For visualizing travel radius on map
 let homeMarker = null; // Marker for home city
