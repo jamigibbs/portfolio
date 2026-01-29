@@ -819,9 +819,24 @@ async function fetchWikivoyageDescription(cityName) {
                 let extract = pages[pageId].extract;
                 // Clean up and truncate the description
                 extract = extract.replace(/\n+/g, ' ').trim();
-                // Take first 2-3 sentences (up to ~300 chars)
+                // Take complete sentences that fit within ~300 chars
                 const sentences = extract.match(/[^.!?]+[.!?]+/g) || [extract];
-                const description = sentences.slice(0, 3).join(' ').substring(0, 350);
+                let description = '';
+                for (const sentence of sentences) {
+                    if ((description + sentence).length <= 300) {
+                        description += sentence;
+                    } else {
+                        break;
+                    }
+                }
+                // If we got no complete sentences, take the first one even if long
+                if (!description && sentences.length > 0) {
+                    description = sentences[0];
+                    if (description.length > 300) {
+                        // Truncate at last word boundary before 300 chars
+                        description = description.substring(0, 297).replace(/\s+\S*$/, '') + '...';
+                    }
+                }
 
                 // Cache the result
                 if (!apiCache.descriptions) apiCache.descriptions = {};
@@ -2761,11 +2776,11 @@ function createPopupContent(dest, travelers, nights) {
         ? `${Math.round(dest.distance)} mi`
         : `${travelers} traveler${travelers > 1 ? 's' : ''}`;
 
-    // Advisory tag
+    // Advisory tag (clickable to show explanation)
     let advisoryTag = '';
     if (dest.advisory) {
         const safetyClass = dest.advisory.level <= 2 ? 'highlight' : dest.advisory.level >= 3 ? 'warning' : '';
-        advisoryTag = `<span class="popup-tag ${safetyClass}">🛡️ Level ${dest.advisory.level}</span>`;
+        advisoryTag = `<span class="popup-tag ${safetyClass} clickable" onclick="showSecurityModal(${dest.advisory.level})" title="Click for details">🛡️ Level ${dest.advisory.level} ⓘ</span>`;
     }
 
     // Currency info
@@ -2910,5 +2925,110 @@ async function fetchWeather(lat, lon, date) {
     } catch (error) {
         console.error('Weather fetch error:', error);
         return null;
+    }
+}
+
+// ============================================
+// SECURITY LEVEL MODAL
+// ============================================
+const SECURITY_LEVEL_INFO = {
+    1: {
+        title: 'Level 1: Exercise Normal Precautions',
+        color: '#4CAF50',
+        summary: 'This is the lowest advisory level for safety and security risk.',
+        details: [
+            'Standard safety precautions apply',
+            'Be aware of your surroundings',
+            'Follow local laws and customs',
+            'Register with your embassy if traveling for extended periods'
+        ],
+        examples: 'Countries like Canada, Japan, UK, Ireland, and Portugal typically have Level 1 advisories.'
+    },
+    2: {
+        title: 'Level 2: Exercise Increased Caution',
+        color: '#FFA500',
+        summary: 'There are heightened risks to safety and security.',
+        details: [
+            'Be more vigilant when traveling',
+            'Avoid demonstrations and large gatherings',
+            'Monitor local news for updates',
+            'Keep a low profile and avoid displaying valuables',
+            'Have contingency plans for emergencies'
+        ],
+        examples: 'Many popular tourist destinations including Mexico, France, Italy, Spain, and Indonesia have Level 2 advisories due to risks like petty crime or terrorism concerns.'
+    },
+    3: {
+        title: 'Level 3: Reconsider Travel',
+        color: '#FF6B6B',
+        summary: 'Serious risks are present. Travel should be reconsidered.',
+        details: [
+            'Significant safety concerns exist in some or all areas',
+            'Evaluate your personal circumstances carefully',
+            'If you must travel, have robust contingency plans',
+            'Avoid high-risk areas completely',
+            'Ensure comprehensive travel insurance',
+            'Share detailed itinerary with family/friends'
+        ],
+        examples: 'Countries with regional conflicts, high crime rates, or civil unrest may have Level 3 advisories. Sometimes only certain regions within a country are affected.'
+    },
+    4: {
+        title: 'Level 4: Do Not Travel',
+        color: '#d32f2f',
+        summary: 'This is the highest advisory level due to life-threatening risks.',
+        details: [
+            'Greater likelihood of life-threatening risks',
+            'Government ability to assist citizens is extremely limited',
+            'Active conflict, terrorism, or civil unrest may be ongoing',
+            'U.S. citizens should depart if safe to do so',
+            'Travel insurance may not be valid'
+        ],
+        examples: 'Countries with active wars, widespread violence, or where government services have collapsed typically have Level 4 advisories.'
+    }
+};
+
+function showSecurityModal(level) {
+    const info = SECURITY_LEVEL_INFO[level] || SECURITY_LEVEL_INFO[2];
+
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('securityModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'securityModal';
+        modal.className = 'security-modal';
+        document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+        <div class="security-modal-content">
+            <button class="security-modal-close" onclick="closeSecurityModal()">&times;</button>
+            <h2 style="color: ${info.color}; margin-bottom: 16px;">${info.title}</h2>
+            <p style="font-size: 15px; margin-bottom: 16px; color: #ddd;">${info.summary}</p>
+            <h3 style="font-size: 14px; color: #00d4ff; margin-bottom: 8px;">What this means:</h3>
+            <ul style="margin-bottom: 16px; padding-left: 20px; color: #bbb;">
+                ${info.details.map(d => `<li style="margin-bottom: 6px;">${d}</li>`).join('')}
+            </ul>
+            <p style="font-size: 13px; color: #888; border-top: 1px solid #404040; padding-top: 12px;">
+                <strong>Examples:</strong> ${info.examples}
+            </p>
+            <p style="font-size: 12px; color: #666; margin-top: 12px;">
+                Source: U.S. Department of State Travel Advisories. Always check
+                <a href="https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories.html/" target="_blank" style="color: #00d4ff;">travel.state.gov</a>
+                for the most current information.
+            </p>
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+
+    // Close on background click
+    modal.onclick = (e) => {
+        if (e.target === modal) closeSecurityModal();
+    };
+}
+
+function closeSecurityModal() {
+    const modal = document.getElementById('securityModal');
+    if (modal) {
+        modal.style.display = 'none';
     }
 }
