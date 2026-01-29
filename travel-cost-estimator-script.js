@@ -1537,6 +1537,123 @@ const DESTINATIONS = [
       activities: 55, food: 55, description: "Australia's cultural capital with street art, coffee culture, live music, and gateway to the Great Ocean Road.",
       seasonality: { winter: 0.8, spring: 1.1, summer: 0.9, fall: 1.3 } },
 
+    // Australian road trips & regional destinations
+    { city: "Great Ocean Road", region: "Victoria", country: "Australia", lat: -38.68, lon: 143.39,
+      type: "drive", driveHoursFromMelbourne: 2.5,
+      accommodation: { budget: 60, mid: 140, luxury: 320 },
+      activities: 40, food: 45, description: "One of the world's most scenic coastal drives. See the Twelve Apostles, rainforest walks, and charming surf towns.",
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.3, fall: 1.1 } },
+
+    { city: "Wilson's Promontory", region: "Victoria", country: "Australia", lat: -39.03, lon: 146.42,
+      type: "drive", driveHoursFromMelbourne: 3,
+      accommodation: { budget: 40, mid: 100, luxury: 220 },
+      activities: 35, food: 35, description: "Victoria's wilderness gem. Pristine beaches, coastal hiking, abundant wildlife, and stunning sunsets at Australia's southernmost mainland point.",
+      seasonality: { winter: 0.7, spring: 1.0, summer: 1.4, fall: 1.0 } },
+
+    { city: "Phillip Island", region: "Victoria", country: "Australia", lat: -38.49, lon: 145.23,
+      type: "drive", driveHoursFromMelbourne: 2,
+      accommodation: { budget: 55, mid: 130, luxury: 280 },
+      activities: 50, food: 45, description: "Famous for the nightly penguin parade, plus koalas, seals, and the MotoGP circuit. Perfect family getaway.",
+      seasonality: { winter: 0.9, spring: 1.0, summer: 1.3, fall: 1.0 } },
+
+    { city: "Yarra Valley", region: "Victoria", country: "Australia", lat: -37.71, lon: 145.58,
+      type: "drive", driveHoursFromMelbourne: 1,
+      accommodation: { budget: 70, mid: 160, luxury: 400 },
+      activities: 60, food: 70, description: "Victoria's premier wine region. World-class wineries, gourmet restaurants, hot air ballooning, and stunning valley views.",
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.1, fall: 1.3 } },
+
+    { city: "Mornington Peninsula", region: "Victoria", country: "Australia", lat: -38.35, lon: 145.0,
+      type: "drive", driveHoursFromMelbourne: 1,
+      accommodation: { budget: 65, mid: 150, luxury: 380 },
+      activities: 55, food: 65, description: "Beaches, wineries, hot springs, and artisan food. Melbourne's favorite weekend escape with coastal charm.",
+      seasonality: { winter: 0.7, spring: 1.0, summer: 1.4, fall: 1.1 } },
+
+    { city: "Grampians", region: "Victoria", country: "Australia", lat: -37.14, lon: 142.52,
+      type: "drive", driveHoursFromMelbourne: 3,
+      accommodation: { budget: 50, mid: 120, luxury: 280 },
+      activities: 45, food: 40, description: "Dramatic sandstone mountains with incredible hiking, Aboriginal rock art, waterfalls, and native wildlife.",
+      seasonality: { winter: 0.8, spring: 1.2, summer: 1.0, fall: 1.1 } },
+
+    { city: "Ballarat", region: "Victoria", country: "Australia", lat: -37.56, lon: 143.86,
+      type: "drive", driveHoursFromMelbourne: 1.5,
+      accommodation: { budget: 50, mid: 110, luxury: 250 },
+      activities: 40, food: 40, description: "Gold rush history comes alive at Sovereign Hill. Beautiful gardens, historic architecture, and thriving arts scene.",
+      seasonality: { winter: 0.9, spring: 1.0, summer: 1.0, fall: 1.0 } },
+
+    { city: "Bendigo", region: "Victoria", country: "Australia", lat: -36.76, lon: 144.28,
+      type: "drive", driveHoursFromMelbourne: 2,
+      accommodation: { budget: 50, mid: 110, luxury: 260 },
+      activities: 40, food: 45, description: "Stunning Victorian architecture, underground mine tours, excellent food and wine, and a thriving creative culture.",
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.0, fall: 1.05 } },
+
+    // Australian flights
+    { city: "Hobart", region: "Tasmania", country: "Australia", lat: -42.88, lon: 147.33,
+      type: "fly", flightFromNYC: { low: 850, mid: 1300, high: 2100 },
+      accommodation: { budget: 55, mid: 130, luxury: 320 },
+      activities: 50, food: 55, description: "Australia's second-oldest city. MONA museum, fresh seafood, historic waterfront, and gateway to Tasmanian wilderness.",
+      seasonality: { winter: 0.7, spring: 1.0, summer: 1.3, fall: 1.1 } },
+
+    { city: "Launceston", region: "Tasmania", country: "Australia", lat: -41.44, lon: 147.14,
+      type: "fly", flightFromNYC: { low: 850, mid: 1300, high: 2100 },
+      accommodation: { budget: 50, mid: 120, luxury: 280 },
+      activities: 45, food: 50, description: "Cataract Gorge in the city center, excellent wine region, and gateway to Tasmania's stunning northeast.",
+      seasonality: { winter: 0.7, spring: 1.0, summer: 1.3, fall: 1.1 } },
+
+    { city: "Cairns", region: "Queensland", country: "Australia", lat: -16.92, lon: 145.77,
+      type: "fly", flightFromNYC: { low: 800, mid: 1200, high: 2000 },
+      accommodation: { budget: 55, mid: 130, luxury: 350 },
+      activities: 80, food: 50, description: "Gateway to the Great Barrier Reef and Daintree Rainforest. Snorkel, dive, and explore two World Heritage wonders.",
+      seasonality: { winter: 1.3, spring: 1.1, summer: 0.7, fall: 0.9 } },
+
+    { city: "Gold Coast", region: "Queensland", country: "Australia", lat: -28.0, lon: 153.43,
+      type: "fly", flightFromNYC: { low: 800, mid: 1200, high: 2000 },
+      accommodation: { budget: 60, mid: 140, luxury: 350 },
+      activities: 60, food: 50, description: "Surf beaches, theme parks, vibrant nightlife, and lush hinterland rainforest. Australia's playground.",
+      seasonality: { winter: 1.0, spring: 1.1, summer: 1.2, fall: 1.0 } },
+
+    { city: "Brisbane", region: "Queensland", country: "Australia", lat: -27.47, lon: 153.03,
+      type: "fly", flightFromNYC: { low: 800, mid: 1200, high: 2000 },
+      accommodation: { budget: 55, mid: 130, luxury: 320 },
+      activities: 45, food: 50, description: "Sunny river city with South Bank cultural precinct, rooftop bars, and easy access to beaches and islands.",
+      seasonality: { winter: 1.1, spring: 1.0, summer: 0.9, fall: 1.0 } },
+
+    { city: "Adelaide", region: "South Australia", country: "Australia", lat: -34.93, lon: 138.6,
+      type: "fly", flightFromNYC: { low: 800, mid: 1200, high: 2000 },
+      accommodation: { budget: 55, mid: 130, luxury: 320 },
+      activities: 50, food: 55, description: "Festival city surrounded by world-class wine regions. Barossa Valley, McLaren Vale, and Kangaroo Island await.",
+      seasonality: { winter: 0.85, spring: 1.1, summer: 1.0, fall: 1.1 } },
+
+    { city: "Perth", region: "Western Australia", country: "Australia", lat: -31.95, lon: 115.86,
+      type: "fly", flightFromNYC: { low: 850, mid: 1300, high: 2200 },
+      accommodation: { budget: 60, mid: 140, luxury: 350 },
+      activities: 50, food: 50, description: "Australia's sunniest city with pristine beaches, vibrant food scene, and gateway to Margaret River wine country.",
+      seasonality: { winter: 0.9, spring: 1.1, summer: 1.0, fall: 1.0 } },
+
+    { city: "Uluru", region: "Northern Territory", country: "Australia", lat: -25.34, lon: 131.04,
+      type: "fly", flightFromNYC: { low: 900, mid: 1400, high: 2300 },
+      accommodation: { budget: 80, mid: 200, luxury: 600 },
+      activities: 70, food: 60, description: "The spiritual heart of Australia. Witness sunrise and sunset over the sacred red rock and learn ancient Aboriginal culture.",
+      seasonality: { winter: 1.3, spring: 1.1, summer: 0.6, fall: 1.0 } },
+
+    { city: "Darwin", region: "Northern Territory", country: "Australia", lat: -12.46, lon: 130.84,
+      type: "fly", flightFromNYC: { low: 850, mid: 1300, high: 2100 },
+      accommodation: { budget: 55, mid: 140, luxury: 320 },
+      activities: 60, food: 50, description: "Tropical frontier city. Gateway to Kakadu National Park, crocodile encounters, and spectacular wet season storms.",
+      seasonality: { winter: 1.4, spring: 1.0, summer: 0.6, fall: 0.8 } },
+
+    // New Zealand additions
+    { city: "Wellington", region: "Wellington", country: "New Zealand", lat: -41.29, lon: 174.78,
+      type: "fly", flightFromNYC: { low: 850, mid: 1300, high: 2200 },
+      accommodation: { budget: 55, mid: 130, luxury: 320 },
+      activities: 50, food: 55, description: "New Zealand's creative capital. Craft beer, Te Papa museum, vibrant cafe culture, and stunning harbor views.",
+      seasonality: { winter: 0.75, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    { city: "Queenstown", region: "Otago", country: "New Zealand", lat: -45.03, lon: 168.66,
+      type: "fly", flightFromNYC: { low: 900, mid: 1400, high: 2300 },
+      accommodation: { budget: 65, mid: 160, luxury: 450 },
+      activities: 90, food: 55, description: "Adventure capital of the world. Bungee jumping, skiing, jet boating, and jaw-dropping mountain scenery.",
+      seasonality: { winter: 1.3, spring: 1.0, summer: 1.0, fall: 1.2 } },
+
     { city: "Auckland", region: "Auckland", country: "New Zealand", lat: -36.85, lon: 174.76,
       type: "fly", flightFromNYC: { low: 850, mid: 1300, high: 2200 },
       accommodation: { budget: 60, mid: 140, luxury: 350 },
