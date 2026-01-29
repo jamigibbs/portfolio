@@ -1580,6 +1580,60 @@ const DESTINATIONS = [
       activities: 45, food: 50, description: "Dramatic castle, medieval Old Town, world-class festivals, and gateway to the Scottish Highlands.",
       seasonality: { winter: 0.75, spring: 1.0, summer: 1.4, fall: 1.1 } },
 
+    { city: "Manchester", region: "England", country: "UK", lat: 53.48, lon: -2.24,
+      type: "fly", flightFromNYC: { low: 340, mid: 540, high: 840 },
+      accommodation: { budget: 50, mid: 110, luxury: 280 },
+      activities: 40, food: 45, description: "Music heritage, football culture, Victorian architecture, and a thriving food and nightlife scene.",
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    { city: "Birmingham", region: "England", country: "UK", lat: 52.49, lon: -1.90,
+      type: "fly", flightFromNYC: { low: 340, mid: 540, high: 840 },
+      accommodation: { budget: 45, mid: 100, luxury: 260 },
+      activities: 35, food: 40, description: "Britain's second city with world-class museums, diverse food scene, and easy access to the Cotswolds.",
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.15, fall: 1.0 } },
+
+    { city: "Bristol", region: "England", country: "UK", lat: 51.45, lon: -2.59,
+      type: "fly", flightFromNYC: { low: 350, mid: 550, high: 850 },
+      accommodation: { budget: 50, mid: 110, luxury: 280 },
+      activities: 40, food: 45, description: "Creative hub with street art, harbourside dining, independent shops, and gateway to Bath and the southwest.",
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    { city: "Liverpool", region: "England", country: "UK", lat: 53.41, lon: -2.98,
+      type: "fly", flightFromNYC: { low: 340, mid: 540, high: 840 },
+      accommodation: { budget: 45, mid: 100, luxury: 260 },
+      activities: 40, food: 40, description: "Beatles heritage, stunning waterfront, world-class museums, and passionate football culture.",
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    { city: "Glasgow", region: "Scotland", country: "UK", lat: 55.86, lon: -4.25,
+      type: "fly", flightFromNYC: { low: 350, mid: 550, high: 850 },
+      accommodation: { budget: 50, mid: 110, luxury: 280 },
+      activities: 40, food: 45, description: "Victorian architecture, vibrant music scene, excellent museums, and gateway to the Highlands and lochs.",
+      seasonality: { winter: 0.75, spring: 1.0, summer: 1.3, fall: 1.0 } },
+
+    { city: "Bath", region: "England", country: "UK", lat: 51.38, lon: -2.36,
+      type: "fly", flightFromNYC: { low: 360, mid: 560, high: 860 },
+      accommodation: { budget: 60, mid: 130, luxury: 320 },
+      activities: 45, food: 50, description: "Stunning Georgian architecture, Roman baths, Jane Austen connections, and beautiful countryside.",
+      seasonality: { winter: 0.85, spring: 1.1, summer: 1.3, fall: 1.1 } },
+
+    { city: "York", region: "England", country: "UK", lat: 53.96, lon: -1.08,
+      type: "fly", flightFromNYC: { low: 350, mid: 550, high: 850 },
+      accommodation: { budget: 55, mid: 120, luxury: 300 },
+      activities: 40, food: 45, description: "Medieval walls, stunning Minster, charming Shambles, Viking heritage, and chocolate history.",
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.25, fall: 1.1 } },
+
+    { city: "Cambridge", region: "England", country: "UK", lat: 52.21, lon: 0.12,
+      type: "fly", flightFromNYC: { low: 350, mid: 550, high: 850 },
+      accommodation: { budget: 55, mid: 125, luxury: 320 },
+      activities: 40, food: 45, description: "Historic university city with stunning colleges, punting on the Cam, and peaceful meadows.",
+      seasonality: { winter: 0.8, spring: 1.1, summer: 1.3, fall: 1.0 } },
+
+    { city: "Oxford", region: "England", country: "UK", lat: 51.75, lon: -1.25,
+      type: "fly", flightFromNYC: { low: 350, mid: 550, high: 850 },
+      accommodation: { budget: 55, mid: 125, luxury: 320 },
+      activities: 40, food: 45, description: "Dreaming spires, ancient colleges, Bodleian Library, covered market, and Harry Potter filming locations.",
+      seasonality: { winter: 0.8, spring: 1.1, summer: 1.3, fall: 1.0 } },
+
     { city: "Berlin", region: "Berlin", country: "Germany", lat: 52.52, lon: 13.4,
       type: "fly", flightFromNYC: { low: 350, mid: 550, high: 850 },
       accommodation: { budget: 50, mid: 120, luxury: 300 },
@@ -2596,8 +2650,20 @@ async function searchDestinations(searchInArea = false) {
                 };
             } else {
                 // Calculate bounds based on travel radius from home city
-                // If "Any distance" (maxHours=0), use a very large radius to get worldwide cities
-                const maxDistance = maxHours > 0 ? maxHours * 500 : 12000; // 12000 miles covers most of the globe
+                // Use appropriate speed based on travel mode
+                let maxDistance;
+                if (maxHours === 0) {
+                    maxDistance = 12000; // "Any distance" - worldwide
+                } else if (travelMode === 'drive') {
+                    maxDistance = maxHours * 60; // ~60 mph for driving bounds
+                } else if (travelMode === 'fly') {
+                    maxDistance = (maxHours - 3) * 500 + 500; // Flight speed minus airport time
+                } else {
+                    // "Both" mode - use larger of the two
+                    const driveDistance = maxHours * 60;
+                    const flyDistance = maxHours > 3 ? (maxHours - 3) * 500 + 500 : 500;
+                    maxDistance = Math.max(driveDistance, flyDistance);
+                }
                 const latOffset = maxDistance / 69; // ~69 miles per degree of latitude
                 const lonOffset = maxDistance / (69 * Math.cos(selectedHomeCity.lat * Math.PI / 180));
                 fetchBounds = {
