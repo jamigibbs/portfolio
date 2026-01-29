@@ -2263,30 +2263,41 @@ function updateTravelTimeInfo() {
 
 // Check if driving is possible between two locations (no major water crossings)
 function isDrivingPossible(homeCountry, destCountry, homeLat, homeLon, destLat, destLon) {
-    // Island nations that cannot be driven to/from
-    const islandNations = ['Ireland', 'UK', 'United Kingdom', 'Great Britain', 'Japan', 'Philippines',
-                           'Indonesia', 'Australia', 'New Zealand', 'Taiwan', 'Singapore', 'Hong Kong',
-                           'Iceland', 'Cuba', 'Jamaica', 'Puerto Rico', 'Dominican Republic', 'Bahamas',
-                           'Hawaii', 'Sri Lanka', 'Madagascar', 'Maldives', 'Fiji', 'Malta', 'Cyprus'];
+    // Normalize country names for comparison
+    const normalizeCountry = (country) => {
+        if (!country) return '';
+        const c = country.toLowerCase();
+        // Normalize UK variants
+        if (c === 'uk' || c === 'united kingdom' || c === 'great britain' || c === 'england' || c === 'scotland' || c === 'wales') {
+            return 'uk';
+        }
+        // Normalize USA variants
+        if (c === 'usa' || c === 'united states' || c === 'united states of america' || c === 'us') {
+            return 'usa';
+        }
+        return c;
+    };
+
+    const homeNorm = normalizeCountry(homeCountry);
+    const destNorm = normalizeCountry(destCountry);
+
+    // Island nations that cannot be driven to/from other countries
+    const islandNations = ['ireland', 'uk', 'japan', 'philippines',
+                           'indonesia', 'australia', 'new zealand', 'taiwan', 'singapore', 'hong kong',
+                           'iceland', 'cuba', 'jamaica', 'puerto rico', 'dominican republic', 'bahamas',
+                           'sri lanka', 'madagascar', 'maldives', 'fiji', 'malta', 'cyprus'];
 
     // Check if either location is an island nation
-    const homeIsIsland = islandNations.some(island =>
-        homeCountry?.toLowerCase().includes(island.toLowerCase()));
-    const destIsIsland = islandNations.some(island =>
-        destCountry?.toLowerCase().includes(island.toLowerCase()));
+    const homeIsIsland = islandNations.includes(homeNorm);
+    const destIsIsland = islandNations.includes(destNorm);
 
-    // If both are on the same island nation, driving might be possible
-    if (homeIsIsland && destIsIsland && homeCountry === destCountry) {
+    // If both are in the same country (normalized), driving is possible within that country
+    if (homeNorm === destNorm) {
         return true;
     }
 
-    // If one is an island and the other isn't, no driving
-    if (homeIsIsland !== destIsIsland) {
-        return false;
-    }
-
-    // Both are islands but different countries (e.g., UK to Ireland) - no driving
-    if (homeIsIsland && destIsIsland && homeCountry !== destCountry) {
+    // If one is an island and the other isn't, no driving between them
+    if (homeIsIsland || destIsIsland) {
         return false;
     }
 
