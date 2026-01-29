@@ -366,6 +366,23 @@
         .alternative-icon {
             font-size: 24px;
             margin-right: 12px;
+            width: 40px;
+            text-align: center;
+        }
+
+        .alternative-thumb {
+            width: 50px;
+            height: 40px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .alternative-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .alternative-info {
@@ -513,8 +530,55 @@
         }
 
         .popup-content {
-            padding: 16px;
+            padding: 0;
             color: #fff;
+        }
+
+        .popup-image {
+            position: relative;
+            width: 100%;
+            height: 140px;
+            overflow: hidden;
+            border-radius: 12px 12px 0 0;
+            margin: 0;
+        }
+
+        .popup-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .popup-image-credit {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: #aaa;
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 4px 0 0 0;
+        }
+
+        .popup-image-credit a {
+            color: #00d4ff;
+            text-decoration: none;
+        }
+
+        .popup-image-credit a:hover {
+            text-decoration: underline;
+        }
+
+        /* Add padding to content when image is present */
+        .popup-content > .popup-header,
+        .popup-content > .popup-subheader,
+        .popup-content > .popup-section {
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+
+        .popup-content > .popup-header {
+            padding-top: 16px;
         }
 
         .popup-header {
