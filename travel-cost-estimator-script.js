@@ -679,10 +679,17 @@ async function fetchGeoNamesCities(bounds, maxRows = 50) {
         // Use citiesJSON endpoint for populated places within bounds
         const url = `https://secure.geonames.org/citiesJSON?north=${bounds.north}&south=${bounds.south}&east=${bounds.east}&west=${bounds.west}&maxRows=${maxRows}&username=${API_KEYS.geonames.username}`;
 
+        console.log('GeoNames fetch:', { bounds, url });
+
         const response = await fetch(url);
         if (!response.ok) throw new Error('GeoNames API failed');
 
         const data = await response.json();
+        console.log('GeoNames response:', {
+            status: data.status,
+            citiesFound: data.geonames?.length || 0,
+            cities: data.geonames?.slice(0, 5).map(c => c.name)
+        });
 
         if (data.geonames && data.geonames.length > 0) {
             const cities = data.geonames.map(city => {
@@ -2320,11 +2327,25 @@ async function searchDestinations(searchInArea = false) {
 
         const allDestinations = [...destinationsData, ...uniqueGeonamesCities];
 
+        console.log('Search debug:', {
+            homeCity: selectedHomeCity.city,
+            homeLat: selectedHomeCity.lat,
+            homeLon: selectedHomeCity.lon,
+            travelMode,
+            maxHours,
+            curatedCount: destinationsData.length,
+            geonamesCount: geonamesCities.length,
+            totalDestinations: allDestinations.length
+        });
+
         // Calculate costs for each destination
         const results = [];
         const DRIVE_THRESHOLD = 500; // Miles - destinations under this are drivable
 
         for (const dest of allDestinations) {
+            // Skip if destination is the same as home city
+            if (dest.city.toLowerCase() === selectedHomeCity.city.toLowerCase()) continue;
+
             // Calculate distance from home city
             const distance = calculateDistance(
                 selectedHomeCity.lat, selectedHomeCity.lon,
@@ -2377,6 +2398,16 @@ async function searchDestinations(searchInArea = false) {
                 travelTime
             });
         }
+
+        console.log('Filter results:', {
+            totalAfterFilters: results.length,
+            sampleResults: results.slice(0, 5).map(r => ({
+                city: r.city,
+                distance: Math.round(r.distance),
+                type: r.type,
+                travelTime: r.travelTime.toFixed(1)
+            }))
+        });
 
         // Sort by total cost
         results.sort((a, b) => a.costs.total - b.costs.total);
