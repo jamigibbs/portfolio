@@ -1946,10 +1946,45 @@ function initTravelTimeSelector() {
     updateTravelTimeInfo(); // Set initial info
 }
 
+// Adjust travel time with stepper buttons
+function adjustTravelTime(delta) {
+    const input = document.getElementById('maxTravelTime');
+    const display = document.getElementById('travelTimeDisplay');
+    let currentValue = parseInt(input.value) || 0;
+
+    // Increment by 1 hour, min 0, max 24
+    currentValue = Math.max(0, Math.min(24, currentValue + delta));
+    input.value = currentValue;
+
+    // Update display text
+    if (currentValue === 0) {
+        display.textContent = 'Any';
+    } else {
+        display.textContent = `${currentValue} hr${currentValue !== 1 ? 's' : ''}`;
+    }
+
+    // Trigger the travel time info update and auto-search
+    updateTravelTimeInfo();
+
+    // Debounced auto-search
+    if (selectedHomeCity && hasSearched) {
+        clearTimeout(window.travelTimeSearchTimeout);
+        window.travelTimeSearchTimeout = setTimeout(() => {
+            searchDestinations();
+        }, 500);
+    }
+}
+
 // Update travel time info display
 function updateTravelTimeInfo() {
     const hours = parseInt(document.getElementById('maxTravelTime').value) || 0;
     maxTravelTime = hours;
+
+    // Also update the stepper display in case called from elsewhere
+    const display = document.getElementById('travelTimeDisplay');
+    if (display) {
+        display.textContent = hours === 0 ? 'Any' : `${hours} hr${hours !== 1 ? 's' : ''}`;
+    }
 
     const infoEl = document.getElementById('travelTimeInfo');
 
@@ -1959,7 +1994,15 @@ function updateTravelTimeInfo() {
         infoEl.textContent = '📍 Select your home city to see travel radius';
     } else {
         // Calculate actual radius based on selected time
-        const driveMiles = Math.round(hours * 55); // 55 mph average driving
+        // Using updated formula: 50 mph base + 15 min per 100 mi for longer trips
+        let driveMiles;
+        if (hours <= 4) {
+            driveMiles = Math.round(hours * 50);
+        } else {
+            // For longer trips, account for stops: solve hours = distance/50 + (distance/100)*0.25
+            // hours = distance * (1/50 + 0.0025) = distance * 0.0225
+            driveMiles = Math.round(hours / 0.0225);
+        }
         const flyMiles = Math.round((hours - 3) * 500); // 500 mph minus 3h airport time
 
         if (hours <= 3) {
@@ -1978,8 +2021,12 @@ function updateTravelTimeInfo() {
 // Calculate travel time to destination
 function calculateTravelTime(homeCity, dest, distance) {
     if (dest.type === 'drive') {
-        // Driving: assume average 55 mph with traffic/stops
-        return distance / 55;
+        // More realistic driving time calculation:
+        // - Base speed: 50 mph average (accounts for mix of highway/city)
+        // - For trips over 200 miles, add 15 min per 100 miles for rest/fuel stops
+        const baseTime = distance / 50;
+        const stopBuffer = distance > 200 ? (distance / 100) * 0.25 : 0;
+        return baseTime + stopBuffer;
     } else {
         // Flying: flight time + 3 hours for airport (security, boarding, etc.)
         const flightSpeed = 500; // mph average
@@ -2440,10 +2487,17 @@ async function searchDestinations(searchInArea = false) {
         // Mark that we've searched
         hasSearched = true;
 
-        // Fit map to show all markers (unless searching in area)
+        // Fit map to show all markers plus home city (unless searching in area)
         if (markers.length > 0 && !searchInArea) {
             const group = L.featureGroup(markers);
-            map.fitBounds(group.getBounds().pad(0.1));
+            // Include home city in the bounds
+            const bounds = group.getBounds();
+            bounds.extend([selectedHomeCity.lat, selectedHomeCity.lon]);
+            // Limit max zoom to prevent jarring zoom-in on single/close markers
+            map.fitBounds(bounds.pad(0.15), { maxZoom: 8 });
+        } else if (!searchInArea && selectedHomeCity) {
+            // No markers but have home city - show a reasonable area around home
+            map.setView([selectedHomeCity.lat, selectedHomeCity.lon], 5);
         }
 
         // Store the current bounds for later comparison

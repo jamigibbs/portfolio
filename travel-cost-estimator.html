@@ -265,6 +265,48 @@
             background: #404040;
         }
 
+        /* Stepper control */
+        .stepper-control {
+            display: flex;
+            align-items: center;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .stepper-btn {
+            width: 44px;
+            height: 44px;
+            background: #363636;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stepper-btn:hover {
+            background: #00d4ff;
+            color: #1a1a1a;
+        }
+
+        .stepper-btn:active {
+            background: #0096ff;
+        }
+
+        .stepper-value {
+            flex: 1;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            padding: 0 12px;
+        }
+
         /* Budget range */
         .budget-inputs {
             display: flex;
@@ -1061,7 +1103,7 @@
     <div class="container">
         <aside class="sidebar">
             <h1 class="logo">✈️ Travel Cost Estimator</h1>
-            <p class="tagline">Find the perfect trip within your budget <span class="version">v1.6.0</span></p>
+            <p class="tagline">Find the perfect trip within your budget <span class="version">v1.7.0</span></p>
 
             <!-- Step 1: Trip Details -->
             <div class="step-section always-on" id="step1">
@@ -1107,14 +1149,14 @@
                     </div>
 
                     <label>Max travel time (one-way)</label>
-                    <select id="maxTravelTime">
-                        <option value="0" selected>Any distance</option>
-                        <option value="4">4 hours</option>
-                        <option value="8">8 hours</option>
-                        <option value="12">12 hours</option>
-                        <option value="16">16 hours</option>
-                        <option value="24">24 hours</option>
-                    </select>
+                    <div class="stepper-control">
+                        <button type="button" class="stepper-btn" onclick="adjustTravelTime(-1)">−</button>
+                        <div class="stepper-value">
+                            <span id="travelTimeDisplay">Any</span>
+                            <input type="hidden" id="maxTravelTime" value="0">
+                        </div>
+                        <button type="button" class="stepper-btn" onclick="adjustTravelTime(1)">+</button>
+                    </div>
                     <div class="info-box travel-time-info">
                         <span id="travelTimeInfo">🚗 ~480 mi drive or ✈️ ~2,400 mi flight</span>
                     </div>
