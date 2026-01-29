@@ -2012,6 +2012,28 @@ function adjustTravelTime(delta) {
     }
 }
 
+// Adjust trip duration with stepper buttons
+function adjustTripDuration(delta) {
+    const input = document.getElementById('tripDuration');
+    const display = document.getElementById('tripDurationDisplay');
+    let currentValue = parseInt(input.value) || 7;
+
+    // Increment by 1 night, min 1, max 30
+    currentValue = Math.max(1, Math.min(30, currentValue + delta));
+    input.value = currentValue;
+
+    // Update display text
+    display.textContent = `${currentValue} night${currentValue !== 1 ? 's' : ''}`;
+
+    // Debounced auto-search if already searched
+    if (selectedHomeCity && hasSearched) {
+        clearTimeout(window.tripDurationSearchTimeout);
+        window.tripDurationSearchTimeout = setTimeout(() => {
+            searchDestinations();
+        }, 500);
+    }
+}
+
 // Update travel time info display
 function updateTravelTimeInfo() {
     const hours = parseInt(document.getElementById('maxTravelTime').value) || 0;
@@ -2331,10 +2353,21 @@ function toggleApiPanel() {
 
 // Update API status indicators
 function updateApiStatus() {
+    // Log API configuration status
+    console.log('API Status Check:', {
+        geonames: API_KEYS.geonames.username ? `Configured (${API_KEYS.geonames.username})` : 'Not configured',
+        amadeus: API_KEYS.amadeus.clientId ? 'Configured' : 'Not configured',
+        openMeteo: 'No key needed (free)',
+        wikivoyage: 'No key needed (free)',
+        wikipedia: 'No key needed (free)'
+    });
+
+    // Update Amadeus status if element exists
     const amadeusStatus = document.getElementById('amadeusStatus');
-    if (API_KEYS.amadeus.clientId && API_KEYS.amadeus.clientSecret) {
+    if (amadeusStatus && API_KEYS.amadeus.clientId && API_KEYS.amadeus.clientSecret) {
         amadeusStatus.classList.add('connected');
-        amadeusStatus.querySelector('.api-badge').textContent = 'Live';
+        const badge = amadeusStatus.querySelector('.api-badge');
+        if (badge) badge.textContent = 'Live';
     }
 }
 
@@ -2425,10 +2458,16 @@ async function searchDestinations(searchInArea = false) {
         // Calculate costs for each destination
         const results = [];
         const DRIVE_THRESHOLD = 500; // Miles - destinations under this are drivable
+        const filterStats = { total: 0, sameCity: 0, modeFilter: 0, timeFilter: 0, boundsFilter: 0, budgetFilter: 0, passed: 0 };
 
         for (const dest of allDestinations) {
+            filterStats.total++;
+
             // Skip if destination is the same as home city
-            if (dest.city.toLowerCase() === selectedHomeCity.city.toLowerCase()) continue;
+            if (dest.city.toLowerCase() === selectedHomeCity.city.toLowerCase()) {
+                filterStats.sameCity++;
+                continue;
+            }
 
             // Calculate distance from home city
             const distance = calculateDistance(
@@ -2441,8 +2480,14 @@ async function searchDestinations(searchInArea = false) {
             const effectiveType = distance <= DRIVE_THRESHOLD ? 'drive' : 'fly';
 
             // Filter by travel mode preference
-            if (travelMode === 'fly' && effectiveType === 'drive') continue;
-            if (travelMode === 'drive' && effectiveType === 'fly') continue;
+            if (travelMode === 'fly' && effectiveType === 'drive') {
+                filterStats.modeFilter++;
+                continue;
+            }
+            if (travelMode === 'drive' && effectiveType === 'fly') {
+                filterStats.modeFilter++;
+                continue;
+            }
 
             // Create a copy with the effective travel type
             const destWithType = { ...dest, type: effectiveType };
@@ -2451,11 +2496,17 @@ async function searchDestinations(searchInArea = false) {
             const travelTime = calculateTravelTime(selectedHomeCity, destWithType, distance);
 
             // Filter by max travel time (if set)
-            if (maxHours > 0 && travelTime > maxHours) continue;
+            if (maxHours > 0 && travelTime > maxHours) {
+                filterStats.timeFilter++;
+                continue;
+            }
 
             // If searching in current area, filter by map bounds
             if (searchInArea && mapBounds) {
-                if (!mapBounds.contains([dest.lat, dest.lon])) continue;
+                if (!mapBounds.contains([dest.lat, dest.lon])) {
+                    filterStats.boundsFilter++;
+                    continue;
+                }
             }
 
             // Calculate costs with the effective type
@@ -2471,10 +2522,12 @@ async function searchDestinations(searchInArea = false) {
             // Check budget filter
             if (budgetMin > 0 || budgetMax < Infinity) {
                 if (costs.total < budgetMin || costs.total > budgetMax) {
+                    filterStats.budgetFilter++;
                     continue;
                 }
             }
 
+            filterStats.passed++;
             results.push({
                 ...destWithType,
                 costs,
@@ -2483,9 +2536,10 @@ async function searchDestinations(searchInArea = false) {
             });
         }
 
+        console.log('Filter statistics:', filterStats);
         console.log('Filter results:', {
             totalAfterFilters: results.length,
-            sampleResults: results.slice(0, 5).map(r => ({
+            sampleResults: results.slice(0, 10).map(r => ({
                 city: r.city,
                 distance: Math.round(r.distance),
                 type: r.type,

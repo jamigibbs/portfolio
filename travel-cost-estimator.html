@@ -1284,18 +1284,25 @@
                     </div>
 
                     <label>Trip duration (nights)</label>
-                    <input type="number" id="tripDuration" value="7" min="1" max="30">
+                    <div class="stepper-control">
+                        <button type="button" class="stepper-btn" onclick="adjustTripDuration(-1)">−</button>
+                        <div class="stepper-value">
+                            <span id="tripDurationDisplay">7 nights</span>
+                            <input type="hidden" id="tripDuration" value="7">
+                        </div>
+                        <button type="button" class="stepper-btn" onclick="adjustTripDuration(1)">+</button>
+                    </div>
 
                     <label>How do you want to travel?</label>
                     <div class="travel-mode-toggle">
+                        <button class="travel-mode-btn" data-mode="drive" onclick="setTravelMode('drive')">
+                            🚗 Drive Only
+                        </button>
                         <button class="travel-mode-btn active" data-mode="both" onclick="setTravelMode('both')">
                             🚗✈️ Both
                         </button>
                         <button class="travel-mode-btn" data-mode="fly" onclick="setTravelMode('fly')">
                             ✈️ Fly Only
-                        </button>
-                        <button class="travel-mode-btn" data-mode="drive" onclick="setTravelMode('drive')">
-                            🚗 Drive Only
                         </button>
                     </div>
 
