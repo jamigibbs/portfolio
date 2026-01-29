@@ -411,6 +411,204 @@ const DESTINATIONS = [
       activities: 40, food: 50, description: "French culture & poutine",
       seasonality: { winter: 0.8, spring: 0.9, summer: 1.3, fall: 1.1 } },
 
+    // Drivable from Los Angeles (within ~6 hours)
+    { city: "Palm Springs", region: "California", country: "USA", lat: 33.83, lon: -116.55,
+      type: "drive",
+      accommodation: { budget: 80, mid: 180, luxury: 450 },
+      activities: 40, food: 55, description: "Desert oasis & mid-century modern",
+      seasonality: { winter: 1.4, spring: 1.2, summer: 0.6, fall: 1.0 } },
+
+    { city: "San Diego", region: "California", country: "USA", lat: 32.72, lon: -117.16,
+      type: "drive",
+      accommodation: { budget: 90, mid: 170, luxury: 380 },
+      activities: 50, food: 55, description: "Beaches, zoo & craft beer",
+      seasonality: { winter: 1.0, spring: 1.1, summer: 1.3, fall: 1.1 } },
+
+    { city: "Santa Barbara", region: "California", country: "USA", lat: 34.42, lon: -119.7,
+      type: "drive",
+      accommodation: { budget: 100, mid: 200, luxury: 500 },
+      activities: 45, food: 65, description: "American Riviera & wine country",
+      seasonality: { winter: 0.9, spring: 1.1, summer: 1.4, fall: 1.1 } },
+
+    { city: "Joshua Tree", region: "California", country: "USA", lat: 34.13, lon: -116.31,
+      type: "drive",
+      accommodation: { budget: 60, mid: 120, luxury: 280 },
+      activities: 30, food: 40, description: "Desert stargazing & hiking",
+      seasonality: { winter: 1.2, spring: 1.3, summer: 0.5, fall: 1.1 } },
+
+    { city: "Big Sur", region: "California", country: "USA", lat: 36.27, lon: -121.81,
+      type: "drive",
+      accommodation: { budget: 120, mid: 250, luxury: 600 },
+      activities: 35, food: 60, description: "Dramatic coastline & redwoods",
+      seasonality: { winter: 0.8, spring: 1.1, summer: 1.4, fall: 1.2 } },
+
+    { city: "Lake Tahoe", region: "California/Nevada", country: "USA", lat: 39.1, lon: -120.04,
+      type: "drive",
+      accommodation: { budget: 90, mid: 180, luxury: 450 },
+      activities: 60, food: 55, description: "Mountain lake & skiing",
+      seasonality: { winter: 1.5, spring: 0.9, summer: 1.3, fall: 1.0 } },
+
+    { city: "Sedona", region: "Arizona", country: "USA", lat: 34.87, lon: -111.76,
+      type: "drive",
+      accommodation: { budget: 100, mid: 200, luxury: 500 },
+      activities: 50, food: 55, description: "Red rocks & spiritual vortexes",
+      seasonality: { winter: 1.1, spring: 1.3, summer: 0.8, fall: 1.2 } },
+
+    { city: "Grand Canyon", region: "Arizona", country: "USA", lat: 36.1, lon: -112.11,
+      type: "drive",
+      accommodation: { budget: 80, mid: 160, luxury: 350 },
+      activities: 40, food: 45, description: "Natural wonder of the world",
+      seasonality: { winter: 0.8, spring: 1.2, summer: 1.3, fall: 1.1 } },
+
+    { city: "Scottsdale", region: "Arizona", country: "USA", lat: 33.49, lon: -111.93,
+      type: "drive",
+      accommodation: { budget: 80, mid: 180, luxury: 450 },
+      activities: 55, food: 60, description: "Desert luxury & golf",
+      seasonality: { winter: 1.5, spring: 1.3, summer: 0.5, fall: 1.0 } },
+
+    // Drivable from Chicago (within ~6 hours)
+    { city: "Milwaukee", region: "Wisconsin", country: "USA", lat: 43.04, lon: -87.91,
+      type: "drive",
+      accommodation: { budget: 70, mid: 140, luxury: 280 },
+      activities: 40, food: 50, description: "Breweries & lakefront",
+      seasonality: { winter: 0.7, spring: 0.9, summer: 1.3, fall: 1.0 } },
+
+    { city: "Door County", region: "Wisconsin", country: "USA", lat: 45.01, lon: -87.15,
+      type: "drive",
+      accommodation: { budget: 80, mid: 150, luxury: 320 },
+      activities: 40, food: 50, description: "Charming villages & cherries",
+      seasonality: { winter: 0.5, spring: 0.8, summer: 1.5, fall: 1.4 } },
+
+    { city: "Galena", region: "Illinois", country: "USA", lat: 42.42, lon: -90.43,
+      type: "drive",
+      accommodation: { budget: 90, mid: 170, luxury: 350 },
+      activities: 35, food: 50, description: "Historic town & wineries",
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.2, fall: 1.3 } },
+
+    { city: "Indianapolis", region: "Indiana", country: "USA", lat: 39.77, lon: -86.16,
+      type: "drive",
+      accommodation: { budget: 70, mid: 130, luxury: 280 },
+      activities: 40, food: 45, description: "Speedway & monuments",
+      seasonality: { winter: 0.8, spring: 1.1, summer: 1.1, fall: 1.0 } },
+
+    { city: "Ann Arbor", region: "Michigan", country: "USA", lat: 42.28, lon: -83.74,
+      type: "drive",
+      accommodation: { budget: 75, mid: 140, luxury: 280 },
+      activities: 35, food: 50, description: "College town & culture",
+      seasonality: { winter: 0.7, spring: 0.9, summer: 1.1, fall: 1.3 } },
+
+    { city: "St. Louis", region: "Missouri", country: "USA", lat: 38.63, lon: -90.2,
+      type: "drive",
+      accommodation: { budget: 65, mid: 130, luxury: 280 },
+      activities: 35, food: 45, description: "Gateway Arch & BBQ",
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.1, fall: 1.0 } },
+
+    // Drivable from Miami (within ~6 hours)
+    { city: "Key West", region: "Florida", country: "USA", lat: 24.56, lon: -81.78,
+      type: "drive",
+      accommodation: { budget: 100, mid: 220, luxury: 500 },
+      activities: 50, food: 65, description: "Tropical paradise & sunsets",
+      seasonality: { winter: 1.5, spring: 1.3, summer: 0.7, fall: 0.8 } },
+
+    { city: "Naples", region: "Florida", country: "USA", lat: 26.14, lon: -81.79,
+      type: "drive",
+      accommodation: { budget: 90, mid: 180, luxury: 450 },
+      activities: 45, food: 60, description: "Gulf beaches & upscale dining",
+      seasonality: { winter: 1.5, spring: 1.2, summer: 0.6, fall: 0.8 } },
+
+    { city: "Tampa", region: "Florida", country: "USA", lat: 27.95, lon: -82.46,
+      type: "drive",
+      accommodation: { budget: 70, mid: 140, luxury: 320 },
+      activities: 50, food: 50, description: "Theme parks & Ybor City",
+      seasonality: { winter: 1.2, spring: 1.1, summer: 0.8, fall: 0.9 } },
+
+    { city: "Orlando", region: "Florida", country: "USA", lat: 28.54, lon: -81.38,
+      type: "drive",
+      accommodation: { budget: 80, mid: 160, luxury: 380 },
+      activities: 100, food: 55, description: "Theme park capital",
+      seasonality: { winter: 1.2, spring: 1.3, summer: 1.1, fall: 0.9 } },
+
+    { city: "Savannah", region: "Georgia", country: "USA", lat: 32.08, lon: -81.09,
+      type: "drive",
+      accommodation: { budget: 80, mid: 160, luxury: 350 },
+      activities: 40, food: 55, description: "Historic squares & Southern charm",
+      seasonality: { winter: 0.8, spring: 1.3, summer: 0.9, fall: 1.1 } },
+
+    // Drivable from Atlanta (within ~5 hours)
+    { city: "Asheville", region: "North Carolina", country: "USA", lat: 35.6, lon: -82.55,
+      type: "drive",
+      accommodation: { budget: 80, mid: 160, luxury: 380 },
+      activities: 45, food: 55, description: "Mountains, arts & breweries",
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.1, fall: 1.4 } },
+
+    { city: "Charleston", region: "South Carolina", country: "USA", lat: 32.78, lon: -79.93,
+      type: "drive",
+      accommodation: { budget: 90, mid: 180, luxury: 420 },
+      activities: 45, food: 65, description: "Historic charm & Lowcountry cuisine",
+      seasonality: { winter: 0.8, spring: 1.3, summer: 1.0, fall: 1.1 } },
+
+    { city: "Chattanooga", region: "Tennessee", country: "USA", lat: 35.05, lon: -85.31,
+      type: "drive",
+      accommodation: { budget: 70, mid: 140, luxury: 300 },
+      activities: 45, food: 45, description: "Outdoor adventure & aquarium",
+      seasonality: { winter: 0.8, spring: 1.1, summer: 1.1, fall: 1.2 } },
+
+    { city: "Birmingham", region: "Alabama", country: "USA", lat: 33.52, lon: -86.8,
+      type: "drive",
+      accommodation: { budget: 65, mid: 130, luxury: 280 },
+      activities: 35, food: 45, description: "Civil rights history & food scene",
+      seasonality: { winter: 0.85, spring: 1.0, summer: 0.9, fall: 1.0 } },
+
+    // Drivable from Texas cities (within ~5 hours)
+    { city: "Fredericksburg", region: "Texas", country: "USA", lat: 30.28, lon: -98.87,
+      type: "drive",
+      accommodation: { budget: 90, mid: 180, luxury: 400 },
+      activities: 40, food: 55, description: "Wine country & German heritage",
+      seasonality: { winter: 0.8, spring: 1.3, summer: 0.9, fall: 1.1 } },
+
+    { city: "Big Bend", region: "Texas", country: "USA", lat: 29.25, lon: -103.25,
+      type: "drive",
+      accommodation: { budget: 60, mid: 120, luxury: 250 },
+      activities: 35, food: 35, description: "Remote desert wilderness",
+      seasonality: { winter: 1.1, spring: 1.3, summer: 0.5, fall: 1.0 } },
+
+    { city: "South Padre Island", region: "Texas", country: "USA", lat: 26.11, lon: -97.17,
+      type: "drive",
+      accommodation: { budget: 80, mid: 160, luxury: 350 },
+      activities: 45, food: 50, description: "Beach resort & spring break",
+      seasonality: { winter: 0.8, spring: 1.5, summer: 1.1, fall: 0.8 } },
+
+    { city: "Marfa", region: "Texas", country: "USA", lat: 30.31, lon: -104.02,
+      type: "drive",
+      accommodation: { budget: 80, mid: 150, luxury: 320 },
+      activities: 30, food: 45, description: "Art installations & mystery lights",
+      seasonality: { winter: 0.9, spring: 1.2, summer: 0.8, fall: 1.1 } },
+
+    // Drivable from Pacific Northwest
+    { city: "Portland", region: "Oregon", country: "USA", lat: 45.52, lon: -122.68,
+      type: "drive",
+      accommodation: { budget: 80, mid: 160, luxury: 350 },
+      activities: 45, food: 55, description: "Weird & wonderful, food carts",
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.3, fall: 1.0 } },
+
+    { city: "Bend", region: "Oregon", country: "USA", lat: 44.06, lon: -121.31,
+      type: "drive",
+      accommodation: { budget: 90, mid: 170, luxury: 380 },
+      activities: 55, food: 50, description: "Outdoor recreation & craft beer",
+      seasonality: { winter: 1.3, spring: 1.0, summer: 1.4, fall: 1.1 } },
+
+    { city: "Olympic National Park", region: "Washington", country: "USA", lat: 47.8, lon: -123.6,
+      type: "drive",
+      accommodation: { budget: 70, mid: 140, luxury: 300 },
+      activities: 40, food: 40, description: "Rainforest, mountains & coast",
+      seasonality: { winter: 0.7, spring: 0.9, summer: 1.5, fall: 1.0 } },
+
+    { city: "Vancouver", region: "British Columbia", country: "Canada", lat: 49.28, lon: -123.12,
+      type: "drive",
+      accommodation: { budget: 90, mid: 180, luxury: 400 },
+      activities: 50, food: 55, description: "Mountains meet ocean",
+      seasonality: { winter: 0.9, spring: 1.0, summer: 1.3, fall: 1.0 } },
+
     // Fly destinations - Caribbean & Mexico
     { city: "Cancun", region: "Quintana Roo", country: "Mexico", lat: 21.16, lon: -86.85,
       type: "fly", flightFromNYC: { low: 250, mid: 400, high: 600 },
@@ -784,12 +982,23 @@ function updateTravelTimeInfo() {
 
     if (hours === 0) {
         infoEl.textContent = '🌍 Showing all destinations worldwide';
+    } else if (!selectedHomeCity) {
+        infoEl.textContent = '📍 Select your home city to see travel radius';
     } else {
-        // Estimate distances: ~60 mph driving, ~500 mph flying (including airport time)
-        const driveMiles = hours * 60;
-        const flyMiles = hours * 300; // Conservative estimate accounting for airport time
+        // Calculate actual radius based on selected time
+        const driveMiles = Math.round(hours * 55); // 55 mph average driving
+        const flyMiles = Math.round((hours - 3) * 500); // 500 mph minus 3h airport time
 
-        infoEl.textContent = `🚗 ~${driveMiles.toLocaleString()} mi drive or ✈️ ~${flyMiles.toLocaleString()} mi flight`;
+        if (hours <= 3) {
+            infoEl.textContent = `🚗 Up to ~${driveMiles.toLocaleString()} mi drive from ${selectedHomeCity.city}`;
+        } else {
+            infoEl.textContent = `🚗 ~${driveMiles.toLocaleString()} mi drive or ✈️ ~${flyMiles.toLocaleString()} mi flight from ${selectedHomeCity.city}`;
+        }
+    }
+
+    // Auto-zoom the map if home city is selected
+    if (selectedHomeCity && hours > 0) {
+        autoZoomToTravelRadius(hours);
     }
 }
 
@@ -861,8 +1070,41 @@ function selectHomeCity(item) {
     document.getElementById('homeCity').value = `${city}, ${state}`;
     document.getElementById('homeCityResults').classList.remove('show');
 
-    // Center map on home city
-    map.setView([lat, lon], 5);
+    // Update travel time info with new home city
+    updateTravelTimeInfo();
+
+    // If travel time is set, auto-zoom; otherwise just center on home city
+    const hours = parseInt(document.getElementById('maxTravelTime').value) || 0;
+    if (hours > 0) {
+        autoZoomToTravelRadius(hours);
+    } else {
+        map.setView([lat, lon], 5);
+    }
+}
+
+// Auto-zoom map to show travel radius from home city
+function autoZoomToTravelRadius(hours) {
+    if (!selectedHomeCity) return;
+
+    // Calculate approximate radius in miles
+    // Use the larger of drive or fly distance to ensure we show all possibilities
+    const driveRadius = hours * 55; // 55 mph average
+    const flyRadius = hours > 3 ? (hours - 3) * 500 : 0; // 500 mph minus airport time
+    const maxRadius = Math.max(driveRadius, flyRadius);
+
+    // Convert miles to degrees (rough approximation: 1 degree ≈ 69 miles at equator)
+    // Adjust for latitude
+    const latDegrees = maxRadius / 69;
+    const lonDegrees = maxRadius / (69 * Math.cos(selectedHomeCity.lat * Math.PI / 180));
+
+    // Create bounds around home city
+    const bounds = L.latLngBounds(
+        [selectedHomeCity.lat - latDegrees, selectedHomeCity.lon - lonDegrees],
+        [selectedHomeCity.lat + latDegrees, selectedHomeCity.lon + lonDegrees]
+    );
+
+    // Fit map to bounds with some padding
+    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
 }
 
 // UI state functions
@@ -1168,16 +1410,26 @@ function addDestinationMarker(dest, travelers, nights) {
 
     if (dest.type === 'drive') markerClass += ' marker-drive';
 
+    // Build weather display for marker
+    let weatherDisplay = '';
+    if (dest.weather) {
+        const weatherEmoji = dest.weather.conditions.split(' ')[0]; // Get just the emoji
+        weatherDisplay = `<span class="marker-weather">${weatherEmoji} ${dest.weather.avgHigh}°</span>`;
+    }
+
     const icon = L.divIcon({
         className: 'custom-div-icon',
         html: `
             <div class="custom-marker ${markerClass}">
                 <span class="marker-price">$${dest.costs.total}</span>
-                <span class="marker-type">${dest.type === 'drive' ? '🚗' : '✈️'}</span>
+                <div class="marker-details">
+                    <span class="marker-type">${dest.type === 'drive' ? '🚗' : '✈️'}</span>
+                    ${weatherDisplay}
+                </div>
             </div>
         `,
-        iconSize: [50, 50],
-        iconAnchor: [25, 25]
+        iconSize: [70, 55],
+        iconAnchor: [35, 27]
     });
 
     const popup = createPopupContent(dest, travelers, nights);
