@@ -1189,11 +1189,12 @@ function calculateTravelTime(homeCity, dest, distance) {
 }
 
 // Debounce helper function
-let debounceTimer = null;
+// Debounce helper - creates independent timer for each use
 function debounce(func, delay) {
+    let timer = null;
     return function(...args) {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => func.apply(this, args), delay);
+        clearTimeout(timer);
+        timer = setTimeout(() => func.apply(this, args), delay);
     };
 }
 
@@ -1215,13 +1216,15 @@ function initAutocomplete() {
             results.classList.add('show');
 
             // Use Nominatim API for worldwide city search
-            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=8&featuretype=city&dedupe=1`;
+            const url = `https://nominatim.openstreetmap.org/search?` + new URLSearchParams({
+                q: query,
+                format: 'json',
+                addressdetails: '1',
+                limit: '10',
+                dedupe: '1'
+            }).toString();
 
-            const response = await fetch(url, {
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
+            const response = await fetch(url);
 
             if (!response.ok) throw new Error('Nominatim API failed');
 
@@ -1269,7 +1272,10 @@ function initAutocomplete() {
 
         } catch (error) {
             console.error('Nominatim error:', error);
-            results.innerHTML = '<div class="autocomplete-item" style="color: #f44;">Search failed, try again</div>';
+            // Show more helpful error message
+            results.innerHTML = `<div class="autocomplete-item" style="color: #f44;">
+                Search failed - check console for details
+            </div>`;
         }
     }, 400); // 400ms debounce to respect rate limits
 
