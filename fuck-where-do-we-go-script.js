@@ -1740,6 +1740,73 @@ const DESTINATIONS = [
       accommodation: { budget: 35, mid: 80, luxury: 200 },
       activities: 40, food: 30, description: "Iconic Petronas Towers, incredible multicultural food scene, and gateway to stunning beaches and rainforests.",
       seasonality: { winter: 1.1, spring: 1.0, summer: 0.95, fall: 1.0 } },
+
+    // Additional Asian Destinations
+    { city: "Seoul", region: "Capital Area", country: "South Korea", lat: 37.57, lon: 126.98,
+      type: "fly", flightFromNYC: { low: 650, mid: 1000, high: 1600 },
+      accommodation: { budget: 45, mid: 100, luxury: 280 },
+      activities: 45, food: 40, description: "K-pop, incredible street food, ancient palaces, and cutting-edge technology blend seamlessly in this dynamic capital.",
+      seasonality: { winter: 0.85, spring: 1.3, summer: 1.0, fall: 1.3 } },
+
+    { city: "Kyoto", region: "Kansai", country: "Japan", lat: 35.01, lon: 135.77,
+      type: "fly", flightFromNYC: { low: 620, mid: 980, high: 1550 },
+      accommodation: { budget: 55, mid: 130, luxury: 400 },
+      activities: 50, food: 45, description: "Ancient temples, traditional geisha districts, stunning bamboo groves, and Japan's cultural heart.",
+      seasonality: { winter: 0.85, spring: 1.5, summer: 1.0, fall: 1.4 } },
+
+    { city: "Osaka", region: "Kansai", country: "Japan", lat: 34.69, lon: 135.50,
+      type: "fly", flightFromNYC: { low: 600, mid: 950, high: 1500 },
+      accommodation: { budget: 45, mid: 110, luxury: 300 },
+      activities: 45, food: 50, description: "Japan's kitchen with incredible street food, vibrant nightlife, and easy access to Kyoto and Nara.",
+      seasonality: { winter: 0.9, spring: 1.4, summer: 1.0, fall: 1.2 } },
+
+    { city: "Hong Kong", region: "Hong Kong", country: "Hong Kong", lat: 22.32, lon: 114.17,
+      type: "fly", flightFromNYC: { low: 550, mid: 850, high: 1400 },
+      accommodation: { budget: 60, mid: 150, luxury: 400 },
+      activities: 50, food: 45, description: "Stunning skyline, dim sum paradise, hiking trails with harbor views, and vibrant night markets.",
+      seasonality: { winter: 1.0, spring: 1.1, summer: 0.85, fall: 1.2 } },
+
+    { city: "Taipei", region: "Northern Taiwan", country: "Taiwan", lat: 25.03, lon: 121.57,
+      type: "fly", flightFromNYC: { low: 550, mid: 850, high: 1350 },
+      accommodation: { budget: 40, mid: 90, luxury: 250 },
+      activities: 40, food: 35, description: "Night markets, bubble tea origins, stunning temples, and easy access to beautiful mountain scenery.",
+      seasonality: { winter: 0.9, spring: 1.1, summer: 0.85, fall: 1.1 } },
+
+    { city: "Hanoi", region: "Northern Vietnam", country: "Vietnam", lat: 21.03, lon: 105.85,
+      type: "fly", flightFromNYC: { low: 500, mid: 800, high: 1300 },
+      accommodation: { budget: 20, mid: 50, luxury: 150 },
+      activities: 25, food: 15, description: "Charming Old Quarter, legendary pho, French colonial architecture, and gateway to Ha Long Bay.",
+      seasonality: { winter: 1.0, spring: 1.2, summer: 0.8, fall: 1.1 } },
+
+    { city: "Chiang Mai", region: "Northern Thailand", country: "Thailand", lat: 18.79, lon: 98.98,
+      type: "fly", flightFromNYC: { low: 580, mid: 900, high: 1400 },
+      accommodation: { budget: 20, mid: 50, luxury: 150 },
+      activities: 30, food: 15, description: "Ancient temples, elephant sanctuaries, incredible food scene, and laid-back mountain vibes.",
+      seasonality: { winter: 1.4, spring: 1.0, summer: 0.75, fall: 0.9 } },
+
+    { city: "Phuket", region: "Southern Thailand", country: "Thailand", lat: 7.89, lon: 98.40,
+      type: "fly", flightFromNYC: { low: 600, mid: 950, high: 1450 },
+      accommodation: { budget: 30, mid: 80, luxury: 250 },
+      activities: 40, food: 25, description: "Thailand's largest island with stunning beaches, vibrant nightlife, and world-class diving.",
+      seasonality: { winter: 1.5, spring: 1.1, summer: 0.7, fall: 0.8 } },
+
+    { city: "Siem Reap", region: "Siem Reap", country: "Cambodia", lat: 13.36, lon: 103.86,
+      type: "fly", flightFromNYC: { low: 550, mid: 900, high: 1400 },
+      accommodation: { budget: 15, mid: 45, luxury: 180 },
+      activities: 35, food: 15, description: "Gateway to magnificent Angkor Wat, charming pub street, and authentic Khmer culture.",
+      seasonality: { winter: 1.4, spring: 1.0, summer: 0.7, fall: 0.8 } },
+
+    { city: "Mumbai", region: "Maharashtra", country: "India", lat: 19.08, lon: 72.88,
+      type: "fly", flightFromNYC: { low: 500, mid: 800, high: 1300 },
+      accommodation: { budget: 25, mid: 70, luxury: 200 },
+      activities: 30, food: 20, description: "Bollywood, incredible street food, colonial architecture, and India's most cosmopolitan city.",
+      seasonality: { winter: 1.3, spring: 1.0, summer: 0.6, fall: 0.9 } },
+
+    { city: "Goa", region: "Goa", country: "India", lat: 15.30, lon: 74.12,
+      type: "fly", flightFromNYC: { low: 550, mid: 850, high: 1350 },
+      accommodation: { budget: 20, mid: 60, luxury: 200 },
+      activities: 25, food: 20, description: "Beautiful beaches, Portuguese heritage, legendary parties, and laid-back tropical vibes.",
+      seasonality: { winter: 1.5, spring: 1.0, summer: 0.5, fall: 0.8 } },
 ];
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
@@ -2673,8 +2740,8 @@ function calculateTripCost(dest, options) {
     // Food cost (per person per day)
     const foodCost = dest.food * travelers * nights * seasonMultiplier;
 
-    // Activities cost (per person, spread across trip)
-    const activitiesCost = dest.activities * travelers;
+    // Activities cost (per person per day)
+    const activitiesCost = dest.activities * travelers * nights;
 
     // Total cost
     const total = transportCost + accommodationCost + foodCost + activitiesCost;
