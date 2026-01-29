@@ -1743,14 +1743,23 @@ const DESTINATIONS = [
 ];
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
+    // Load curated destinations FIRST (before any functions that might fail)
+    destinationsData = DESTINATIONS;
+    console.log('Loaded', destinationsData.length, 'curated destinations');
+
     initMap();
     initDatePickers();
     initAutocomplete();
     initMonthSelector();
     initTravelTimeSelector();
     initSearchTriggers();
-    updateApiStatus();
-    destinationsData = DESTINATIONS;
+
+    // Wrap in try-catch to prevent breaking initialization
+    try {
+        updateApiStatus();
+    } catch (e) {
+        console.warn('API status update failed:', e);
+    }
 });
 
 // Track if user has made changes since last search
