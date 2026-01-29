@@ -662,6 +662,55 @@
         .back-link:hover {
             color: #00d4ff;
         }
+
+        /* Search this area button */
+        .search-area-btn {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            padding: 12px 20px;
+            background: #2d2d2d;
+            border: 2px solid #00d4ff;
+            border-radius: 25px;
+            color: #00d4ff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s;
+            display: none;
+        }
+
+        .search-area-btn.show {
+            display: block;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .search-area-btn:hover {
+            background: #00d4ff;
+            color: #1e1e1e;
+            transform: translateX(-50%) scale(1.05);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Travel time info box */
+        .travel-time-info {
+            margin-top: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -712,6 +761,21 @@
                         <button class="travel-mode-btn" data-mode="drive" onclick="setTravelMode('drive')">
                             🚗 Drive Only
                         </button>
+                    </div>
+
+                    <label>Max travel time (one-way)</label>
+                    <select id="maxTravelTime">
+                        <option value="0">Any distance</option>
+                        <option value="2">2 hours</option>
+                        <option value="4">4 hours</option>
+                        <option value="6">6 hours</option>
+                        <option value="8" selected>8 hours</option>
+                        <option value="12">12 hours</option>
+                        <option value="16">16 hours</option>
+                        <option value="24">24+ hours</option>
+                    </select>
+                    <div class="info-box travel-time-info">
+                        <span id="travelTimeInfo">🚗 ~480 mi drive or ✈️ ~2,400 mi flight</span>
                     </div>
                 </div>
             </div>
@@ -788,6 +852,9 @@
 
         <div class="map-container">
             <div id="map"></div>
+            <button class="search-area-btn" id="searchAreaBtn" onclick="searchInCurrentArea()">
+                🔄 Search this area
+            </button>
             <div class="loading-overlay" id="loadingOverlay">
                 <div class="spinner"></div>
                 <div class="loading-text">Calculating travel costs...</div>

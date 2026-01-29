@@ -9,6 +9,9 @@ let selectedHomeCity = null;
 let travelMode = 'both';
 let dateType = 'specific';
 let selectedMonths = [];
+let maxTravelTime = 8; // hours
+let hasSearched = false;
+let lastSearchBounds = null;
 
 // OpenWeatherMap API (free tier - 1000 calls/day)
 const WEATHER_API_KEY = ''; // User should add their own key
@@ -313,6 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initDatePickers();
     initAutocomplete();
     initMonthSelector();
+    initTravelTimeSelector();
     destinationsData = DESTINATIONS;
 });
 
@@ -324,6 +328,45 @@ function initMap() {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19
     }).addTo(map);
+
+    // Listen for map move/zoom to show "Search this area" button
+    map.on('moveend', onMapMoved);
+    map.on('zoomend', onMapMoved);
+}
+
+// Handle map move/zoom - show search area button
+function onMapMoved() {
+    if (!hasSearched || !selectedHomeCity) return;
+
+    const currentBounds = map.getBounds();
+
+    // Check if map has moved significantly from last search
+    if (lastSearchBounds) {
+        const centerMoved = !lastSearchBounds.contains(map.getCenter());
+        const zoomChanged = Math.abs(map.getZoom() - (lastSearchBounds._zoom || 3)) > 0.5;
+
+        if (centerMoved || zoomChanged) {
+            showSearchAreaButton();
+        }
+    }
+}
+
+// Show the "Search this area" button
+function showSearchAreaButton() {
+    const btn = document.getElementById('searchAreaBtn');
+    btn.classList.add('show');
+}
+
+// Hide the "Search this area" button
+function hideSearchAreaButton() {
+    const btn = document.getElementById('searchAreaBtn');
+    btn.classList.remove('show');
+}
+
+// Search in current map area
+function searchInCurrentArea() {
+    hideSearchAreaButton();
+    searchDestinations(true); // Pass true to indicate area-based search
 }
 
 // Initialize date pickers with defaults
@@ -390,6 +433,45 @@ function toggleMonth(btn, monthIndex) {
         selectedMonths = selectedMonths.filter(m => m !== monthIndex);
     } else {
         selectedMonths.push(monthIndex);
+    }
+}
+
+// Initialize travel time selector
+function initTravelTimeSelector() {
+    const select = document.getElementById('maxTravelTime');
+    select.addEventListener('change', updateTravelTimeInfo);
+    updateTravelTimeInfo(); // Set initial info
+}
+
+// Update travel time info display
+function updateTravelTimeInfo() {
+    const hours = parseInt(document.getElementById('maxTravelTime').value) || 0;
+    maxTravelTime = hours;
+
+    const infoEl = document.getElementById('travelTimeInfo');
+
+    if (hours === 0) {
+        infoEl.textContent = '🌍 Showing all destinations worldwide';
+    } else {
+        // Estimate distances: ~60 mph driving, ~500 mph flying (including airport time)
+        const driveMiles = hours * 60;
+        const flyMiles = hours * 300; // Conservative estimate accounting for airport time
+
+        infoEl.textContent = `🚗 ~${driveMiles.toLocaleString()} mi drive or ✈️ ~${flyMiles.toLocaleString()} mi flight`;
+    }
+}
+
+// Calculate travel time to destination
+function calculateTravelTime(homeCity, dest, distance) {
+    if (dest.type === 'drive') {
+        // Driving: assume average 55 mph with traffic/stops
+        return distance / 55;
+    } else {
+        // Flying: flight time + 3 hours for airport (security, boarding, etc.)
+        const flightSpeed = 500; // mph average
+        const flightTime = distance / flightSpeed;
+        const airportTime = 3; // hours
+        return flightTime + airportTime;
     }
 }
 
@@ -476,7 +558,7 @@ function toggleStep(stepId) {
 }
 
 // Main search function
-async function searchDestinations() {
+async function searchDestinations(searchInArea = false) {
     if (!selectedHomeCity) {
         alert('Please select your home city first.');
         return;
@@ -487,6 +569,10 @@ async function searchDestinations() {
     const accommodationType = document.getElementById('accommodationType').value;
     const budgetMin = parseInt(document.getElementById('budgetMin').value) || 0;
     const budgetMax = parseInt(document.getElementById('budgetMax').value) || Infinity;
+    const maxHours = parseInt(document.getElementById('maxTravelTime').value) || 0;
+
+    // Get current map bounds if searching in area
+    const mapBounds = searchInArea ? map.getBounds() : null;
 
     // Get travel dates/season
     let travelMonth;
@@ -520,8 +606,16 @@ async function searchDestinations() {
                 dest.lat, dest.lon
             );
 
-            // Skip drive destinations if too far (> 600 miles)
-            if (dest.type === 'drive' && distance > 600) continue;
+            // Calculate travel time and filter
+            const travelTime = calculateTravelTime(selectedHomeCity, dest, distance);
+
+            // Filter by max travel time (if set)
+            if (maxHours > 0 && travelTime > maxHours) continue;
+
+            // If searching in current area, filter by map bounds
+            if (searchInArea && mapBounds) {
+                if (!mapBounds.contains([dest.lat, dest.lon])) continue;
+            }
 
             // Calculate costs
             const costs = calculateTripCost(dest, {
@@ -543,7 +637,8 @@ async function searchDestinations() {
             results.push({
                 ...dest,
                 costs,
-                distance
+                distance,
+                travelTime
             });
         }
 
@@ -556,11 +651,21 @@ async function searchDestinations() {
         // Update alternatives panel
         updateAlternativesPanel(results, budgetMin, budgetMax);
 
-        // Fit map to show all markers
-        if (markers.length > 0) {
+        // Mark that we've searched
+        hasSearched = true;
+
+        // Fit map to show all markers (unless searching in area)
+        if (markers.length > 0 && !searchInArea) {
             const group = L.featureGroup(markers);
             map.fitBounds(group.getBounds().pad(0.1));
         }
+
+        // Store the current bounds for later comparison
+        lastSearchBounds = map.getBounds();
+        lastSearchBounds._zoom = map.getZoom();
+
+        // Hide search area button after search
+        hideSearchAreaButton();
 
     } catch (error) {
         console.error('Error searching destinations:', error);
@@ -671,6 +776,22 @@ function toRad(deg) {
     return deg * Math.PI / 180;
 }
 
+// Format travel time for display
+function formatTravelTime(hours) {
+    if (!hours) return 'N/A';
+    if (hours < 1) {
+        return `${Math.round(hours * 60)}min`;
+    } else if (hours < 24) {
+        const h = Math.floor(hours);
+        const m = Math.round((hours - h) * 60);
+        return m > 0 ? `${h}h ${m}m` : `${h}h`;
+    } else {
+        const d = Math.floor(hours / 24);
+        const h = Math.round(hours % 24);
+        return h > 0 ? `${d}d ${h}h` : `${d}d`;
+    }
+}
+
 // Add destination marker to map
 function addDestinationMarker(dest, travelers, nights) {
     // Determine marker class based on cost
@@ -709,6 +830,9 @@ function createPopupContent(dest, travelers, nights) {
     const seasonLabel = costs.seasonMultiplier > 1.1 ? '🔥 Peak Season' :
                        costs.seasonMultiplier < 0.9 ? '💰 Off-Season' : '📅 Shoulder Season';
 
+    // Format travel time
+    const travelTimeStr = formatTravelTime(dest.travelTime);
+
     return `
         <div class="popup-content">
             <div class="popup-header">${dest.city}</div>
@@ -719,6 +843,7 @@ function createPopupContent(dest, travelers, nights) {
                 <p style="font-size: 13px; color: #ccc; margin: 0;">${dest.description}</p>
                 <div style="margin-top: 8px;">
                     <span class="weather-badge">${seasonLabel}</span>
+                    <span class="weather-badge" style="margin-left: 4px;">⏱️ ${travelTimeStr}</span>
                 </div>
             </div>
 
@@ -727,8 +852,8 @@ function createPopupContent(dest, travelers, nights) {
                 <div class="popup-row">
                     <span class="popup-row-label">
                         ${costs.transportType === 'drive'
-                            ? `${Math.round(dest.distance)} mi round trip`
-                            : `${travelers} traveler${travelers > 1 ? 's' : ''}`}
+                            ? `${Math.round(dest.distance)} mi (${travelTimeStr})`
+                            : `${travelers} traveler${travelers > 1 ? 's' : ''} (${travelTimeStr})`}
                     </span>
                     <span class="popup-row-value">$${costs.transport}</span>
                 </div>
@@ -784,7 +909,7 @@ function updateAlternativesPanel(results, budgetMin, budgetMax) {
             <div class="alternative-icon">${dest.type === 'drive' ? '🚗' : '✈️'}</div>
             <div class="alternative-info">
                 <div class="alternative-name">${dest.city}, ${dest.country}</div>
-                <div class="alternative-details">${dest.description}</div>
+                <div class="alternative-details">${dest.description} · ${formatTravelTime(dest.travelTime)}</div>
             </div>
             <div class="alternative-price">$${dest.costs.total}</div>
         </div>
