@@ -33,8 +33,8 @@ const apiCache = {
 const API_KEYS = {
     // Amadeus: Get free key at https://developers.amadeus.com (2000 calls/month)
     amadeus: {
-        clientId: '',      // Your Amadeus API Key
-        clientSecret: ''   // Your Amadeus API Secret
+        clientId: '7fvKA80GShJnStxs1wjCJO2gGRr3q7a0',
+        clientSecret: 'hKXHWj1xB3fVAseN'
     },
     // Optional: OpenRouteService for isochrones: https://openrouteservice.org
     openRouteService: ''   // Free key, 2000 calls/day
