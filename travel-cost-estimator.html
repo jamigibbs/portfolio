@@ -1060,9 +1060,8 @@
 <body>
     <div class="container">
         <aside class="sidebar">
-            <a href="index.html" class="back-link">← Back to Home</a>
             <h1 class="logo">✈️ Travel Cost Estimator</h1>
-            <p class="tagline">Find the perfect trip within your budget <span class="version">v1.3.0</span></p>
+            <p class="tagline">Find the perfect trip within your budget <span class="version">v1.4.0</span></p>
 
             <!-- Step 1: Trip Details -->
             <div class="step-section always-on" id="step1">
@@ -1109,14 +1108,12 @@
 
                     <label>Max travel time (one-way)</label>
                     <select id="maxTravelTime">
-                        <option value="0">Any distance</option>
-                        <option value="2">2 hours</option>
+                        <option value="0" selected>Any distance</option>
                         <option value="4">4 hours</option>
-                        <option value="6">6 hours</option>
-                        <option value="8" selected>8 hours</option>
+                        <option value="8">8 hours</option>
                         <option value="12">12 hours</option>
                         <option value="16">16 hours</option>
-                        <option value="24">24+ hours</option>
+                        <option value="24">24 hours</option>
                     </select>
                     <div class="info-box travel-time-info">
                         <span id="travelTimeInfo">🚗 ~480 mi drive or ✈️ ~2,400 mi flight</span>

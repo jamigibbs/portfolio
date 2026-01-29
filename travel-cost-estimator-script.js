@@ -2180,7 +2180,8 @@ async function searchDestinations(searchInArea = false) {
                 };
             } else {
                 // Calculate bounds based on travel radius from home city
-                const maxDistance = maxHours > 0 ? maxHours * 500 : 4000; // Rough miles based on hours
+                // If "Any distance" (maxHours=0), use a very large radius to get worldwide cities
+                const maxDistance = maxHours > 0 ? maxHours * 500 : 12000; // 12000 miles covers most of the globe
                 const latOffset = maxDistance / 69; // ~69 miles per degree of latitude
                 const lonOffset = maxDistance / (69 * Math.cos(selectedHomeCity.lat * Math.PI / 180));
                 fetchBounds = {
@@ -2204,20 +2205,28 @@ async function searchDestinations(searchInArea = false) {
 
         // Calculate costs for each destination
         const results = [];
+        const DRIVE_THRESHOLD = 500; // Miles - destinations under this are drivable
 
         for (const dest of allDestinations) {
-            // Filter by travel mode
-            if (travelMode === 'fly' && dest.type === 'drive') continue;
-            if (travelMode === 'drive' && dest.type === 'fly') continue;
-
             // Calculate distance from home city
             const distance = calculateDistance(
                 selectedHomeCity.lat, selectedHomeCity.lon,
                 dest.lat, dest.lon
             );
 
-            // Calculate travel time and filter
-            const travelTime = calculateTravelTime(selectedHomeCity, dest, distance);
+            // Dynamically determine travel type based on distance from THIS user's home
+            // (overrides the static type which was based on NYC)
+            const effectiveType = distance <= DRIVE_THRESHOLD ? 'drive' : 'fly';
+
+            // Filter by travel mode preference
+            if (travelMode === 'fly' && effectiveType === 'drive') continue;
+            if (travelMode === 'drive' && effectiveType === 'fly') continue;
+
+            // Create a copy with the effective travel type
+            const destWithType = { ...dest, type: effectiveType };
+
+            // Calculate travel time based on effective type
+            const travelTime = calculateTravelTime(selectedHomeCity, destWithType, distance);
 
             // Filter by max travel time (if set)
             if (maxHours > 0 && travelTime > maxHours) continue;
@@ -2227,8 +2236,8 @@ async function searchDestinations(searchInArea = false) {
                 if (!mapBounds.contains([dest.lat, dest.lon])) continue;
             }
 
-            // Calculate costs
-            const costs = calculateTripCost(dest, {
+            // Calculate costs with the effective type
+            const costs = calculateTripCost(destWithType, {
                 travelers,
                 nights,
                 accommodationType,
@@ -2245,7 +2254,7 @@ async function searchDestinations(searchInArea = false) {
             }
 
             results.push({
-                ...dest,
+                ...destWithType,
                 costs,
                 distance,
                 travelTime
