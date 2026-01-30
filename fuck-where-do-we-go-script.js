@@ -2854,14 +2854,22 @@ async function searchDestinations(searchInArea = false) {
         console.log('UK destinations found:', ukDests.length, ukDests.slice(0, 3).map(d => d.city));
 
         // Fetch isochrone for drive mode - this gives us accurate reachable area
+        // Note: ORS free tier limits isochrones to 1 hour max, so we cap it
         let isochroneData = null;
+        const MAX_ISOCHRONE_HOURS = 1; // ORS free tier limit
         if ((travelMode === 'drive' || travelMode === 'both') && maxHours > 0 && API_KEYS.openRouteService) {
-            console.log('Fetching driving isochrone for', maxHours, 'hours...');
-            const timeSeconds = maxHours * 3600; // Convert hours to seconds
+            const isochroneHours = Math.min(maxHours, MAX_ISOCHRONE_HOURS);
+            console.log('Fetching driving isochrone for', isochroneHours, 'hour(s)...', maxHours > MAX_ISOCHRONE_HOURS ? `(capped from ${maxHours}h due to API limit)` : '');
+            const timeSeconds = isochroneHours * 3600; // Convert hours to seconds
             isochroneData = await fetchDrivingIsochrone(selectedHomeCity.lat, selectedHomeCity.lon, timeSeconds);
             if (isochroneData) {
                 console.log('Isochrone fetched successfully');
-                displayIsochrone(isochroneData, selectedHomeCity);
+                // Only display isochrone if it matches the requested time (not capped)
+                if (maxHours <= MAX_ISOCHRONE_HOURS) {
+                    displayIsochrone(isochroneData, selectedHomeCity);
+                } else {
+                    console.log('Not displaying isochrone (time was capped), using circle radius instead');
+                }
             } else {
                 console.log('Isochrone fetch failed, falling back to distance-based filtering');
             }
@@ -2944,8 +2952,9 @@ async function searchDestinations(searchInArea = false) {
             // Use generous estimate (faster speed) to avoid filtering out reachable destinations
             const roughTravelTime = calculateTravelTime(selectedHomeCity, destWithType, distance);
 
-            // For drive mode with isochrone, use the accurate polygon for filtering
-            if (effectiveType === 'drive' && isochroneData && isochroneData.polygon) {
+            // For drive mode with valid isochrone (not capped), use the accurate polygon for filtering
+            const useIsochroneFilter = effectiveType === 'drive' && isochroneData && isochroneData.polygon && maxHours <= MAX_ISOCHRONE_HOURS;
+            if (useIsochroneFilter) {
                 const inIsochrone = isPointInIsochrone(dest.lat, dest.lon, isochroneData.polygon);
                 if (!inIsochrone) {
                     filterStats.isochroneFilter++;
@@ -2953,7 +2962,7 @@ async function searchDestinations(searchInArea = false) {
                     continue;
                 }
             } else if (maxHours > 0) {
-                // Fallback to time-based filter when no isochrone available
+                // Fallback to time-based filter when no isochrone or isochrone was capped
                 const filterBuffer = effectiveType === 'drive' ? 1.3 : 1.0;
                 if (roughTravelTime > maxHours * filterBuffer) {
                     filterStats.timeFilter++;
