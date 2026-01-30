@@ -637,6 +637,123 @@ async function fetchDrivingRoute(homeLat, homeLon, destLat, destLon) {
 }
 
 // ============================================
+// OPENROUTESERVICE API - Isochrones
+// Get accurate reachable area polygons for driving
+// ============================================
+let currentIsochrone = null; // Store the current isochrone layer
+
+async function fetchDrivingIsochrone(lat, lon, timeSeconds) {
+    if (!API_KEYS.openRouteService) {
+        return null;
+    }
+
+    const cacheKey = `iso-${lat.toFixed(2)},${lon.toFixed(2)}-${timeSeconds}`;
+    if (apiCache.driving[cacheKey]) {
+        return apiCache.driving[cacheKey];
+    }
+
+    try {
+        const url = 'https://api.openrouteservice.org/v2/isochrones/driving-car';
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': API_KEYS.openRouteService,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                locations: [[lon, lat]], // ORS uses [lon, lat] format
+                range: [timeSeconds],
+                range_type: 'time',
+                smoothing: 0.5
+            })
+        });
+
+        if (!response.ok) {
+            console.error('Isochrone API error:', response.status);
+            return null;
+        }
+
+        const data = await response.json();
+
+        if (data.features && data.features[0]) {
+            const result = {
+                polygon: data.features[0].geometry,
+                properties: data.features[0].properties
+            };
+            apiCache.driving[cacheKey] = result;
+            return result;
+        }
+
+        return null;
+    } catch (error) {
+        console.error('OpenRouteService isochrone error:', error);
+        return null;
+    }
+}
+
+// Check if a point is inside the isochrone polygon
+function isPointInIsochrone(lat, lon, isochroneGeometry) {
+    if (!isochroneGeometry) return true; // If no isochrone, allow all
+
+    // Use Leaflet's built-in point-in-polygon check
+    const point = L.latLng(lat, lon);
+
+    // Convert GeoJSON polygon to Leaflet format and check containment
+    // GeoJSON coordinates are [lon, lat], Leaflet uses [lat, lon]
+    const coords = isochroneGeometry.coordinates[0].map(c => [c[1], c[0]]);
+    const polygon = L.polygon(coords);
+
+    return isPointInPolygon(point, polygon);
+}
+
+// Ray casting algorithm for point in polygon
+function isPointInPolygon(point, polygon) {
+    const latlngs = polygon.getLatLngs()[0];
+    let inside = false;
+    const x = point.lat, y = point.lng;
+
+    for (let i = 0, j = latlngs.length - 1; i < latlngs.length; j = i++) {
+        const xi = latlngs[i].lat, yi = latlngs[i].lng;
+        const xj = latlngs[j].lat, yj = latlngs[j].lng;
+
+        const intersect = ((yi > y) !== (yj > y)) &&
+            (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+
+    return inside;
+}
+
+// Display isochrone on map
+function displayIsochrone(isochroneData, homeCity) {
+    // Remove existing isochrone layer
+    if (currentIsochrone) {
+        map.removeLayer(currentIsochrone);
+        currentIsochrone = null;
+    }
+
+    if (!isochroneData || !isochroneData.polygon) return;
+
+    // Convert GeoJSON coordinates [lon, lat] to Leaflet [lat, lon]
+    const coords = isochroneData.polygon.coordinates[0].map(c => [c[1], c[0]]);
+
+    currentIsochrone = L.polygon(coords, {
+        color: '#ff6b35',
+        weight: 2,
+        fillColor: '#ff6b35',
+        fillOpacity: 0.15,
+        dashArray: '5, 5'
+    }).addTo(map);
+
+    // Add tooltip
+    currentIsochrone.bindTooltip('Drivable area', {
+        permanent: false,
+        direction: 'center'
+    });
+}
+
+// ============================================
 // GEONAMES API - Dynamic City Discovery
 // Fetches cities within map bounds
 // ============================================
@@ -2712,10 +2829,30 @@ async function searchDestinations(searchInArea = false) {
         const ukDests = allDestinations.filter(d => d.country === 'UK' || d.country === 'United Kingdom');
         console.log('UK destinations found:', ukDests.length, ukDests.slice(0, 3).map(d => d.city));
 
+        // Fetch isochrone for drive mode - this gives us accurate reachable area
+        let isochroneData = null;
+        if ((travelMode === 'drive' || travelMode === 'both') && maxHours > 0 && API_KEYS.openRouteService) {
+            console.log('Fetching driving isochrone for', maxHours, 'hours...');
+            const timeSeconds = maxHours * 3600; // Convert hours to seconds
+            isochroneData = await fetchDrivingIsochrone(selectedHomeCity.lat, selectedHomeCity.lon, timeSeconds);
+            if (isochroneData) {
+                console.log('Isochrone fetched successfully');
+                displayIsochrone(isochroneData, selectedHomeCity);
+            } else {
+                console.log('Isochrone fetch failed, falling back to distance-based filtering');
+            }
+        } else {
+            // Remove any existing isochrone if not in drive mode
+            if (currentIsochrone) {
+                map.removeLayer(currentIsochrone);
+                currentIsochrone = null;
+            }
+        }
+
         // Calculate costs for each destination
         const results = [];
         const DRIVE_THRESHOLD = 500; // Miles - destinations under this are drivable
-        const filterStats = { total: 0, sameCity: 0, modeFilter: 0, timeFilter: 0, boundsFilter: 0, budgetFilter: 0, cantDrive: 0, passed: 0 };
+        const filterStats = { total: 0, sameCity: 0, modeFilter: 0, timeFilter: 0, boundsFilter: 0, budgetFilter: 0, cantDrive: 0, isochroneFilter: 0, passed: 0 };
         const ukFilterDebug = []; // Track UK destinations through filtering
 
         for (const dest of allDestinations) {
@@ -2783,13 +2920,22 @@ async function searchDestinations(searchInArea = false) {
             // Use generous estimate (faster speed) to avoid filtering out reachable destinations
             const roughTravelTime = calculateTravelTime(selectedHomeCity, destWithType, distance);
 
-            // For initial filter, add 30% buffer to avoid over-filtering
-            // Actual times will be calculated with ORS for driving destinations
-            const filterBuffer = effectiveType === 'drive' ? 1.3 : 1.0;
-            if (maxHours > 0 && roughTravelTime > maxHours * filterBuffer) {
-                filterStats.timeFilter++;
-                if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = `timeFilter (${roughTravelTime.toFixed(1)}h > ${(maxHours * filterBuffer).toFixed(1)}h)`;
-                continue;
+            // For drive mode with isochrone, use the accurate polygon for filtering
+            if (effectiveType === 'drive' && isochroneData && isochroneData.polygon) {
+                const inIsochrone = isPointInIsochrone(dest.lat, dest.lon, isochroneData.polygon);
+                if (!inIsochrone) {
+                    filterStats.isochroneFilter++;
+                    if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = 'isochroneFilter (outside drivable area)';
+                    continue;
+                }
+            } else if (maxHours > 0) {
+                // Fallback to time-based filter when no isochrone available
+                const filterBuffer = effectiveType === 'drive' ? 1.3 : 1.0;
+                if (roughTravelTime > maxHours * filterBuffer) {
+                    filterStats.timeFilter++;
+                    if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = `timeFilter (${roughTravelTime.toFixed(1)}h > ${(maxHours * filterBuffer).toFixed(1)}h)`;
+                    continue;
+                }
             }
 
             // If searching in current area, filter by map bounds
