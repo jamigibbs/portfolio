@@ -644,16 +644,26 @@ let currentIsochrone = null; // Store the current isochrone layer
 
 async function fetchDrivingIsochrone(lat, lon, timeSeconds) {
     if (!API_KEYS.openRouteService) {
+        console.log('Isochrone: No ORS API key configured');
         return null;
     }
 
     const cacheKey = `iso-${lat.toFixed(2)},${lon.toFixed(2)}-${timeSeconds}`;
     if (apiCache.driving[cacheKey]) {
+        console.log('Isochrone: Using cached data');
         return apiCache.driving[cacheKey];
     }
 
     try {
         const url = 'https://api.openrouteservice.org/v2/isochrones/driving-car';
+        const requestBody = {
+            locations: [[lon, lat]], // ORS uses [lon, lat] format
+            range: [timeSeconds],
+            range_type: 'time',
+            smoothing: 0.5
+        };
+
+        console.log('Isochrone: Fetching from ORS', { lat, lon, timeSeconds, url });
 
         const response = await fetch(url, {
             method: 'POST',
@@ -661,30 +671,31 @@ async function fetchDrivingIsochrone(lat, lon, timeSeconds) {
                 'Authorization': API_KEYS.openRouteService,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                locations: [[lon, lat]], // ORS uses [lon, lat] format
-                range: [timeSeconds],
-                range_type: 'time',
-                smoothing: 0.5
-            })
+            body: JSON.stringify(requestBody)
         });
 
+        console.log('Isochrone: Response status', response.status);
+
         if (!response.ok) {
-            console.error('Isochrone API error:', response.status);
+            const errorText = await response.text();
+            console.error('Isochrone API error:', response.status, errorText);
             return null;
         }
 
         const data = await response.json();
+        console.log('Isochrone: Response data', data);
 
         if (data.features && data.features[0]) {
             const result = {
                 polygon: data.features[0].geometry,
                 properties: data.features[0].properties
             };
+            console.log('Isochrone: Successfully parsed polygon with', result.polygon.coordinates[0].length, 'points');
             apiCache.driving[cacheKey] = result;
             return result;
         }
 
+        console.log('Isochrone: No features in response');
         return null;
     } catch (error) {
         console.error('OpenRouteService isochrone error:', error);
@@ -733,24 +744,37 @@ function displayIsochrone(isochroneData, homeCity) {
         currentIsochrone = null;
     }
 
-    if (!isochroneData || !isochroneData.polygon) return;
+    if (!isochroneData || !isochroneData.polygon) {
+        console.log('No isochrone data to display');
+        return;
+    }
+
+    // Remove the simple circular radius when showing accurate isochrone
+    if (travelRadiusLayer) {
+        map.removeLayer(travelRadiusLayer);
+        travelRadiusLayer = null;
+    }
 
     // Convert GeoJSON coordinates [lon, lat] to Leaflet [lat, lon]
     const coords = isochroneData.polygon.coordinates[0].map(c => [c[1], c[0]]);
+    console.log('Drawing isochrone with', coords.length, 'points');
 
     currentIsochrone = L.polygon(coords, {
         color: '#ff6b35',
-        weight: 2,
+        weight: 3,
         fillColor: '#ff6b35',
         fillOpacity: 0.15,
-        dashArray: '5, 5'
+        dashArray: '10, 6'
     }).addTo(map);
 
     // Add tooltip
-    currentIsochrone.bindTooltip('Drivable area', {
+    currentIsochrone.bindTooltip('Actual drivable area (via roads)', {
         permanent: false,
         direction: 'center'
     });
+
+    // Fit map to isochrone bounds
+    map.fitBounds(currentIsochrone.getBounds(), { padding: [50, 50] });
 }
 
 // ============================================
