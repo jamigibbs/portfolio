@@ -3300,6 +3300,59 @@ async function searchDestinations(searchInArea = false) {
         // Sort by total cost
         results.sort((a, b) => a.costs.total - b.costs.total);
 
+        // Handle empty results - suggest expanding search
+        if (results.length === 0) {
+            console.log('No results found, checking for fallback options...');
+
+            // Determine fallback suggestion based on current settings
+            let fallbackMessage = '';
+            let fallbackAction = null;
+
+            if (travelMode === 'drive' && maxHours > 0 && maxHours < 6) {
+                // Suggest expanding drive time
+                const suggestedHours = Math.min(maxHours * 2, 8);
+                fallbackMessage = `No destinations found within ${maxHours} hours driving. `;
+                fallbackMessage += `<a href="#" onclick="document.getElementById('maxTravelTime').value='${suggestedHours}'; searchDestinations(); return false;">Try ${suggestedHours} hours instead?</a>`;
+            } else if (travelMode === 'drive') {
+                // Suggest switching to "both" mode
+                fallbackMessage = `No driving destinations found within ${maxHours} hours. `;
+                fallbackMessage += `<a href="#" onclick="setTravelMode('both'); searchDestinations(); return false;">Include flights too?</a>`;
+            } else if (travelMode === 'fly' && maxHours > 0 && maxHours < 8) {
+                // Suggest expanding flight time
+                const suggestedHours = Math.min(maxHours + 4, 12);
+                fallbackMessage = `No destinations found within ${maxHours} hours flight. `;
+                fallbackMessage += `<a href="#" onclick="document.getElementById('maxTravelTime').value='${suggestedHours}'; searchDestinations(); return false;">Try ${suggestedHours} hours instead?</a>`;
+            } else {
+                // Generic fallback
+                fallbackMessage = `No destinations found matching your criteria. `;
+                fallbackMessage += `<a href="#" onclick="document.getElementById('maxTravelTime').value='0'; searchDestinations(); return false;">Search worldwide?</a>`;
+            }
+
+            // Show the fallback message in the alternatives panel
+            const alternativesPanel = document.querySelector('.alternatives-list');
+            if (alternativesPanel) {
+                alternativesPanel.innerHTML = `
+                    <div class="no-results-message" style="padding: 20px; text-align: center; color: #666;">
+                        <p style="font-size: 1.1em; margin-bottom: 15px;">😕 ${fallbackMessage}</p>
+                        <p style="font-size: 0.9em; color: #888;">
+                            We're still building our destination database.
+                            Try a larger search radius or different travel mode.
+                        </p>
+                    </div>
+                `;
+            }
+
+            // Hide loading and enable search button
+            document.getElementById('loadingOverlay').classList.remove('show');
+            document.getElementById('searchBtn').disabled = false;
+
+            // Mark that we've searched (even though no results)
+            hasSearched = true;
+            lastSearchBounds = map.getBounds();
+
+            return; // Exit early
+        }
+
         // Fetch real-time data for top results (weather, images, etc.)
         const topResults = results.slice(0, 15);
         const startDateStr = document.getElementById('startDate').value;
