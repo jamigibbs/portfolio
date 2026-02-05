@@ -1919,6 +1919,101 @@ const DESTINATIONS = [
       activities: 55, food: 60, description: "Built on 14 islands with stunning waterways, innovative design, historic old town, and Nordic beauty.",
       seasonality: { winter: 0.7, spring: 1.0, summer: 1.5, fall: 1.0 } },
 
+    // Additional Scandinavian cities for driving
+    // Denmark
+    { city: "Aarhus", region: "Central Denmark", country: "Denmark", lat: 56.16, lon: 10.20,
+      type: "drive", flightFromNYC: { low: 400, mid: 620, high: 980 },
+      accommodation: { budget: 60, mid: 140, luxury: 350 },
+      activities: 50, food: 55, description: "Denmark's second city with Viking history, ARoS art museum, charming Latin Quarter, and young creative energy.",
+      seasonality: { winter: 0.75, spring: 1.0, summer: 1.4, fall: 1.0 } },
+
+    { city: "Odense", region: "Southern Denmark", country: "Denmark", lat: 55.40, lon: 10.39,
+      type: "drive", flightFromNYC: { low: 420, mid: 640, high: 1000 },
+      accommodation: { budget: 55, mid: 130, luxury: 320 },
+      activities: 45, food: 50, description: "Hans Christian Andersen's birthplace with charming old town, excellent museums, and gateway to Funen island.",
+      seasonality: { winter: 0.75, spring: 1.0, summer: 1.3, fall: 1.0 } },
+
+    { city: "Aalborg", region: "North Denmark", country: "Denmark", lat: 57.05, lon: 9.92,
+      type: "drive", flightFromNYC: { low: 420, mid: 640, high: 1000 },
+      accommodation: { budget: 50, mid: 120, luxury: 300 },
+      activities: 40, food: 45, description: "Viking heritage meets modern waterfront. Great nightlife, Utzon Center, and gateway to northern Jutland beaches.",
+      seasonality: { winter: 0.7, spring: 1.0, summer: 1.4, fall: 1.0 } },
+
+    // Sweden
+    { city: "Gothenburg", region: "Västra Götaland", country: "Sweden", lat: 57.71, lon: 11.97,
+      type: "drive", flightFromNYC: { low: 420, mid: 640, high: 1000 },
+      accommodation: { budget: 65, mid: 150, luxury: 380 },
+      activities: 50, food: 55, description: "Sweden's friendly second city with excellent seafood, Liseberg amusement park, beautiful archipelago, and relaxed vibes.",
+      seasonality: { winter: 0.75, spring: 1.0, summer: 1.4, fall: 1.0 } },
+
+    { city: "Malmö", region: "Skåne", country: "Sweden", lat: 55.60, lon: 13.00,
+      type: "drive", flightFromNYC: { low: 400, mid: 620, high: 980 },
+      accommodation: { budget: 60, mid: 140, luxury: 350 },
+      activities: 45, food: 50, description: "Trendy city connected to Copenhagen by bridge. Turning Torso tower, diverse food scene, and beautiful parks.",
+      seasonality: { winter: 0.75, spring: 1.0, summer: 1.4, fall: 1.0 } },
+
+    { city: "Uppsala", region: "Uppsala", country: "Sweden", lat: 59.86, lon: 17.64,
+      type: "drive", flightFromNYC: { low: 420, mid: 640, high: 1000 },
+      accommodation: { budget: 55, mid: 130, luxury: 320 },
+      activities: 40, food: 45, description: "Historic university town with stunning cathedral, Viking burial mounds, and charming student atmosphere.",
+      seasonality: { winter: 0.7, spring: 1.0, summer: 1.4, fall: 1.0 } },
+
+    { city: "Helsingborg", region: "Skåne", country: "Sweden", lat: 56.05, lon: 12.69,
+      type: "drive", flightFromNYC: { low: 420, mid: 640, high: 1000 },
+      accommodation: { budget: 55, mid: 130, luxury: 320 },
+      activities: 40, food: 45, description: "Charming coastal city with medieval tower, ferry connection to Denmark, and gateway to Swedish Riviera.",
+      seasonality: { winter: 0.7, spring: 1.0, summer: 1.4, fall: 1.0 } },
+
+    // Norway
+    { city: "Oslo", region: "Oslo", country: "Norway", lat: 59.91, lon: 10.75,
+      type: "drive", flightFromNYC: { low: 400, mid: 620, high: 980 },
+      accommodation: { budget: 80, mid: 180, luxury: 450 },
+      activities: 60, food: 70, description: "Compact capital surrounded by fjords and forests. Viking ships, Munch Museum, opera house, and outdoor lifestyle.",
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.4, fall: 1.0 } },
+
+    { city: "Bergen", region: "Vestland", country: "Norway", lat: 60.39, lon: 5.32,
+      type: "drive", flightFromNYC: { low: 450, mid: 700, high: 1100 },
+      accommodation: { budget: 75, mid: 170, luxury: 420 },
+      activities: 65, food: 65, description: "Gateway to the fjords with colorful Bryggen wharf, funicular views, and dramatic mountain scenery.",
+      seasonality: { winter: 0.75, spring: 1.0, summer: 1.5, fall: 1.0 } },
+
+    { city: "Stavanger", region: "Rogaland", country: "Norway", lat: 58.97, lon: 5.73,
+      type: "drive", flightFromNYC: { low: 450, mid: 700, high: 1100 },
+      accommodation: { budget: 70, mid: 160, luxury: 400 },
+      activities: 60, food: 60, description: "Oil capital with charming old town, Pulpit Rock nearby, and beautiful Lysefjord for hiking adventures.",
+      seasonality: { winter: 0.75, spring: 1.0, summer: 1.5, fall: 1.0 } },
+
+    { city: "Trondheim", region: "Trøndelag", country: "Norway", lat: 63.43, lon: 10.39,
+      type: "drive", flightFromNYC: { low: 480, mid: 740, high: 1150 },
+      accommodation: { budget: 70, mid: 160, luxury: 400 },
+      activities: 55, food: 60, description: "Historic pilgrimage city with stunning Nidaros Cathedral, colorful warehouses, and student energy.",
+      seasonality: { winter: 0.7, spring: 1.0, summer: 1.5, fall: 1.0 } },
+
+    { city: "Tromsø", region: "Troms", country: "Norway", lat: 69.65, lon: 18.96,
+      type: "drive", flightFromNYC: { low: 550, mid: 850, high: 1300 },
+      accommodation: { budget: 80, mid: 180, luxury: 450 },
+      activities: 80, food: 65, description: "Arctic capital and best place for Northern Lights. Midnight sun, Arctic Cathedral, and whale watching.",
+      seasonality: { winter: 1.3, spring: 1.0, summer: 1.2, fall: 1.1 } },
+
+    // Finland
+    { city: "Helsinki", region: "Uusimaa", country: "Finland", lat: 60.17, lon: 24.94,
+      type: "drive", flightFromNYC: { low: 420, mid: 650, high: 1000 },
+      accommodation: { budget: 65, mid: 150, luxury: 380 },
+      activities: 50, food: 55, description: "Design capital with stunning architecture, sauna culture, island fortress, and gateway to Lapland.",
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.4, fall: 1.0 } },
+
+    { city: "Turku", region: "Southwest Finland", country: "Finland", lat: 60.45, lon: 22.27,
+      type: "drive", flightFromNYC: { low: 450, mid: 680, high: 1050 },
+      accommodation: { budget: 55, mid: 130, luxury: 320 },
+      activities: 45, food: 50, description: "Finland's oldest city with medieval castle, beautiful archipelago, and historic riverside charm.",
+      seasonality: { winter: 0.75, spring: 1.0, summer: 1.4, fall: 1.0 } },
+
+    { city: "Tampere", region: "Pirkanmaa", country: "Finland", lat: 61.50, lon: 23.79,
+      type: "drive", flightFromNYC: { low: 450, mid: 680, high: 1050 },
+      accommodation: { budget: 50, mid: 120, luxury: 300 },
+      activities: 45, food: 45, description: "Industrial heritage turned creative hub between two lakes. Excellent museums and authentic sauna culture.",
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.4, fall: 1.0 } },
+
     { city: "Reykjavik", region: "Capital Region", country: "Iceland", lat: 64.15, lon: -21.95,
       type: "fly", flightFromNYC: { low: 280, mid: 450, high: 700 },
       accommodation: { budget: 80, mid: 180, luxury: 400 },
