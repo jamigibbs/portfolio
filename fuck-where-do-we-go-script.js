@@ -747,29 +747,36 @@ async function fetchDrivingIsochrone(lat, lon, timeSeconds) {
 function isPointInIsochrone(lat, lon, isochroneGeometry) {
     if (!isochroneGeometry) return true; // If no isochrone, allow all
 
-    // Use Leaflet's built-in point-in-polygon check
-    const point = L.latLng(lat, lon);
+    try {
+        // Convert GeoJSON polygon to Leaflet format
+        // GeoJSON coordinates are [lon, lat], Leaflet uses [lat, lon]
+        const coords = isochroneGeometry.coordinates[0].map(c => [c[1], c[0]]);
+        const polygon = L.polygon(coords);
 
-    // Convert GeoJSON polygon to Leaflet format and check containment
-    // GeoJSON coordinates are [lon, lat], Leaflet uses [lat, lon]
-    const coords = isochroneGeometry.coordinates[0].map(c => [c[1], c[0]]);
-    const polygon = L.polygon(coords);
+        // Use Leaflet's bounds check first (fast)
+        const bounds = polygon.getBounds();
+        if (!bounds.contains([lat, lon])) {
+            return false;
+        }
 
-    return isPointInPolygon(point, polygon);
+        // Then use ray casting for accurate check
+        return isPointInPolygonRayCasting(lat, lon, coords);
+    } catch (error) {
+        console.error('Error in isPointInIsochrone:', error);
+        return true; // Allow if there's an error
+    }
 }
 
-// Ray casting algorithm for point in polygon
-function isPointInPolygon(point, polygon) {
-    const latlngs = polygon.getLatLngs()[0];
+// Ray casting algorithm for point in polygon (more reliable)
+function isPointInPolygonRayCasting(lat, lon, coords) {
     let inside = false;
-    const x = point.lat, y = point.lng;
 
-    for (let i = 0, j = latlngs.length - 1; i < latlngs.length; j = i++) {
-        const xi = latlngs[i].lat, yi = latlngs[i].lng;
-        const xj = latlngs[j].lat, yj = latlngs[j].lng;
+    for (let i = 0, j = coords.length - 1; i < coords.length; j = i++) {
+        const xi = coords[i][0], yi = coords[i][1]; // [lat, lon]
+        const xj = coords[j][0], yj = coords[j][1];
 
-        const intersect = ((yi > y) !== (yj > y)) &&
-            (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        const intersect = ((yi > lon) !== (yj > lon)) &&
+            (lat < (xj - xi) * (lon - yi) / (yj - yi) + xi);
         if (intersect) inside = !inside;
     }
 
@@ -3171,6 +3178,9 @@ async function searchDestinations(searchInArea = false) {
             const useIsochroneFilter = effectiveType === 'drive' && isochroneData && isochroneData.polygon && maxHours <= MAX_ISOCHRONE_HOURS;
             if (useIsochroneFilter) {
                 const inIsochrone = isPointInIsochrone(dest.lat, dest.lon, isochroneData.polygon);
+                if (isUK) {
+                    console.log(`UK isochrone check: ${dest.city} at (${dest.lat}, ${dest.lon}) - inIsochrone: ${inIsochrone}`);
+                }
                 if (!inIsochrone) {
                     filterStats.isochroneFilter++;
                     if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = 'isochroneFilter (outside drivable area)';
