@@ -1175,79 +1175,163 @@ async function fetchDestinationData(dest, startDate, endDate, travelers) {
 
 // Destinations data with base prices
 // Prices are baseline estimates that get adjusted for seasonality
+// touristScore: 1-10 scale (10=world famous, 7-8=major destination, 5-6=regional highlight, 3-4=worth visiting, 1-2=hidden gem)
 const DESTINATIONS = [
     // Drivable from NYC (within ~8 hours)
     { city: "Catskills", region: "New York", country: "USA", lat: 42.1, lon: -74.4,
       type: "drive", driveHoursFromNYC: 2.5,
       accommodation: { budget: 80, mid: 150, luxury: 350 },
       activities: 40, food: 60, description: "Escape to rustic mountain cabins, pristine hiking trails, and charming small towns. Perfect for a cozy weekend retreat with stunning fall foliage and winter skiing.",
+      highlights: ["Fall Foliage", "Hiking", "Cozy Cabins"],
+      touristScore: 5,
       seasonality: { winter: 1.3, spring: 0.9, summer: 1.2, fall: 1.4 } },
 
     { city: "Cape Cod", region: "Massachusetts", country: "USA", lat: 41.67, lon: -70.3,
       type: "drive", driveHoursFromNYC: 5,
       accommodation: { budget: 100, mid: 180, luxury: 400 },
       activities: 50, food: 70, description: "Classic New England charm with sandy beaches, fresh lobster rolls, lighthouses, and quaint seaside villages. Best enjoyed in summer but magical year-round.",
+      highlights: ["Beaches", "Lobster Rolls", "Lighthouses"],
+      touristScore: 7,
       seasonality: { winter: 0.6, spring: 0.8, summer: 1.5, fall: 1.0 } },
 
     { city: "Philadelphia", region: "Pennsylvania", country: "USA", lat: 39.95, lon: -75.17,
       type: "drive", driveHoursFromNYC: 2,
       accommodation: { budget: 70, mid: 140, luxury: 280 },
       activities: 35, food: 55, description: "Birthplace of American democracy with world-class museums, a thriving food scene, and the iconic cheesesteak. History buffs and foodies alike will love it here.",
+      highlights: ["American History", "Food Scene", "Museums"],
+      touristScore: 8,
       seasonality: { winter: 0.85, spring: 1.0, summer: 1.1, fall: 1.05 } },
 
     { city: "Washington DC", region: "DC", country: "USA", lat: 38.9, lon: -77.04,
       type: "drive", driveHoursFromNYC: 4,
       accommodation: { budget: 90, mid: 170, luxury: 350 },
       activities: 25, food: 60, description: "The nation's capital offers free world-class museums, iconic monuments, and vibrant neighborhoods. Cherry blossoms in spring are unforgettable.",
+      highlights: ["Smithsonian Museums", "Monuments", "Cherry Blossoms"],
+      touristScore: 9,
       seasonality: { winter: 0.8, spring: 1.3, summer: 1.0, fall: 1.0 } },
 
     { city: "Boston", region: "Massachusetts", country: "USA", lat: 42.36, lon: -71.06,
       type: "drive", driveHoursFromNYC: 4,
       accommodation: { budget: 100, mid: 190, luxury: 400 },
       activities: 45, food: 70, description: "Walk the Freedom Trail through American history, catch a game at Fenway, and feast on the freshest seafood. A perfect blend of old and new.",
+      highlights: ["Freedom Trail", "Fenway Park", "Seafood"],
+      touristScore: 8,
       seasonality: { winter: 0.75, spring: 1.0, summer: 1.2, fall: 1.3 } },
 
     { city: "Atlantic City", region: "New Jersey", country: "USA", lat: 39.36, lon: -74.42,
       type: "drive", driveHoursFromNYC: 2.5,
       accommodation: { budget: 60, mid: 120, luxury: 280 },
       activities: 50, food: 55, description: "Vegas vibes on the East Coast with beachfront casinos, a famous boardwalk, and surprisingly good dining. Great for a quick weekend getaway.",
+      highlights: ["Casinos", "Boardwalk", "Beach"],
+      touristScore: 6,
       seasonality: { winter: 0.7, spring: 0.9, summer: 1.4, fall: 0.9 } },
 
     { city: "Poconos", region: "Pennsylvania", country: "USA", lat: 41.1, lon: -75.3,
       type: "drive", driveHoursFromNYC: 2,
       accommodation: { budget: 70, mid: 140, luxury: 300 },
       activities: 45, food: 50, description: "Year-round mountain escape with skiing, water parks, hiking, and romantic cabin retreats. Popular for couples and family getaways alike.",
+      highlights: ["Skiing", "Water Parks", "Romantic Cabins"],
+      touristScore: 5,
       seasonality: { winter: 1.4, spring: 0.8, summer: 1.1, fall: 1.2 } },
 
     { city: "Hudson Valley", region: "New York", country: "USA", lat: 41.5, lon: -73.9,
       type: "drive", driveHoursFromNYC: 1.5,
       accommodation: { budget: 90, mid: 180, luxury: 400 },
       activities: 40, food: 65, description: "Rolling hills, award-winning wineries, farm-to-table dining, and stunning fall colors. NYC's favorite escape for food and nature lovers.",
+      highlights: ["Wineries", "Farm-to-Table", "Fall Colors"],
+      touristScore: 6,
       seasonality: { winter: 0.7, spring: 1.0, summer: 1.1, fall: 1.5 } },
 
     { city: "Vermont", region: "Vermont", country: "USA", lat: 44.26, lon: -72.58,
       type: "drive", driveHoursFromNYC: 5,
       accommodation: { budget: 85, mid: 160, luxury: 350 },
       activities: 50, food: 55, description: "Quintessential New England with covered bridges, maple syrup farms, craft breweries, and some of the best skiing on the East Coast.",
+      highlights: ["Fall Foliage", "Skiing", "Maple Syrup"],
+      touristScore: 7,
       seasonality: { winter: 1.5, spring: 0.7, summer: 1.0, fall: 1.4 } },
 
     { city: "Montreal", region: "Quebec", country: "Canada", lat: 45.5, lon: -73.57,
       type: "drive", driveHoursFromNYC: 6,
       accommodation: { budget: 70, mid: 130, luxury: 280 },
       activities: 40, food: 50, description: "A slice of Europe in North America. French-speaking city with incredible food scene, vibrant nightlife, beautiful architecture, and world-famous poutine.",
+      highlights: ["French Culture", "Food Scene", "Old Montreal"],
+      touristScore: 8,
       seasonality: { winter: 0.8, spring: 0.9, summer: 1.3, fall: 1.1 } },
+
+    // Long Island - South Fork (The Hamptons)
+    { city: "Montauk", region: "New York", country: "USA", lat: 41.04, lon: -71.95,
+      type: "drive", driveHoursFromNYC: 2.5,
+      accommodation: { budget: 120, mid: 250, luxury: 600 },
+      activities: 50, food: 70, description: "The End - where Long Island meets the Atlantic. Legendary surf spot, iconic lighthouse, fresh seafood, and laid-back beach vibes away from Hamptons glitz.",
+      highlights: ["Surfing", "Lighthouse", "Seafood"],
+      touristScore: 7,
+      seasonality: { winter: 0.5, spring: 0.8, summer: 1.6, fall: 0.9 } },
+
+    { city: "East Hampton", region: "New York", country: "USA", lat: 40.96, lon: -72.18,
+      type: "drive", driveHoursFromNYC: 2,
+      accommodation: { budget: 150, mid: 350, luxury: 800 },
+      activities: 45, food: 80, description: "The heart of the Hamptons with pristine beaches, celebrity sightings, world-class restaurants, and charming Main Street shopping.",
+      highlights: ["Beaches", "Fine Dining", "Celebrity Scene"],
+      touristScore: 8,
+      seasonality: { winter: 0.4, spring: 0.7, summer: 1.7, fall: 0.8 } },
+
+    { city: "Southampton", region: "New York", country: "USA", lat: 40.88, lon: -72.39,
+      type: "drive", driveHoursFromNYC: 1.75,
+      accommodation: { budget: 140, mid: 320, luxury: 750 },
+      activities: 45, food: 75, description: "America's oldest summer colony with gorgeous beaches, historic estates, upscale boutiques, and the famous Cooper's Beach.",
+      highlights: ["Historic Estates", "Beaches", "Boutique Shopping"],
+      touristScore: 7,
+      seasonality: { winter: 0.4, spring: 0.7, summer: 1.7, fall: 0.8 } },
+
+    { city: "Sag Harbor", region: "New York", country: "USA", lat: 41.00, lon: -72.29,
+      type: "drive", driveHoursFromNYC: 2,
+      accommodation: { budget: 130, mid: 280, luxury: 600 },
+      activities: 40, food: 70, description: "Historic whaling village turned artsy enclave. Charming harbor, indie bookstores, great restaurants, and a more relaxed Hamptons vibe.",
+      highlights: ["Harbor Views", "Art Galleries", "Historic Village"],
+      touristScore: 6,
+      seasonality: { winter: 0.5, spring: 0.8, summer: 1.6, fall: 0.9 } },
+
+    // Long Island - North Fork
+    { city: "Greenport", region: "New York", country: "USA", lat: 41.10, lon: -72.36,
+      type: "drive", driveHoursFromNYC: 2,
+      accommodation: { budget: 100, mid: 200, luxury: 400 },
+      activities: 40, food: 60, description: "Charming maritime village with excellent wineries, oyster farms, antique carousel, and a refreshingly unpretentious alternative to the Hamptons.",
+      highlights: ["Wine Tasting", "Oysters", "Maritime Charm"],
+      touristScore: 6,
+      seasonality: { winter: 0.5, spring: 0.9, summer: 1.5, fall: 1.2 } },
+
+    { city: "Shelter Island", region: "New York", country: "USA", lat: 41.07, lon: -72.34,
+      type: "drive", driveHoursFromNYC: 2.5,
+      accommodation: { budget: 110, mid: 220, luxury: 450 },
+      activities: 35, food: 55, description: "Peaceful island accessible only by ferry. Nature preserve, quiet beaches, kayaking, and a true escape from the bustle. The Hamptons' hidden secret.",
+      highlights: ["Nature Preserve", "Kayaking", "Peace & Quiet"],
+      touristScore: 5,
+      seasonality: { winter: 0.4, spring: 0.8, summer: 1.5, fall: 0.9 } },
+
+    // Fire Island
+    { city: "Fire Island", region: "New York", country: "USA", lat: 40.65, lon: -73.15,
+      type: "drive", driveHoursFromNYC: 1.5,
+      accommodation: { budget: 100, mid: 200, luxury: 450 },
+      activities: 40, food: 55, description: "Car-free barrier island with pristine beaches, legendary LGBTQ+ communities, deer roaming the streets, and the Sunken Forest nature trail.",
+      highlights: ["Car-Free Island", "LGBTQ+ Friendly", "Pristine Beaches"],
+      touristScore: 7,
+      seasonality: { winter: 0.3, spring: 0.7, summer: 1.7, fall: 0.7 } },
 
     // Drivable from Los Angeles (within ~6 hours)
     { city: "Palm Springs", region: "California", country: "USA", lat: 33.83, lon: -116.55,
       type: "drive",
       accommodation: { budget: 80, mid: 180, luxury: 450 },
       activities: 40, food: 55, description: "Retro desert paradise with stunning mid-century modern architecture, natural hot springs, and year-round sunshine. Great for pool parties and relaxation.",
+      highlights: ["Mid-Century Architecture", "Hot Springs", "Desert Vibes"],
+      touristScore: 7,
       seasonality: { winter: 1.4, spring: 1.2, summer: 0.6, fall: 1.0 } },
 
     { city: "San Diego", region: "California", country: "USA", lat: 32.72, lon: -117.16,
       type: "drive",
       accommodation: { budget: 90, mid: 170, luxury: 380 },
       activities: 50, food: 55, description: "Perfect weather year-round with world-famous zoo, stunning beaches, vibrant Gaslamp Quarter, and an incredible craft beer scene.",
+      highlights: ["San Diego Zoo", "Beaches", "Craft Beer"],
+      touristScore: 8,
       seasonality: { winter: 1.0, spring: 1.1, summer: 1.3, fall: 1.1 } },
 
     { city: "Santa Barbara", region: "California", country: "USA", lat: 34.42, lon: -119.7,
@@ -4254,14 +4338,50 @@ function createPopupContent(dest, travelers, nights) {
     // Description
     const description = dest.description || dest.wikiDescription || 'A beautiful destination worth exploring.';
 
+    // Tourist score badge
+    let touristScoreHtml = '';
+    if (dest.touristScore) {
+        const score = dest.touristScore;
+        let scoreLabel, scoreClass, scoreIcon;
+        if (score >= 9) {
+            scoreLabel = 'World Famous';
+            scoreClass = 'score-world-famous';
+            scoreIcon = '🌟';
+        } else if (score >= 7) {
+            scoreLabel = 'Must Visit';
+            scoreClass = 'score-must-visit';
+            scoreIcon = '🔥';
+        } else if (score >= 5) {
+            scoreLabel = 'Popular';
+            scoreClass = 'score-popular';
+            scoreIcon = '⭐';
+        } else if (score >= 3) {
+            scoreLabel = 'Worth a Trip';
+            scoreClass = 'score-worth-trip';
+            scoreIcon = '👍';
+        } else {
+            scoreLabel = 'Hidden Gem';
+            scoreClass = 'score-hidden-gem';
+            scoreIcon = '💎';
+        }
+        touristScoreHtml = `<span class="tourist-score ${scoreClass}">${scoreIcon} ${scoreLabel}</span>`;
+    }
+
     // Highlights section (top reasons to visit)
     let highlightsHtml = '';
     if (dest.highlights && dest.highlights.length > 0) {
         const highlightTags = dest.highlights.map(h => `<span class="highlight-tag">${h}</span>`).join('');
         highlightsHtml = `
             <div class="popup-highlights">
-                <div class="popup-highlights-label">Why visit</div>
+                <div class="popup-highlights-label">Why visit ${touristScoreHtml}</div>
                 <div class="popup-highlights-list">${highlightTags}</div>
+            </div>
+        `;
+    } else if (touristScoreHtml) {
+        // Show tourist score even without highlights
+        highlightsHtml = `
+            <div class="popup-highlights">
+                <div class="popup-highlights-label">${touristScoreHtml}</div>
             </div>
         `;
     }
@@ -4423,12 +4543,21 @@ function updateAlternativesPanel(results, budgetMin, budgetMax) {
         const imageHtml = dest.image && dest.image.thumb
             ? `<div class="alternative-thumb"><img src="${dest.image.thumb}" alt="${dest.city}" loading="lazy"></div>`
             : `<div class="alternative-icon">${dest.type === 'drive' ? '🚗' : '✈️'}</div>`;
+        // Tourist score mini indicator
+        let scoreIndicator = '';
+        if (dest.touristScore) {
+            if (dest.touristScore >= 9) scoreIndicator = '<span class="alt-score" title="World Famous">🌟</span>';
+            else if (dest.touristScore >= 7) scoreIndicator = '<span class="alt-score" title="Must Visit">🔥</span>';
+            else if (dest.touristScore >= 5) scoreIndicator = '<span class="alt-score" title="Popular">⭐</span>';
+            else if (dest.touristScore <= 2) scoreIndicator = '<span class="alt-score" title="Hidden Gem">💎</span>';
+        }
         return `
             <div class="alternative-item" onclick="focusDestination(${dest.lat}, ${dest.lon})">
                 ${imageHtml}
                 <div class="alternative-info">
                     <div class="alternative-name">
                         ${dest.city}, ${dest.country}
+                        ${scoreIndicator}
                         ${dest.advisory ? `<span style="color: ${advisoryColor}; font-size: 10px;">●</span>` : ''}
                     </div>
                     <div class="alternative-details">

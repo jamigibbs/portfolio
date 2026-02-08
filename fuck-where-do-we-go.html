@@ -456,6 +456,11 @@
             color: #4CAF50;
         }
 
+        .alt-score {
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
         /* Map container */
         .map-container {
             flex: 1;
@@ -1014,6 +1019,43 @@
             font-weight: 500;
         }
 
+        /* Tourist score badges */
+        .tourist-score {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .score-world-famous {
+            background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+            color: #E9D5FF;
+        }
+
+        .score-must-visit {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: #FEF3C7;
+        }
+
+        .score-popular {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            color: #DBEAFE;
+        }
+
+        .score-worth-trip {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: #D1FAE5;
+        }
+
+        .score-hidden-gem {
+            background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
+            color: #FCE7F3;
+        }
+
         /* Horizontal costs row */
         .popup-costs-row {
             display: flex;
@@ -1372,7 +1414,7 @@
     <div class="container">
         <aside class="sidebar">
             <h1 class="logo">✈️ Fuck, where do we go?</h1>
-            <p class="tagline">Find places to go for a short break, in short order <span class="version">v1.15.3</span></p>
+            <p class="tagline">Find places to go for a short break, in short order <span class="version">v1.16.0</span></p>
 
             <!-- Step 1: Trip Details -->
             <div class="step-section always-on" id="step1">
