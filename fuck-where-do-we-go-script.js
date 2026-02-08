@@ -3909,14 +3909,19 @@ async function searchDestinations(searchInArea = false) {
 
         // Fetch real-time data for top results (weather, images, etc.)
         const topResults = results.slice(0, 15);
-        const startDateStr = document.getElementById('startDate').value;
-        const endDateStr = document.getElementById('endDate').value;
+        const startDateStr = document.getElementById('startDate')?.value || '';
+        const endDateStr = document.getElementById('endDate')?.value || '';
 
-        // Fetch external data in parallel for top results (no need to re-fetch ORS)
+        // Fetch external data in parallel for top results (with error handling)
         const enrichedResults = await Promise.all(
             topResults.map(async (dest) => {
-                const externalData = await fetchDestinationData(dest, startDateStr, endDateStr, travelers);
-                return { ...dest, ...externalData };
+                try {
+                    const externalData = await fetchDestinationData(dest, startDateStr, endDateStr, travelers);
+                    return { ...dest, ...externalData };
+                } catch (err) {
+                    console.error('Error enriching destination:', dest.city, err);
+                    return dest; // Return unenriched destination on error
+                }
             })
         );
 
@@ -3929,8 +3934,14 @@ async function searchDestinations(searchInArea = false) {
             ...results.slice(15)
         ];
 
-        // Add markers to map
-        allResults.forEach(dest => addDestinationMarker(dest, travelers, nights));
+        // Add markers to map (with error handling for each marker)
+        allResults.forEach(dest => {
+            try {
+                addDestinationMarker(dest, travelers, nights);
+            } catch (err) {
+                console.error('Error creating marker for:', dest.city, err);
+            }
+        });
 
         // Update alternatives panel with enriched data
         updateAlternativesPanel(allResults, budgetMin, budgetMax);
