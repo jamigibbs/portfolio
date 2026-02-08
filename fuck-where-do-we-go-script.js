@@ -4281,21 +4281,19 @@ function createPopupContent(dest, travelers, nights) {
     }
 
     // Generate booking links
-    const departureDate = document.getElementById('startDate').value;
-    const returnDate = document.getElementById('endDate').value;
-    const depFormatted = departureDate.replace(/-/g, '-');
-    const retFormatted = returnDate.replace(/-/g, '-');
+    const departureDate = document.getElementById('startDate')?.value || '';
+    const returnDate = document.getElementById('endDate')?.value || '';
 
     // Google Flights link (format: /flights/FROM/TO/DATE/DATE)
-    const originCity = document.getElementById('startLocation').value.split(',')[0].trim();
+    const originCity = (document.getElementById('homeCity')?.value || '').split(',')[0].trim();
     const googleFlightsUrl = `https://www.google.com/travel/flights?q=flights%20from%20${encodeURIComponent(originCity)}%20to%20${encodeURIComponent(dest.city)}%20${depFormatted}%20to%20${retFormatted}`;
 
     // Kayak link
     const kayakUrl = `https://www.kayak.com/flights/${encodeURIComponent(originCity)}-${encodeURIComponent(dest.city)}/${departureDate}/${returnDate}`;
 
     // Booking.com link
-    const checkinParts = departureDate.split('-');
-    const checkoutParts = returnDate.split('-');
+    const checkinParts = departureDate ? departureDate.split('-') : ['', '', ''];
+    const checkoutParts = returnDate ? returnDate.split('-') : ['', '', ''];
     const bookingUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(dest.city + ', ' + dest.country)}&checkin_year=${checkinParts[0]}&checkin_month=${checkinParts[1]}&checkin_monthday=${checkinParts[2]}&checkout_year=${checkoutParts[0]}&checkout_month=${checkoutParts[1]}&checkout_monthday=${checkoutParts[2]}&group_adults=${travelers}`;
 
     // Hostelworld for budget travelers
