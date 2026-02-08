@@ -4286,7 +4286,7 @@ function createPopupContent(dest, travelers, nights) {
 
     // Google Flights link (format: /flights/FROM/TO/DATE/DATE)
     const originCity = (document.getElementById('homeCity')?.value || '').split(',')[0].trim();
-    const googleFlightsUrl = `https://www.google.com/travel/flights?q=flights%20from%20${encodeURIComponent(originCity)}%20to%20${encodeURIComponent(dest.city)}%20${depFormatted}%20to%20${retFormatted}`;
+    const googleFlightsUrl = `https://www.google.com/travel/flights?q=flights%20from%20${encodeURIComponent(originCity)}%20to%20${encodeURIComponent(dest.city)}%20${departureDate}%20to%20${returnDate}`;
 
     // Kayak link
     const kayakUrl = `https://www.kayak.com/flights/${encodeURIComponent(originCity)}-${encodeURIComponent(dest.city)}/${departureDate}/${returnDate}`;
