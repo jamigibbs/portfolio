@@ -4244,22 +4244,10 @@ function createPopupContent(dest, travelers, nights) {
     // Generate a unique ID for this popup's collapsible
     const popupId = `popup-${dest.city.replace(/\s+/g, '-')}-${Date.now()}`;
 
-    // Placeholder images by destination type/region
-    const placeholderImages = [
-        'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600&h=300&fit=crop', // Road trip
-        'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&h=300&fit=crop', // Lake view
-        'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=300&fit=crop', // Beach
-        'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600&h=300&fit=crop', // City
-        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=300&fit=crop', // Mountains
-        'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&h=300&fit=crop', // Europe
-        'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600&h=300&fit=crop', // Mediterranean
-        'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=600&h=300&fit=crop', // Historic
-    ];
-    // Pick a consistent placeholder based on destination name
-    const placeholderIndex = dest.city.charCodeAt(0) % placeholderImages.length;
-    const placeholderUrl = placeholderImages[placeholderIndex];
+    // Single neutral placeholder - world map that works for any destination type
+    const placeholderUrl = 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=600&h=300&fit=crop';
 
-    // Hero section with image (always show image now)
+    // Hero section with image (use destination image if available, otherwise placeholder)
     const imageUrl = dest.image?.url || placeholderUrl;
     const imageCredit = dest.image?.credit
         ? `<div class="popup-hero-credit"><a href="${dest.image.credit.link}" target="_blank" rel="noopener">📷 ${dest.image.credit.name}</a></div>`
