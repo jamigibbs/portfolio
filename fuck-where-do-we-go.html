@@ -575,7 +575,7 @@
 
         .leaflet-popup-content {
             margin: 0;
-            width: 420px !important;
+            width: 520px !important;
         }
 
         .leaflet-popup-tip {
@@ -986,6 +986,124 @@
             color: #888;
         }
 
+        /* Highlights section - "Why visit" */
+        .popup-highlights {
+            margin-bottom: 12px;
+        }
+
+        .popup-highlights-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .popup-highlights-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .highlight-tag {
+            background: linear-gradient(135deg, #2d5a3d 0%, #1a3d2a 100%);
+            color: #7dcea0;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Horizontal costs row */
+        .popup-costs-row {
+            display: flex;
+            background: #363636;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 16px;
+            gap: 4px;
+        }
+
+        .popup-cost-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 8px 4px;
+            border-radius: 8px;
+        }
+
+        .popup-cost-item.total {
+            background: #2d5a3d;
+            border-left: 2px solid #4CAF50;
+        }
+
+        .popup-cost-item .cost-icon {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .popup-cost-item .cost-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .popup-cost-item.total .cost-value {
+            font-size: 18px;
+            color: #4CAF50;
+        }
+
+        .popup-cost-item .cost-label {
+            font-size: 10px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-top: 2px;
+        }
+
+        /* Booking links section */
+        .popup-booking-links {
+            display: flex;
+            gap: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #404040;
+        }
+
+        .booking-section {
+            flex: 1;
+        }
+
+        .booking-label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .booking-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .booking-btn {
+            background: #404040;
+            color: #00d4ff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            text-decoration: none;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .booking-btn:hover {
+            background: #00d4ff;
+            color: #1a1a1a;
+        }
+
         /* Legacy support */
         .weather-badge {
             display: inline-flex;
@@ -1254,7 +1372,7 @@
     <div class="container">
         <aside class="sidebar">
             <h1 class="logo">✈️ Fuck, where do we go?</h1>
-            <p class="tagline">Find places to go for a short break, in short order <span class="version">v1.14.1</span></p>
+            <p class="tagline">Find places to go for a short break, in short order <span class="version">v1.15.0</span></p>
 
             <!-- Step 1: Trip Details -->
             <div class="step-section always-on" id="step1">

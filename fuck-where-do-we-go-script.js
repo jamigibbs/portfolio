@@ -1545,62 +1545,340 @@ const DESTINATIONS = [
     { city: "Miami", region: "Florida", country: "USA", lat: 25.76, lon: -80.19,
       type: "fly", flightFromNYC: { low: 100, mid: 200, high: 400 },
       accommodation: { budget: 80, mid: 180, luxury: 450 },
-      activities: 50, food: 60, description: "Beaches & nightlife",
+      activities: 50, food: 60, description: "Art deco glamour meets Latin flair. World-class beaches, vibrant nightlife, incredible Cuban food, and year-round sunshine.",
+      highlights: ["Beaches", "Nightlife", "Art Deco"],
       seasonality: { winter: 1.5, spring: 1.3, summer: 0.8, fall: 0.9 } },
 
     { city: "New Orleans", region: "Louisiana", country: "USA", lat: 29.95, lon: -90.07,
       type: "fly", flightFromNYC: { low: 120, mid: 220, high: 400 },
       accommodation: { budget: 70, mid: 150, luxury: 350 },
-      activities: 45, food: 55, description: "Jazz, food & culture",
+      activities: 45, food: 55, description: "The Big Easy pulses with jazz, Creole cuisine, and historic French Quarter charm. Mardi Gras, beignets, and unforgettable nightlife.",
+      highlights: ["Jazz Music", "Cajun Food", "French Quarter"],
       seasonality: { winter: 1.0, spring: 1.5, summer: 0.7, fall: 1.1 } },
+
+    // Cities within driving distance of New Orleans
+    { city: "Baton Rouge", region: "Louisiana", country: "USA", lat: 30.45, lon: -91.15,
+      type: "drive", flightFromNYC: { low: 150, mid: 280, high: 480 },
+      accommodation: { budget: 55, mid: 110, luxury: 250 },
+      activities: 30, food: 40, description: "Louisiana's capital with Southern charm, LSU campus energy, and authentic Cajun culture along the Mississippi.",
+      highlights: ["Cajun Culture", "LSU Campus", "Mississippi River"],
+      seasonality: { winter: 1.0, spring: 1.2, summer: 0.7, fall: 1.1 } },
+
+    { city: "Houston", region: "Texas", country: "USA", lat: 29.76, lon: -95.37,
+      type: "drive", flightFromNYC: { low: 120, mid: 220, high: 400 },
+      accommodation: { budget: 70, mid: 140, luxury: 320 },
+      activities: 45, food: 55, description: "Space City with world-class museums, incredible diverse food scene, and Texas-sized everything. NASA, art, and BBQ.",
+      highlights: ["NASA/Space Center", "Diverse Food", "Museums"],
+      seasonality: { winter: 1.0, spring: 1.1, summer: 0.7, fall: 1.0 } },
+
+    { city: "San Antonio", region: "Texas", country: "USA", lat: 29.42, lon: -98.49,
+      type: "drive", flightFromNYC: { low: 130, mid: 240, high: 420 },
+      accommodation: { budget: 60, mid: 130, luxury: 280 },
+      activities: 40, food: 45, description: "Historic River Walk, the Alamo, and authentic Tex-Mex. A blend of Spanish colonial heritage and modern Texas culture.",
+      highlights: ["River Walk", "The Alamo", "Tex-Mex Food"],
+      seasonality: { winter: 1.0, spring: 1.2, summer: 0.8, fall: 1.0 } },
+
+    { city: "Mobile", region: "Alabama", country: "USA", lat: 30.69, lon: -88.04,
+      type: "drive", flightFromNYC: { low: 180, mid: 320, high: 520 },
+      accommodation: { budget: 50, mid: 100, luxury: 220 },
+      activities: 30, food: 35, description: "America's original Mardi Gras city with beautiful antebellum architecture, Gulf Coast charm, and Southern hospitality.",
+      highlights: ["Mardi Gras", "Historic District", "Gulf Coast"],
+      seasonality: { winter: 1.0, spring: 1.3, summer: 0.7, fall: 1.0 } },
+
+    { city: "Pensacola", region: "Florida", country: "USA", lat: 30.42, lon: -87.22,
+      type: "drive", flightFromNYC: { low: 160, mid: 300, high: 500 },
+      accommodation: { budget: 55, mid: 120, luxury: 280 },
+      activities: 40, food: 40, description: "Emerald Coast beaches with sugar-white sand, naval aviation history, and laid-back Florida Panhandle vibes.",
+      highlights: ["White Sand Beaches", "Naval Aviation Museum", "Seafood"],
+      seasonality: { winter: 0.9, spring: 1.2, summer: 1.0, fall: 0.9 } },
+
+    { city: "Lafayette", region: "Louisiana", country: "USA", lat: 30.22, lon: -92.02,
+      type: "drive", flightFromNYC: { low: 200, mid: 350, high: 550 },
+      accommodation: { budget: 50, mid: 100, luxury: 200 },
+      activities: 35, food: 45, description: "Heart of Cajun Country with authentic boudin, zydeco music, and swamp tours. The real Louisiana experience.",
+      highlights: ["Cajun Music", "Boudin Trail", "Swamp Tours"],
+      seasonality: { winter: 1.0, spring: 1.2, summer: 0.7, fall: 1.1 } },
+
+    { city: "Biloxi", region: "Mississippi", country: "USA", lat: 30.40, lon: -88.89,
+      type: "drive", flightFromNYC: { low: 180, mid: 320, high: 520 },
+      accommodation: { budget: 50, mid: 110, luxury: 250 },
+      activities: 40, food: 40, description: "Gulf Coast casinos, beautiful beaches, and fresh seafood. A fun beach getaway with gaming and Southern charm.",
+      highlights: ["Casinos", "Gulf Beaches", "Fresh Seafood"],
+      seasonality: { winter: 0.9, spring: 1.1, summer: 0.9, fall: 1.0 } },
 
     { city: "Las Vegas", region: "Nevada", country: "USA", lat: 36.17, lon: -115.14,
       type: "fly", flightFromNYC: { low: 150, mid: 280, high: 500 },
       accommodation: { budget: 50, mid: 120, luxury: 350 },
-      activities: 60, food: 60, description: "Entertainment & shows",
+      activities: 60, food: 60, description: "Sin City's neon-lit Strip offers world-class shows, celebrity chef restaurants, and endless entertainment. Day trips to Grand Canyon.",
+      highlights: ["Casinos", "Shows", "Nightlife"],
       seasonality: { winter: 1.0, spring: 1.1, summer: 0.8, fall: 1.2 } },
 
     { city: "Los Angeles", region: "California", country: "USA", lat: 34.05, lon: -118.24,
       type: "fly", flightFromNYC: { low: 180, mid: 320, high: 550 },
       accommodation: { budget: 90, mid: 180, luxury: 400 },
-      activities: 50, food: 55, description: "Beaches & Hollywood",
+      activities: 50, food: 55, description: "Hollywood glamour, stunning beaches, world-class museums, and incredible diversity. Perfect weather year-round and endless neighborhoods to explore.",
+      highlights: ["Beaches", "Hollywood", "Weather"],
       seasonality: { winter: 0.9, spring: 1.0, summer: 1.2, fall: 1.0 } },
 
     { city: "San Francisco", region: "California", country: "USA", lat: 37.77, lon: -122.42,
       type: "fly", flightFromNYC: { low: 180, mid: 320, high: 550 },
       accommodation: { budget: 100, mid: 200, luxury: 450 },
-      activities: 45, food: 60, description: "Tech hub & Golden Gate",
+      activities: 45, food: 60, description: "Iconic Golden Gate, cable cars, Alcatraz, and incredible food scene. Fog-wrapped hills, diverse neighborhoods, and tech innovation.",
+      highlights: ["Golden Gate", "Food Scene", "Culture"],
       seasonality: { winter: 0.85, spring: 1.0, summer: 1.2, fall: 1.1 } },
+
+    { city: "San Diego", region: "California", country: "USA", lat: 32.72, lon: -117.16,
+      type: "fly", flightFromNYC: { low: 180, mid: 320, high: 550 },
+      accommodation: { budget: 80, mid: 160, luxury: 380 },
+      activities: 50, food: 50, description: "Perfect weather, world-famous zoo, beautiful beaches, and craft beer scene. Laid-back SoCal vibes with Gaslamp Quarter nightlife.",
+      highlights: ["Zoo", "Beaches", "Craft Beer"],
+      seasonality: { winter: 1.0, spring: 1.1, summer: 1.2, fall: 1.0 } },
 
     { city: "Austin", region: "Texas", country: "USA", lat: 30.27, lon: -97.74,
       type: "fly", flightFromNYC: { low: 130, mid: 250, high: 450 },
       accommodation: { budget: 70, mid: 150, luxury: 320 },
-      activities: 45, food: 50, description: "Live music & BBQ",
+      activities: 45, food: 50, description: "Live Music Capital of the World with legendary BBQ, SXSW, and a thriving food truck scene. Keep Austin Weird.",
+      highlights: ["Live Music", "BBQ", "SXSW"],
       seasonality: { winter: 0.9, spring: 1.3, summer: 0.8, fall: 1.1 } },
+
+    { city: "Dallas", region: "Texas", country: "USA", lat: 32.78, lon: -96.80,
+      type: "fly", flightFromNYC: { low: 120, mid: 220, high: 400 },
+      accommodation: { budget: 70, mid: 140, luxury: 320 },
+      activities: 40, food: 50, description: "Big Texas city with world-class arts district, incredible Tex-Mex, and JFK history. Modern architecture meets cowboy culture.",
+      highlights: ["Arts District", "Tex-Mex", "Shopping"],
+      seasonality: { winter: 1.0, spring: 1.1, summer: 0.8, fall: 1.0 } },
 
     { city: "Denver", region: "Colorado", country: "USA", lat: 39.74, lon: -104.99,
       type: "fly", flightFromNYC: { low: 130, mid: 250, high: 450 },
       accommodation: { budget: 80, mid: 160, luxury: 350 },
-      activities: 55, food: 50, description: "Mountains & craft beer",
+      activities: 55, food: 50, description: "Mile High City gateway to the Rockies. World-class skiing nearby, 300 days of sunshine, craft beer paradise, and outdoor lifestyle.",
+      highlights: ["Mountains", "Craft Beer", "Outdoor Sports"],
       seasonality: { winter: 1.3, spring: 1.0, summer: 1.1, fall: 1.1 } },
 
     { city: "Seattle", region: "Washington", country: "USA", lat: 47.61, lon: -122.33,
       type: "fly", flightFromNYC: { low: 180, mid: 320, high: 550 },
       accommodation: { budget: 90, mid: 180, luxury: 380 },
-      activities: 45, food: 55, description: "Coffee & tech scene",
+      activities: 45, food: 55, description: "Emerald City with iconic Pike Place Market, tech innovation, stunning mountain views, and the birthplace of coffee culture.",
+      highlights: ["Pike Place", "Coffee Culture", "Nature"],
       seasonality: { winter: 0.8, spring: 1.0, summer: 1.3, fall: 1.0 } },
+
+    { city: "Portland", region: "Oregon", country: "USA", lat: 45.52, lon: -122.68,
+      type: "fly", flightFromNYC: { low: 180, mid: 320, high: 550 },
+      accommodation: { budget: 75, mid: 150, luxury: 340 },
+      activities: 45, food: 55, description: "Keep Portland Weird. Craft beer, food carts, bookstores, and stunning nature nearby. Hipster paradise with incredible restaurants.",
+      highlights: ["Food Scene", "Craft Beer", "Quirky Culture"],
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.4, fall: 1.0 } },
+
+    { city: "Phoenix", region: "Arizona", country: "USA", lat: 33.45, lon: -112.07,
+      type: "fly", flightFromNYC: { low: 150, mid: 280, high: 480 },
+      accommodation: { budget: 60, mid: 130, luxury: 350 },
+      activities: 45, food: 45, description: "Desert oasis with world-class golf, spa resorts, and Sonoran Desert beauty. Gateway to Grand Canyon and Sedona.",
+      highlights: ["Desert Landscapes", "Golf", "Spas"],
+      seasonality: { winter: 1.4, spring: 1.2, summer: 0.5, fall: 1.0 } },
+
+    { city: "Tucson", region: "Arizona", country: "USA", lat: 32.22, lon: -110.93,
+      type: "drive", flightFromNYC: { low: 180, mid: 320, high: 520 },
+      accommodation: { budget: 50, mid: 110, luxury: 280 },
+      activities: 40, food: 40, description: "UNESCO City of Gastronomy with stunning Saguaro National Park, authentic Mexican food, and rich Old West history.",
+      highlights: ["Saguaro Cacti", "Mexican Food", "Stargazing"],
+      seasonality: { winter: 1.3, spring: 1.1, summer: 0.5, fall: 1.0 } },
 
     { city: "Honolulu", region: "Hawaii", country: "USA", lat: 21.31, lon: -157.86,
       type: "fly", flightFromNYC: { low: 400, mid: 650, high: 1000 },
       accommodation: { budget: 120, mid: 250, luxury: 550 },
-      activities: 70, food: 70, description: "Paradise beaches",
+      activities: 70, food: 70, description: "Tropical paradise with world-famous Waikiki Beach, Pearl Harbor history, volcanic landscapes, and authentic Hawaiian culture.",
+      highlights: ["Beaches", "Surfing", "Hawaiian Culture"],
       seasonality: { winter: 1.3, spring: 1.1, summer: 1.0, fall: 0.9 } },
 
     { city: "Nashville", region: "Tennessee", country: "USA", lat: 36.16, lon: -86.78,
       type: "fly", flightFromNYC: { low: 100, mid: 200, high: 380 },
       accommodation: { budget: 80, mid: 160, luxury: 350 },
-      activities: 50, food: 50, description: "Country music & hot chicken",
+      activities: 50, food: 50, description: "Music City USA with honky-tonks, the Grand Ole Opry, incredible hot chicken, and a booming food and bachelorette scene.",
+      highlights: ["Country Music", "Hot Chicken", "Nightlife"],
       seasonality: { winter: 0.85, spring: 1.1, summer: 1.0, fall: 1.1 } },
+
+    // Additional US cities for comprehensive coverage
+    { city: "Memphis", region: "Tennessee", country: "USA", lat: 35.15, lon: -90.05,
+      type: "drive", flightFromNYC: { low: 120, mid: 220, high: 400 },
+      accommodation: { budget: 60, mid: 120, luxury: 280 },
+      activities: 45, food: 50, description: "Birthplace of rock 'n' roll, blues, and soul. Graceland, Beale Street, legendary BBQ, and Civil Rights history.",
+      highlights: ["Graceland", "Blues Music", "BBQ"],
+      seasonality: { winter: 0.9, spring: 1.1, summer: 0.8, fall: 1.0 } },
+
+    { city: "Atlanta", region: "Georgia", country: "USA", lat: 33.75, lon: -84.39,
+      type: "fly", flightFromNYC: { low: 80, mid: 160, high: 320 },
+      accommodation: { budget: 70, mid: 150, luxury: 350 },
+      activities: 45, food: 50, description: "The New South's capital with CNN, Coca-Cola World, incredible food scene, and rich Civil Rights heritage.",
+      highlights: ["Civil Rights History", "Food Scene", "CNN"],
+      seasonality: { winter: 0.9, spring: 1.1, summer: 0.9, fall: 1.0 } },
+
+    { city: "Savannah", region: "Georgia", country: "USA", lat: 32.08, lon: -81.09,
+      type: "drive", flightFromNYC: { low: 120, mid: 220, high: 400 },
+      accommodation: { budget: 70, mid: 150, luxury: 350 },
+      activities: 40, food: 45, description: "America's most beautiful city with moss-draped squares, stunning architecture, ghost tours, and Southern charm.",
+      highlights: ["Historic Squares", "Architecture", "Southern Charm"],
+      seasonality: { winter: 0.9, spring: 1.3, summer: 0.8, fall: 1.1 } },
+
+    { city: "Charleston", region: "South Carolina", country: "USA", lat: 32.78, lon: -79.93,
+      type: "drive", flightFromNYC: { low: 100, mid: 200, high: 380 },
+      accommodation: { budget: 80, mid: 170, luxury: 400 },
+      activities: 45, food: 55, description: "America's most charming city with cobblestone streets, antebellum mansions, world-class restaurants, and beautiful beaches.",
+      highlights: ["Historic District", "Lowcountry Food", "Beaches"],
+      seasonality: { winter: 0.9, spring: 1.3, summer: 0.9, fall: 1.1 } },
+
+    { city: "Charlotte", region: "North Carolina", country: "USA", lat: 35.23, lon: -80.84,
+      type: "drive", flightFromNYC: { low: 80, mid: 160, high: 300 },
+      accommodation: { budget: 65, mid: 130, luxury: 300 },
+      activities: 35, food: 45, description: "Queen City with NASCAR Hall of Fame, craft breweries, and gateway to the Blue Ridge Mountains.",
+      highlights: ["NASCAR", "Craft Beer", "Banking Hub"],
+      seasonality: { winter: 0.9, spring: 1.1, summer: 0.9, fall: 1.0 } },
+
+    { city: "Asheville", region: "North Carolina", country: "USA", lat: 35.60, lon: -82.55,
+      type: "drive", flightFromNYC: { low: 150, mid: 280, high: 480 },
+      accommodation: { budget: 70, mid: 150, luxury: 350 },
+      activities: 50, food: 55, description: "Mountain city with Biltmore Estate, thriving arts scene, incredible craft beer, and stunning Blue Ridge Parkway.",
+      highlights: ["Biltmore Estate", "Craft Beer", "Mountains"],
+      seasonality: { winter: 0.8, spring: 1.1, summer: 1.0, fall: 1.3 } },
+
+    { city: "Richmond", region: "Virginia", country: "USA", lat: 37.54, lon: -77.44,
+      type: "drive", flightFromNYC: { low: 80, mid: 160, high: 300 },
+      accommodation: { budget: 60, mid: 120, luxury: 280 },
+      activities: 35, food: 45, description: "Historic capital with Civil War history, thriving food scene, craft breweries, and beautiful James River.",
+      highlights: ["Civil War History", "Craft Beer", "Food Scene"],
+      seasonality: { winter: 0.9, spring: 1.1, summer: 0.9, fall: 1.1 } },
+
+    { city: "Philadelphia", region: "Pennsylvania", country: "USA", lat: 39.95, lon: -75.17,
+      type: "drive", flightFromNYC: { low: 30, mid: 60, high: 120 },
+      accommodation: { budget: 70, mid: 150, luxury: 350 },
+      activities: 45, food: 50, description: "Birthplace of America with Liberty Bell, incredible art museums, cheesesteaks, and passionate sports culture.",
+      highlights: ["American History", "Art Museums", "Cheesesteaks"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 0.9, fall: 1.1 } },
+
+    { city: "Pittsburgh", region: "Pennsylvania", country: "USA", lat: 40.44, lon: -80.00,
+      type: "drive", flightFromNYC: { low: 80, mid: 160, high: 300 },
+      accommodation: { budget: 60, mid: 120, luxury: 280 },
+      activities: 40, food: 45, description: "Steel City reinvented with world-class museums, stunning bridges, craft beer, and passionate sports fans.",
+      highlights: ["Museums", "Bridges", "Reinvented City"],
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.0, fall: 1.1 } },
+
+    { city: "Baltimore", region: "Maryland", country: "USA", lat: 39.29, lon: -76.61,
+      type: "drive", flightFromNYC: { low: 30, mid: 60, high: 120 },
+      accommodation: { budget: 65, mid: 130, luxury: 300 },
+      activities: 40, food: 50, description: "Charm City with Inner Harbor, incredible crab cakes, Edgar Allan Poe history, and revitalized neighborhoods.",
+      highlights: ["Crab Cakes", "Inner Harbor", "History"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.0, fall: 1.0 } },
+
+    { city: "Boston", region: "Massachusetts", country: "USA", lat: 42.36, lon: -71.06,
+      type: "drive", flightFromNYC: { low: 50, mid: 100, high: 200 },
+      accommodation: { budget: 100, mid: 200, luxury: 450 },
+      activities: 50, food: 55, description: "America's walking city with Freedom Trail, world-class universities, legendary seafood, and passionate sports culture.",
+      highlights: ["Freedom Trail", "Seafood", "Universities"],
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.1, fall: 1.3 } },
+
+    { city: "Providence", region: "Rhode Island", country: "USA", lat: 41.82, lon: -71.41,
+      type: "drive", flightFromNYC: { low: 60, mid: 120, high: 240 },
+      accommodation: { budget: 70, mid: 140, luxury: 320 },
+      activities: 35, food: 50, description: "Creative capital with RISD, incredible restaurant scene, WaterFire festivals, and charming Federal Hill Italian neighborhood.",
+      highlights: ["Food Scene", "Arts", "WaterFire"],
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.1, fall: 1.1 } },
+
+    { city: "Burlington", region: "Vermont", country: "USA", lat: 44.48, lon: -73.21,
+      type: "drive", flightFromNYC: { low: 120, mid: 220, high: 400 },
+      accommodation: { budget: 70, mid: 150, luxury: 320 },
+      activities: 45, food: 50, description: "Lake Champlain beauty with Church Street, craft beer scene, Ben & Jerry's nearby, and stunning fall foliage.",
+      highlights: ["Fall Foliage", "Craft Beer", "Lake Views"],
+      seasonality: { winter: 1.0, spring: 0.9, summer: 1.2, fall: 1.5 } },
+
+    { city: "Portland", region: "Maine", country: "USA", lat: 43.66, lon: -70.25,
+      type: "drive", flightFromNYC: { low: 100, mid: 200, high: 380 },
+      accommodation: { budget: 80, mid: 160, luxury: 350 },
+      activities: 45, food: 60, description: "Foodie heaven with incredible lobster, craft beer, beautiful Old Port, and lighthouse-dotted coastline.",
+      highlights: ["Lobster", "Craft Beer", "Coastal Beauty"],
+      seasonality: { winter: 0.7, spring: 0.9, summer: 1.4, fall: 1.2 } },
+
+    { city: "Minneapolis", region: "Minnesota", country: "USA", lat: 44.98, lon: -93.27,
+      type: "fly", flightFromNYC: { low: 120, mid: 220, high: 400 },
+      accommodation: { budget: 70, mid: 140, luxury: 320 },
+      activities: 45, food: 50, description: "City of Lakes with incredible music scene (Prince!), James Beard-winning restaurants, and vibrant arts culture.",
+      highlights: ["Music Scene", "Lakes", "Arts"],
+      seasonality: { winter: 0.7, spring: 1.0, summer: 1.3, fall: 1.0 } },
+
+    { city: "Chicago", region: "Illinois", country: "USA", lat: 41.88, lon: -87.63,
+      type: "fly", flightFromNYC: { low: 80, mid: 160, high: 320 },
+      accommodation: { budget: 80, mid: 170, luxury: 400 },
+      activities: 55, food: 60, description: "World-class architecture, deep dish pizza, legendary blues and jazz, stunning lakefront, and incredible museums.",
+      highlights: ["Architecture", "Deep Dish Pizza", "Museums"],
+      seasonality: { winter: 0.7, spring: 1.0, summer: 1.3, fall: 1.1 } },
+
+    { city: "Detroit", region: "Michigan", country: "USA", lat: 42.33, lon: -83.05,
+      type: "drive", flightFromNYC: { low: 100, mid: 200, high: 380 },
+      accommodation: { budget: 55, mid: 110, luxury: 260 },
+      activities: 40, food: 45, description: "Motor City reborn with incredible music history, art deco architecture, and one of America's great comebacks.",
+      highlights: ["Motown History", "Architecture", "Comeback City"],
+      seasonality: { winter: 0.7, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    { city: "Cleveland", region: "Ohio", country: "USA", lat: 41.50, lon: -81.69,
+      type: "drive", flightFromNYC: { low: 80, mid: 160, high: 300 },
+      accommodation: { budget: 55, mid: 110, luxury: 260 },
+      activities: 40, food: 45, description: "Rock and Roll Hall of Fame, world-class Cleveland Clinic, stunning cultural gardens, and passionate sports fans.",
+      highlights: ["Rock Hall of Fame", "Museums", "Food"],
+      seasonality: { winter: 0.7, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    { city: "Cincinnati", region: "Ohio", country: "USA", lat: 39.10, lon: -84.51,
+      type: "drive", flightFromNYC: { low: 100, mid: 200, high: 380 },
+      accommodation: { budget: 55, mid: 110, luxury: 260 },
+      activities: 40, food: 45, description: "Queen City with unique chili, Over-the-Rhine neighborhood revival, and stunning riverfront views.",
+      highlights: ["Cincinnati Chili", "Over-the-Rhine", "Architecture"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.0, fall: 1.0 } },
+
+    { city: "Indianapolis", region: "Indiana", country: "USA", lat: 39.77, lon: -86.16,
+      type: "drive", flightFromNYC: { low: 100, mid: 200, high: 380 },
+      accommodation: { budget: 55, mid: 110, luxury: 260 },
+      activities: 40, food: 40, description: "Racing capital with Indianapolis 500, excellent museums, and Massachusetts Avenue arts district.",
+      highlights: ["Indy 500", "Museums", "Sports"],
+      seasonality: { winter: 0.85, spring: 1.1, summer: 1.0, fall: 1.0 } },
+
+    { city: "St. Louis", region: "Missouri", country: "USA", lat: 38.63, lon: -90.20,
+      type: "fly", flightFromNYC: { low: 100, mid: 200, high: 380 },
+      accommodation: { budget: 55, mid: 110, luxury: 260 },
+      activities: 40, food: 45, description: "Gateway Arch, incredible free zoo, toasted ravioli, and rich blues history on the Mississippi.",
+      highlights: ["Gateway Arch", "Free Attractions", "BBQ"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 0.9, fall: 1.0 } },
+
+    { city: "Kansas City", region: "Missouri", country: "USA", lat: 39.10, lon: -94.58,
+      type: "fly", flightFromNYC: { low: 120, mid: 220, high: 400 },
+      accommodation: { budget: 55, mid: 110, luxury: 260 },
+      activities: 40, food: 50, description: "BBQ capital of the world with legendary jazz heritage, fountains everywhere, and incredible value.",
+      highlights: ["BBQ", "Jazz History", "Fountains"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 0.9, fall: 1.0 } },
+
+    { city: "Santa Fe", region: "New Mexico", country: "USA", lat: 35.69, lon: -105.94,
+      type: "fly", flightFromNYC: { low: 180, mid: 320, high: 520 },
+      accommodation: { budget: 70, mid: 150, luxury: 380 },
+      activities: 50, food: 50, description: "America's oldest capital with stunning adobe architecture, world-class art galleries, and incredible New Mexican cuisine.",
+      highlights: ["Art Scene", "Adobe Architecture", "Green Chile"],
+      seasonality: { winter: 0.9, spring: 1.0, summer: 1.1, fall: 1.2 } },
+
+    { city: "Albuquerque", region: "New Mexico", country: "USA", lat: 35.08, lon: -106.65,
+      type: "fly", flightFromNYC: { low: 160, mid: 300, high: 500 },
+      accommodation: { budget: 55, mid: 110, luxury: 260 },
+      activities: 45, food: 45, description: "Hot air balloon capital with Old Town charm, Breaking Bad tours, and stunning Sandia Mountains.",
+      highlights: ["Balloon Fiesta", "Old Town", "Mountains"],
+      seasonality: { winter: 0.9, spring: 1.0, summer: 0.9, fall: 1.3 } },
+
+    { city: "Salt Lake City", region: "Utah", country: "USA", lat: 40.76, lon: -111.89,
+      type: "fly", flightFromNYC: { low: 150, mid: 280, high: 480 },
+      accommodation: { budget: 60, mid: 130, luxury: 300 },
+      activities: 55, food: 45, description: "Gateway to incredible national parks and world-class skiing. Temple Square, outdoor adventure, and stunning mountain backdrop.",
+      highlights: ["Skiing", "National Parks", "Mountains"],
+      seasonality: { winter: 1.3, spring: 1.0, summer: 1.1, fall: 1.0 } },
+
+    { city: "Boise", region: "Idaho", country: "USA", lat: 43.62, lon: -116.21,
+      type: "fly", flightFromNYC: { low: 180, mid: 320, high: 520 },
+      accommodation: { budget: 55, mid: 110, luxury: 260 },
+      activities: 45, food: 45, description: "Outdoor paradise with Basque culture, incredible craft beer scene, and gateway to Idaho's stunning wilderness.",
+      highlights: ["Outdoor Recreation", "Basque Food", "Craft Beer"],
+      seasonality: { winter: 0.9, spring: 1.0, summer: 1.2, fall: 1.0 } },
 
     // Asia
     { city: "Tokyo", region: "Kanto", country: "Japan", lat: 35.68, lon: 139.69,
@@ -1700,72 +1978,84 @@ const DESTINATIONS = [
       type: "fly", flightFromNYC: { low: 350, mid: 550, high: 900 },
       accommodation: { budget: 80, mid: 180, luxury: 450 },
       activities: 60, food: 65, description: "Iconic landmarks, world-class museums (many free!), theater, royalty, and diverse neighborhoods to explore.",
+      highlights: ["Museums", "Theater", "History"],
       seasonality: { winter: 0.85, spring: 1.0, summer: 1.3, fall: 1.0 } },
 
     { city: "Paris", region: "Île-de-France", country: "France", lat: 48.86, lon: 2.35,
       type: "fly", flightFromNYC: { low: 320, mid: 520, high: 850 },
       accommodation: { budget: 70, mid: 160, luxury: 400 },
       activities: 55, food: 60, description: "The City of Light. Art, cuisine, fashion, romance, and timeless architecture at every turn.",
+      highlights: ["Art & Culture", "Food", "Romance"],
       seasonality: { winter: 0.9, spring: 1.1, summer: 1.3, fall: 1.0 } },
 
     { city: "Barcelona", region: "Catalonia", country: "Spain", lat: 41.39, lon: 2.17,
       type: "fly", flightFromNYC: { low: 300, mid: 500, high: 800 },
       accommodation: { budget: 60, mid: 130, luxury: 320 },
       activities: 50, food: 50, description: "Gaudí's masterpieces, Mediterranean beaches, tapas culture, and vibrant nightlife. Art and architecture paradise.",
+      highlights: ["Gaudí Architecture", "Beaches", "Nightlife"],
       seasonality: { winter: 0.8, spring: 1.0, summer: 1.4, fall: 1.1 } },
 
     { city: "Rome", region: "Lazio", country: "Italy", lat: 41.9, lon: 12.5,
       type: "fly", flightFromNYC: { low: 350, mid: 550, high: 900 },
       accommodation: { budget: 65, mid: 140, luxury: 350 },
       activities: 50, food: 55, description: "The Eternal City. Ancient ruins, Vatican treasures, incredible pasta, and 3,000 years of history.",
+      highlights: ["Ancient History", "Vatican", "Italian Food"],
       seasonality: { winter: 0.85, spring: 1.1, summer: 1.3, fall: 1.0 } },
 
     { city: "Amsterdam", region: "North Holland", country: "Netherlands", lat: 52.37, lon: 4.9,
       type: "fly", flightFromNYC: { low: 320, mid: 500, high: 800 },
       accommodation: { budget: 70, mid: 150, luxury: 350 },
       activities: 50, food: 55, description: "Canal-laced charm with world-class museums, cycling culture, liberal vibes, and beautiful Dutch architecture.",
+      highlights: ["Van Gogh Museum", "Canals", "Cycling"],
       seasonality: { winter: 0.8, spring: 1.2, summer: 1.3, fall: 0.95 } },
 
     { city: "Lisbon", region: "Lisbon", country: "Portugal", lat: 38.72, lon: -9.14,
       type: "fly", flightFromNYC: { low: 280, mid: 450, high: 700 },
       accommodation: { budget: 50, mid: 110, luxury: 280 },
       activities: 40, food: 45, description: "Hilly coastal capital with stunning views, historic trams, pastel buildings, and the world's best custard tarts.",
+      highlights: ["Pastéis de Nata", "Trams", "Fado Music"],
       seasonality: { winter: 0.85, spring: 1.0, summer: 1.3, fall: 1.0 } },
 
     { city: "Prague", region: "Bohemia", country: "Czech Republic", lat: 50.08, lon: 14.44,
       type: "fly", flightFromNYC: { low: 350, mid: 550, high: 850 },
       accommodation: { budget: 45, mid: 100, luxury: 250 },
       activities: 40, food: 35, description: "Fairy-tale medieval architecture, legendary beer culture, Gothic charm, and incredible value for Europe.",
+      highlights: ["Beer Culture", "Charles Bridge", "Old Town"],
       seasonality: { winter: 0.9, spring: 1.0, summer: 1.3, fall: 1.1 } },
 
     { city: "Budapest", region: "Central Hungary", country: "Hungary", lat: 47.5, lon: 19.04,
       type: "fly", flightFromNYC: { low: 380, mid: 580, high: 900 },
       accommodation: { budget: 40, mid: 90, luxury: 220 },
       activities: 40, food: 35, description: "Stunning Danube views, thermal baths, ruin bars, and grand architecture. One of Europe's best values.",
+      highlights: ["Thermal Baths", "Ruin Bars", "Architecture"],
       seasonality: { winter: 0.85, spring: 1.0, summer: 1.2, fall: 1.1 } },
 
     { city: "Vienna", region: "Vienna", country: "Austria", lat: 48.21, lon: 16.37,
       type: "fly", flightFromNYC: { low: 380, mid: 580, high: 920 },
       accommodation: { budget: 55, mid: 130, luxury: 320 },
       activities: 50, food: 50, description: "Imperial palaces, classical music heritage, coffee house culture, and world-class museums. Pure elegance.",
+      highlights: ["Classical Music", "Coffee Houses", "Imperial Palaces"],
       seasonality: { winter: 0.9, spring: 1.0, summer: 1.2, fall: 1.0 } },
 
     { city: "Athens", region: "Attica", country: "Greece", lat: 37.98, lon: 23.73,
       type: "fly", flightFromNYC: { low: 400, mid: 620, high: 950 },
       accommodation: { budget: 50, mid: 110, luxury: 280 },
       activities: 45, food: 40, description: "Birthplace of democracy and Western civilization. Ancient ruins, island-hopping gateway, and amazing Mediterranean food.",
+      highlights: ["Acropolis", "Greek Islands", "History"],
       seasonality: { winter: 0.75, spring: 1.0, summer: 1.4, fall: 1.1 } },
 
     { city: "Dublin", region: "Leinster", country: "Ireland", lat: 53.35, lon: -6.26,
       type: "fly", flightFromNYC: { low: 280, mid: 450, high: 700 },
       accommodation: { budget: 65, mid: 150, luxury: 350 },
       activities: 45, food: 50, description: "Literary heritage, legendary pubs, Georgian architecture, and friendly locals. Gateway to stunning Irish countryside.",
+      highlights: ["Pubs", "Literary History", "Countryside"],
       seasonality: { winter: 0.8, spring: 1.0, summer: 1.3, fall: 1.0 } },
 
     { city: "Edinburgh", region: "Scotland", country: "UK", lat: 55.95, lon: -3.19,
       type: "fly", flightFromNYC: { low: 350, mid: 550, high: 850 },
       accommodation: { budget: 60, mid: 140, luxury: 340 },
       activities: 45, food: 50, description: "Dramatic castle, medieval Old Town, world-class festivals, and gateway to the Scottish Highlands.",
+      highlights: ["Edinburgh Castle", "Fringe Festival", "Highlands"],
       seasonality: { winter: 0.75, spring: 1.0, summer: 1.4, fall: 1.1 } },
 
     { city: "Manchester", region: "England", country: "UK", lat: 53.48, lon: -2.24,
@@ -1912,7 +2202,250 @@ const DESTINATIONS = [
       type: "drive", flightFromNYC: { low: 350, mid: 550, high: 880 },
       accommodation: { budget: 60, mid: 130, luxury: 300 },
       activities: 45, food: 55, description: "EU capital with Art Nouveau architecture, world-famous chocolate, waffles, beer, and quirky museums.",
+      highlights: ["Chocolate", "Beer", "Grand Place"],
       seasonality: { winter: 0.85, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    // Additional Belgium cities
+    { city: "Bruges", region: "Flanders", country: "Belgium", lat: 51.21, lon: 3.22,
+      type: "drive", flightFromNYC: { low: 380, mid: 580, high: 920 },
+      accommodation: { budget: 55, mid: 130, luxury: 320 },
+      activities: 40, food: 50, description: "Medieval fairy-tale city with canals, cobblestone streets, and some of Europe's best chocolate and beer.",
+      highlights: ["Canals", "Medieval Town", "Chocolate"],
+      seasonality: { winter: 0.9, spring: 1.1, summer: 1.3, fall: 1.0 } },
+
+    { city: "Ghent", region: "Flanders", country: "Belgium", lat: 51.05, lon: 3.72,
+      type: "drive", flightFromNYC: { low: 380, mid: 580, high: 920 },
+      accommodation: { budget: 50, mid: 120, luxury: 280 },
+      activities: 40, food: 45, description: "Vibrant university town with stunning medieval architecture, excellent food scene, and fewer tourists than Bruges.",
+      highlights: ["Medieval Architecture", "Nightlife", "Art Museums"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    { city: "Antwerp", region: "Flanders", country: "Belgium", lat: 51.22, lon: 4.40,
+      type: "drive", flightFromNYC: { low: 380, mid: 580, high: 920 },
+      accommodation: { budget: 55, mid: 130, luxury: 300 },
+      activities: 45, food: 50, description: "Diamond capital with world-class fashion, Rubens art, stunning train station, and vibrant port city culture.",
+      highlights: ["Fashion", "Diamonds", "Rubens"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    // France driving destinations
+    { city: "Lyon", region: "Auvergne-Rhône-Alpes", country: "France", lat: 45.76, lon: 4.84,
+      type: "drive", flightFromNYC: { low: 400, mid: 620, high: 980 },
+      accommodation: { budget: 60, mid: 140, luxury: 350 },
+      activities: 50, food: 65, description: "France's gastronomic capital with traditional bouchons, Renaissance old town, and two rivers meeting.",
+      highlights: ["French Cuisine", "Old Town", "Gastronomy"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    { city: "Nice", region: "Provence-Alpes-Côte d'Azur", country: "France", lat: 43.71, lon: 7.26,
+      type: "drive", flightFromNYC: { low: 420, mid: 640, high: 1000 },
+      accommodation: { budget: 65, mid: 150, luxury: 400 },
+      activities: 55, food: 55, description: "French Riviera gem with stunning beaches, Belle Époque architecture, vibrant old town, and art museums.",
+      highlights: ["Beaches", "French Riviera", "Old Town"],
+      seasonality: { winter: 0.8, spring: 1.1, summer: 1.5, fall: 1.1 } },
+
+    { city: "Marseille", region: "Provence-Alpes-Côte d'Azur", country: "France", lat: 43.30, lon: 5.37,
+      type: "drive", flightFromNYC: { low: 400, mid: 620, high: 980 },
+      accommodation: { budget: 55, mid: 130, luxury: 320 },
+      activities: 50, food: 55, description: "France's oldest city with stunning calanques, multicultural vibe, bouillabaisse, and gritty port charm.",
+      highlights: ["Calanques", "Seafood", "Multicultural"],
+      seasonality: { winter: 0.8, spring: 1.1, summer: 1.4, fall: 1.1 } },
+
+    { city: "Bordeaux", region: "Nouvelle-Aquitaine", country: "France", lat: 44.84, lon: -0.58,
+      type: "drive", flightFromNYC: { low: 400, mid: 620, high: 980 },
+      accommodation: { budget: 60, mid: 140, luxury: 350 },
+      activities: 50, food: 60, description: "Wine capital of the world with elegant 18th-century architecture, excellent restaurants, and nearby vineyards.",
+      highlights: ["Wine", "Architecture", "Gastronomy"],
+      seasonality: { winter: 0.85, spring: 1.1, summer: 1.3, fall: 1.2 } },
+
+    { city: "Strasbourg", region: "Grand Est", country: "France", lat: 48.57, lon: 7.75,
+      type: "drive", flightFromNYC: { low: 400, mid: 620, high: 980 },
+      accommodation: { budget: 55, mid: 130, luxury: 320 },
+      activities: 45, food: 50, description: "Franco-German border city with stunning cathedral, half-timbered Petite France quarter, and famous Christmas market.",
+      highlights: ["Christmas Markets", "Cathedral", "Alsatian Food"],
+      seasonality: { winter: 1.2, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    { city: "Toulouse", region: "Occitanie", country: "France", lat: 43.60, lon: 1.44,
+      type: "drive", flightFromNYC: { low: 420, mid: 640, high: 1000 },
+      accommodation: { budget: 50, mid: 120, luxury: 280 },
+      activities: 40, food: 45, description: "The Pink City with aerospace heritage, vibrant student life, cassoulet cuisine, and gateway to Cathar country.",
+      highlights: ["Aerospace", "Pink Architecture", "Cassoulet"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    // Spain driving destinations
+    { city: "Madrid", region: "Community of Madrid", country: "Spain", lat: 40.42, lon: -3.70,
+      type: "drive", flightFromNYC: { low: 350, mid: 550, high: 880 },
+      accommodation: { budget: 50, mid: 120, luxury: 300 },
+      activities: 50, food: 50, description: "Spain's vibrant capital with world-class museums, tapas culture, late-night energy, and royal palaces.",
+      highlights: ["Prado Museum", "Tapas", "Nightlife"],
+      seasonality: { winter: 0.85, spring: 1.1, summer: 1.2, fall: 1.0 } },
+
+    { city: "Seville", region: "Andalusia", country: "Spain", lat: 37.39, lon: -5.99,
+      type: "drive", flightFromNYC: { low: 380, mid: 580, high: 920 },
+      accommodation: { budget: 45, mid: 110, luxury: 280 },
+      activities: 45, food: 45, description: "Flamenco capital with stunning Alcázar, Gothic cathedral, tapas bars, and passionate Andalusian spirit.",
+      highlights: ["Flamenco", "Alcázar", "Tapas"],
+      seasonality: { winter: 0.9, spring: 1.3, summer: 0.7, fall: 1.2 } },
+
+    { city: "Valencia", region: "Valencia", country: "Spain", lat: 39.47, lon: -0.38,
+      type: "drive", flightFromNYC: { low: 380, mid: 580, high: 920 },
+      accommodation: { budget: 45, mid: 110, luxury: 280 },
+      activities: 45, food: 50, description: "Birthplace of paella with futuristic City of Arts, beautiful beaches, historic old town, and excellent value.",
+      highlights: ["Paella", "City of Arts", "Beaches"],
+      seasonality: { winter: 0.85, spring: 1.1, summer: 1.3, fall: 1.1 } },
+
+    { city: "Bilbao", region: "Basque Country", country: "Spain", lat: 43.26, lon: -2.93,
+      type: "drive", flightFromNYC: { low: 400, mid: 620, high: 980 },
+      accommodation: { budget: 55, mid: 130, luxury: 320 },
+      activities: 50, food: 55, description: "Transformed industrial city with iconic Guggenheim, incredible pintxos, and gateway to Basque Country.",
+      highlights: ["Guggenheim", "Pintxos", "Basque Culture"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    { city: "Granada", region: "Andalusia", country: "Spain", lat: 37.18, lon: -3.60,
+      type: "drive", flightFromNYC: { low: 400, mid: 620, high: 980 },
+      accommodation: { budget: 40, mid: 100, luxury: 250 },
+      activities: 40, food: 40, description: "Home of the Alhambra palace with Moorish heritage, free tapas tradition, and stunning Sierra Nevada backdrop.",
+      highlights: ["Alhambra", "Moorish Architecture", "Free Tapas"],
+      seasonality: { winter: 0.9, spring: 1.2, summer: 1.0, fall: 1.1 } },
+
+    { city: "San Sebastián", region: "Basque Country", country: "Spain", lat: 43.32, lon: -1.98,
+      type: "drive", flightFromNYC: { low: 420, mid: 640, high: 1000 },
+      accommodation: { budget: 65, mid: 150, luxury: 380 },
+      activities: 55, food: 70, description: "World's highest concentration of Michelin stars with stunning beaches, pintxos bars, and Belle Époque charm.",
+      highlights: ["Michelin Dining", "Pintxos", "La Concha Beach"],
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.5, fall: 1.0 } },
+
+    // Italy driving destinations
+    { city: "Milan", region: "Lombardy", country: "Italy", lat: 45.46, lon: 9.19,
+      type: "drive", flightFromNYC: { low: 380, mid: 580, high: 920 },
+      accommodation: { budget: 60, mid: 140, luxury: 380 },
+      activities: 55, food: 55, description: "Italy's fashion and business capital with Gothic Duomo, La Scala opera, Leonardo's Last Supper, and designer shopping.",
+      highlights: ["Fashion", "Duomo", "Last Supper"],
+      seasonality: { winter: 0.9, spring: 1.1, summer: 1.0, fall: 1.2 } },
+
+    { city: "Florence", region: "Tuscany", country: "Italy", lat: 43.77, lon: 11.25,
+      type: "drive", flightFromNYC: { low: 400, mid: 620, high: 980 },
+      accommodation: { budget: 55, mid: 140, luxury: 350 },
+      activities: 55, food: 55, description: "Renaissance birthplace with Uffizi Gallery, Duomo, Ponte Vecchio, and Tuscan wine just outside the city.",
+      highlights: ["Renaissance Art", "Tuscan Food", "Architecture"],
+      seasonality: { winter: 0.85, spring: 1.2, summer: 1.4, fall: 1.2 } },
+
+    { city: "Venice", region: "Veneto", country: "Italy", lat: 45.44, lon: 12.32,
+      type: "drive", flightFromNYC: { low: 420, mid: 640, high: 1000 },
+      accommodation: { budget: 70, mid: 170, luxury: 450 },
+      activities: 60, food: 60, description: "Unique floating city with iconic canals, St. Mark's Square, gondolas, and romantic atmosphere like nowhere else.",
+      highlights: ["Canals", "St. Mark's", "Romantic"],
+      seasonality: { winter: 0.8, spring: 1.2, summer: 1.3, fall: 1.3 } },
+
+    { city: "Naples", region: "Campania", country: "Italy", lat: 40.85, lon: 14.27,
+      type: "drive", flightFromNYC: { low: 380, mid: 580, high: 920 },
+      accommodation: { budget: 45, mid: 100, luxury: 250 },
+      activities: 45, food: 50, description: "Chaotic, authentic Italy with world's best pizza, Pompeii nearby, and gateway to Amalfi Coast.",
+      highlights: ["Pizza", "Pompeii", "Authentic Italy"],
+      seasonality: { winter: 0.85, spring: 1.1, summer: 1.3, fall: 1.1 } },
+
+    { city: "Turin", region: "Piedmont", country: "Italy", lat: 45.07, lon: 7.69,
+      type: "drive", flightFromNYC: { low: 400, mid: 620, high: 980 },
+      accommodation: { budget: 50, mid: 120, luxury: 300 },
+      activities: 45, food: 55, description: "Elegant former capital with baroque architecture, excellent museums, chocolate heritage, and Alpine views.",
+      highlights: ["Chocolate", "Baroque Palaces", "Egyptian Museum"],
+      seasonality: { winter: 0.9, spring: 1.0, summer: 1.1, fall: 1.0 } },
+
+    { city: "Bologna", region: "Emilia-Romagna", country: "Italy", lat: 44.49, lon: 11.34,
+      type: "drive", flightFromNYC: { low: 400, mid: 620, high: 980 },
+      accommodation: { budget: 50, mid: 120, luxury: 300 },
+      activities: 40, food: 60, description: "Italy's food capital with tortellini, mortadella, arcaded streets, and Europe's oldest university.",
+      highlights: ["Italian Food", "Arcades", "University Town"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.1, fall: 1.0 } },
+
+    // Netherlands driving destinations
+    { city: "Rotterdam", region: "South Holland", country: "Netherlands", lat: 51.92, lon: 4.48,
+      type: "drive", flightFromNYC: { low: 380, mid: 580, high: 920 },
+      accommodation: { budget: 55, mid: 130, luxury: 320 },
+      activities: 45, food: 50, description: "Modern architecture marvel rebuilt after WWII with striking skyline, Markthal, and vibrant port culture.",
+      highlights: ["Architecture", "Markthal", "Modern Art"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    { city: "The Hague", region: "South Holland", country: "Netherlands", lat: 52.08, lon: 4.31,
+      type: "drive", flightFromNYC: { low: 380, mid: 580, high: 920 },
+      accommodation: { budget: 55, mid: 130, luxury: 320 },
+      activities: 45, food: 50, description: "Royal city and seat of government with excellent museums, beach at Scheveningen, and international flair.",
+      highlights: ["Mauritshuis", "Beach", "International Courts"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    { city: "Utrecht", region: "Utrecht", country: "Netherlands", lat: 52.09, lon: 5.12,
+      type: "drive", flightFromNYC: { low: 380, mid: 580, high: 920 },
+      accommodation: { budget: 50, mid: 120, luxury: 280 },
+      activities: 40, food: 45, description: "Charming canal city with unique wharf-level terraces, medieval center, and lively student atmosphere.",
+      highlights: ["Canals", "Dom Tower", "Cafes"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    // Portugal driving destinations
+    { city: "Porto", region: "Norte", country: "Portugal", lat: 41.16, lon: -8.63,
+      type: "drive", flightFromNYC: { low: 350, mid: 550, high: 880 },
+      accommodation: { budget: 45, mid: 100, luxury: 250 },
+      activities: 40, food: 45, description: "Port wine birthplace with stunning Douro River views, azulejo tiles, Harry Potter bookstore inspiration.",
+      highlights: ["Port Wine", "Douro Valley", "Azulejo Tiles"],
+      seasonality: { winter: 0.85, spring: 1.1, summer: 1.3, fall: 1.1 } },
+
+    // Ireland driving destinations
+    { city: "Cork", region: "Munster", country: "Ireland", lat: 51.90, lon: -8.47,
+      type: "drive", flightFromNYC: { low: 350, mid: 550, high: 880 },
+      accommodation: { budget: 55, mid: 130, luxury: 300 },
+      activities: 40, food: 45, description: "Ireland's foodie capital with English Market, pub culture, and gateway to Ring of Kerry and West Cork.",
+      highlights: ["English Market", "Pubs", "Ring of Kerry"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.3, fall: 1.0 } },
+
+    { city: "Galway", region: "Connacht", country: "Ireland", lat: 53.27, lon: -9.06,
+      type: "drive", flightFromNYC: { low: 380, mid: 580, high: 920 },
+      accommodation: { budget: 60, mid: 140, luxury: 320 },
+      activities: 45, food: 50, description: "Bohemian arts city with traditional music, colorful streets, and gateway to Connemara and Cliffs of Moher.",
+      highlights: ["Traditional Music", "Arts Scene", "Cliffs of Moher"],
+      seasonality: { winter: 0.8, spring: 1.0, summer: 1.4, fall: 1.0 } },
+
+    // Croatia driving destinations
+    { city: "Zagreb", region: "City of Zagreb", country: "Croatia", lat: 45.81, lon: 15.98,
+      type: "drive", flightFromNYC: { low: 400, mid: 620, high: 980 },
+      accommodation: { budget: 40, mid: 90, luxury: 220 },
+      activities: 35, food: 35, description: "Underrated capital with Austro-Hungarian architecture, excellent museums, cafe culture, and great value.",
+      highlights: ["Museums", "Cafe Culture", "Architecture"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    { city: "Split", region: "Dalmatia", country: "Croatia", lat: 43.51, lon: 16.44,
+      type: "drive", flightFromNYC: { low: 420, mid: 640, high: 1000 },
+      accommodation: { budget: 45, mid: 100, luxury: 280 },
+      activities: 45, food: 45, description: "Ancient Roman palace turned vibrant city with Adriatic beaches, Game of Thrones filming, and island hopping.",
+      highlights: ["Diocletian's Palace", "Beaches", "Island Hopping"],
+      seasonality: { winter: 0.7, spring: 1.1, summer: 1.5, fall: 1.1 } },
+
+    { city: "Dubrovnik", region: "Dalmatia", country: "Croatia", lat: 42.65, lon: 18.09,
+      type: "drive", flightFromNYC: { low: 450, mid: 700, high: 1100 },
+      accommodation: { budget: 55, mid: 140, luxury: 400 },
+      activities: 50, food: 50, description: "Pearl of the Adriatic with stunning medieval walls, Game of Thrones fame, and crystal-clear waters.",
+      highlights: ["City Walls", "Old Town", "Game of Thrones"],
+      seasonality: { winter: 0.7, spring: 1.1, summer: 1.5, fall: 1.2 } },
+
+    // Slovenia
+    { city: "Ljubljana", region: "Central Slovenia", country: "Slovenia", lat: 46.06, lon: 14.51,
+      type: "drive", flightFromNYC: { low: 400, mid: 620, high: 980 },
+      accommodation: { budget: 40, mid: 90, luxury: 220 },
+      activities: 35, food: 35, description: "Green capital with dragon bridge, charming old town, car-free center, and gateway to Lake Bled.",
+      highlights: ["Lake Bled", "Old Town", "Green City"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.3, fall: 1.0 } },
+
+    // Slovakia
+    { city: "Bratislava", region: "Bratislava", country: "Slovakia", lat: 48.15, lon: 17.11,
+      type: "drive", flightFromNYC: { low: 380, mid: 580, high: 920 },
+      accommodation: { budget: 35, mid: 80, luxury: 200 },
+      activities: 30, food: 30, description: "Compact old town on the Danube, easy day trip from Vienna, quirky statues, and excellent value.",
+      highlights: ["Old Town", "Danube", "Vienna Day Trip"],
+      seasonality: { winter: 0.85, spring: 1.0, summer: 1.2, fall: 1.0 } },
+
+    // Greece driving destinations
+    { city: "Thessaloniki", region: "Central Macedonia", country: "Greece", lat: 40.64, lon: 22.94,
+      type: "drive", flightFromNYC: { low: 450, mid: 700, high: 1100 },
+      accommodation: { budget: 40, mid: 90, luxury: 220 },
+      activities: 40, food: 45, description: "Greece's second city with Ottoman heritage, Byzantine churches, waterfront promenade, and vibrant food scene.",
+      highlights: ["Food Scene", "Byzantine Churches", "Nightlife"],
+      seasonality: { winter: 0.8, spring: 1.1, summer: 1.3, fall: 1.1 } },
 
     { city: "Copenhagen", region: "Capital Region", country: "Denmark", lat: 55.68, lon: 12.57,
       type: "fly", flightFromNYC: { low: 380, mid: 600, high: 950 },
@@ -3591,7 +4124,7 @@ function addDestinationMarker(dest, travelers, nights) {
     const popup = createPopupContent(dest, travelers, nights);
 
     const marker = L.marker([dest.lat, dest.lon], { icon })
-        .bindPopup(popup, { maxWidth: 450, minWidth: 420 })
+        .bindPopup(popup, { maxWidth: 550, minWidth: 520 })
         .addTo(map);
 
     markers.push(marker);
@@ -3699,6 +4232,18 @@ function createPopupContent(dest, travelers, nights) {
     // Description
     const description = dest.description || dest.wikiDescription || 'A beautiful destination worth exploring.';
 
+    // Highlights section (top reasons to visit)
+    let highlightsHtml = '';
+    if (dest.highlights && dest.highlights.length > 0) {
+        const highlightTags = dest.highlights.map(h => `<span class="highlight-tag">${h}</span>`).join('');
+        highlightsHtml = `
+            <div class="popup-highlights">
+                <div class="popup-highlights-label">Why visit</div>
+                <div class="popup-highlights-list">${highlightTags}</div>
+            </div>
+        `;
+    }
+
     // Transport details
     const transportIcon = costs.transportType === 'drive' ? '🚗' : '✈️';
     const transportLabel = costs.transportType === 'drive' ? 'Drive' : 'Flights';
@@ -3724,11 +4269,72 @@ function createPopupContent(dest, travelers, nights) {
         `;
     }
 
+    // Generate booking links
+    const departureDate = document.getElementById('departureDate').value;
+    const returnDate = document.getElementById('returnDate').value;
+    const depFormatted = departureDate.replace(/-/g, '-');
+    const retFormatted = returnDate.replace(/-/g, '-');
+
+    // Google Flights link (format: /flights/FROM/TO/DATE/DATE)
+    const originCity = document.getElementById('startLocation').value.split(',')[0].trim();
+    const googleFlightsUrl = `https://www.google.com/travel/flights?q=flights%20from%20${encodeURIComponent(originCity)}%20to%20${encodeURIComponent(dest.city)}%20${depFormatted}%20to%20${retFormatted}`;
+
+    // Kayak link
+    const kayakUrl = `https://www.kayak.com/flights/${encodeURIComponent(originCity)}-${encodeURIComponent(dest.city)}/${departureDate}/${returnDate}`;
+
+    // Booking.com link
+    const checkinParts = departureDate.split('-');
+    const checkoutParts = returnDate.split('-');
+    const bookingUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(dest.city + ', ' + dest.country)}&checkin_year=${checkinParts[0]}&checkin_month=${checkinParts[1]}&checkin_monthday=${checkinParts[2]}&checkout_year=${checkoutParts[0]}&checkout_month=${checkoutParts[1]}&checkout_monthday=${checkoutParts[2]}&group_adults=${travelers}`;
+
+    // Hostelworld for budget travelers
+    const hostelworldUrl = `https://www.hostelworld.com/s?q=${encodeURIComponent(dest.city + ', ' + dest.country)}&dateFrom=${departureDate}&dateTo=${returnDate}&guests=${travelers}`;
+
+    // Airbnb link
+    const airbnbUrl = `https://www.airbnb.com/s/${encodeURIComponent(dest.city + '--' + dest.country)}/homes?checkin=${departureDate}&checkout=${returnDate}&adults=${travelers}`;
+
+    // Only show flight links for fly destinations
+    let bookingLinksHtml = '';
+    if (costs.transportType === 'fly') {
+        bookingLinksHtml = `
+            <div class="popup-booking-links">
+                <div class="booking-section">
+                    <span class="booking-label">✈️ Flights</span>
+                    <div class="booking-buttons">
+                        <a href="${googleFlightsUrl}" target="_blank" rel="noopener" class="booking-btn">Google Flights</a>
+                        <a href="${kayakUrl}" target="_blank" rel="noopener" class="booking-btn">Kayak</a>
+                    </div>
+                </div>
+                <div class="booking-section">
+                    <span class="booking-label">🏨 Stay</span>
+                    <div class="booking-buttons">
+                        <a href="${bookingUrl}" target="_blank" rel="noopener" class="booking-btn">Booking.com</a>
+                        <a href="${airbnbUrl}" target="_blank" rel="noopener" class="booking-btn">Airbnb</a>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        bookingLinksHtml = `
+            <div class="popup-booking-links">
+                <div class="booking-section">
+                    <span class="booking-label">🏨 Stay</span>
+                    <div class="booking-buttons">
+                        <a href="${bookingUrl}" target="_blank" rel="noopener" class="booking-btn">Booking.com</a>
+                        <a href="${airbnbUrl}" target="_blank" rel="noopener" class="booking-btn">Airbnb</a>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     return `
         <div class="popup-content">
             ${heroHtml}
 
             <div class="popup-body">
+                ${highlightsHtml}
+
                 <p class="popup-description">${description}</p>
 
                 <div class="popup-tags">
@@ -3739,42 +4345,36 @@ function createPopupContent(dest, travelers, nights) {
 
                 ${weatherHtml}
 
-                <div class="popup-grid">
-                    <div class="popup-card">
-                        <div class="popup-card-header">${transportIcon} ${transportLabel}</div>
-                        <div class="popup-card-value">$${costs.transport}</div>
-                        <div class="popup-card-detail">${transportDetail}</div>
+                <div class="popup-costs-row">
+                    <div class="popup-cost-item">
+                        <span class="cost-icon">${transportIcon}</span>
+                        <span class="cost-value">$${costs.transport}</span>
+                        <span class="cost-label">${transportLabel}</span>
                     </div>
-                    <div class="popup-card">
-                        <div class="popup-card-header">🏨 Accommodation</div>
-                        <div class="popup-card-value">$${costs.accommodation}</div>
-                        <div class="popup-card-detail">${nights} nights</div>
+                    <div class="popup-cost-item">
+                        <span class="cost-icon">🏨</span>
+                        <span class="cost-value">$${costs.accommodation}</span>
+                        <span class="cost-label">${nights}n</span>
                     </div>
-                    <div class="popup-card">
-                        <div class="popup-card-header">🍽️ Food</div>
-                        <div class="popup-card-value">$${costs.food}</div>
-                        <div class="popup-card-detail">${nights} days</div>
+                    <div class="popup-cost-item">
+                        <span class="cost-icon">🍽️</span>
+                        <span class="cost-value">$${costs.food}</span>
+                        <span class="cost-label">Food</span>
                     </div>
-                    <div class="popup-card">
-                        <div class="popup-card-header">🎯 Activities</div>
-                        <div class="popup-card-value">$${costs.activities}</div>
-                        <div class="popup-card-detail">Estimated</div>
+                    <div class="popup-cost-item">
+                        <span class="cost-icon">🎯</span>
+                        <span class="cost-value">$${costs.activities}</span>
+                        <span class="cost-label">Activities</span>
+                    </div>
+                    <div class="popup-cost-item total">
+                        <span class="cost-value">$${costs.total.toLocaleString()}</span>
+                        <span class="cost-label">Total</span>
                     </div>
                 </div>
 
                 ${currencyHtml}
-            </div>
 
-            <div class="popup-total">
-                <div class="popup-total-left">
-                    <div class="popup-total-label">Estimated Total</div>
-                    <div class="popup-total-value">$${costs.total.toLocaleString()}</div>
-                    <div class="popup-total-breakdown">${travelers} traveler${travelers > 1 ? 's' : ''} · ${nights} nights</div>
-                </div>
-                <div class="popup-total-right">
-                    <div class="popup-total-perday">$${costs.perDay}</div>
-                    <div class="popup-total-perday-label">per day</div>
-                </div>
+                ${bookingLinksHtml}
             </div>
         </div>
     `;
