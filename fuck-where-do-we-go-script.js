@@ -717,8 +717,19 @@ async function fetchDrivingIsochrone(lat, lon, timeSeconds) {
             // Handle both Polygon and MultiPolygon
             let coords;
             if (geometry.type === 'MultiPolygon') {
-                // Use the largest polygon (first one is usually the main area)
-                coords = geometry.coordinates[0];
+                // Find the largest polygon by number of points (most detailed = main area)
+                let largestPolygon = geometry.coordinates[0];
+                let maxPoints = geometry.coordinates[0][0] ? geometry.coordinates[0][0].length : 0;
+
+                for (let i = 1; i < geometry.coordinates.length; i++) {
+                    const polyPoints = geometry.coordinates[i][0] ? geometry.coordinates[i][0].length : 0;
+                    if (polyPoints > maxPoints) {
+                        maxPoints = polyPoints;
+                        largestPolygon = geometry.coordinates[i];
+                    }
+                }
+                console.log(`Isochrone: MultiPolygon with ${geometry.coordinates.length} polygons, using largest with ${maxPoints} points`);
+                coords = largestPolygon;
             } else {
                 coords = geometry.coordinates;
             }
@@ -820,8 +831,8 @@ function displayIsochrone(isochroneData, homeCity) {
         direction: 'center'
     });
 
-    // Fit map to isochrone bounds
-    map.fitBounds(currentIsochrone.getBounds(), { padding: [50, 50] });
+    // Fit map to isochrone bounds, but limit zoom level to avoid zooming too close
+    map.fitBounds(currentIsochrone.getBounds(), { padding: [50, 50], maxZoom: 8 });
 }
 
 // ============================================
