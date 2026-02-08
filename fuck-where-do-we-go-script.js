@@ -4218,13 +4218,13 @@ function addDestinationMarker(dest, travelers, nights) {
                 <span class="marker-city">${dest.city}</span>
                 <span class="marker-price">${formattedPrice}</span>
                 <div class="marker-details">
-                    <span class="marker-type">${dest.type === 'drive' ? '🚗' : '✈️'}</span>
+                    <span class="marker-type">${dest.type === 'drive' ? 'Drive' : 'Fly'}</span>
                     ${weatherDisplay}
                 </div>
             </div>
         `,
-        iconSize: [90, 60],
-        iconAnchor: [45, 30]
+        iconSize: [100, 65],
+        iconAnchor: [50, 32]
     });
 
     const popup = createPopupContent(dest, travelers, nights);
