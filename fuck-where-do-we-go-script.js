@@ -4281,8 +4281,8 @@ function createPopupContent(dest, travelers, nights) {
     }
 
     // Generate booking links
-    const departureDate = document.getElementById('departureDate').value;
-    const returnDate = document.getElementById('returnDate').value;
+    const departureDate = document.getElementById('startDate').value;
+    const returnDate = document.getElementById('endDate').value;
     const depFormatted = departureDate.replace(/-/g, '-');
     const retFormatted = returnDate.replace(/-/g, '-');
 
