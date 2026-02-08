@@ -1056,94 +1056,205 @@
             color: #FCE7F3;
         }
 
-        /* Horizontal costs row */
-        .popup-costs-row {
+        /* Redesigned popup card */
+        .popup-redesign .popup-body {
+            padding: 16px 20px;
+        }
+
+        .popup-header-row {
             display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .info-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #404040;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        .info-badge.warning {
+            background: #5a4a2d;
+            color: #f0c674;
+        }
+
+        .info-badge.highlight {
+            background: #2d5a3d;
+            color: #7dcea0;
+        }
+
+        .popup-redesign .popup-description {
+            font-size: 14px;
+            color: #bbb;
+            line-height: 1.5;
+            margin: 0 0 12px 0;
+        }
+
+        .popup-highlights-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        /* Cost breakdown - clean list style */
+        .cost-breakdown {
             background: #363636;
             border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 16px;
-            gap: 4px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
         }
 
-        .popup-cost-item {
-            flex: 1;
+        .cost-line {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 8px 4px;
-            border-radius: 8px;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+            color: #ccc;
+            border-bottom: 1px solid #444;
         }
 
-        .popup-cost-item.total {
-            background: #2d5a3d;
-            border-left: 2px solid #4CAF50;
+        .cost-line:last-child {
+            border-bottom: none;
         }
 
-        .popup-cost-item .cost-icon {
-            font-size: 18px;
-            margin-bottom: 4px;
-        }
-
-        .popup-cost-item .cost-value {
-            font-size: 16px;
-            font-weight: 700;
+        .cost-line span:last-child {
+            font-weight: 600;
             color: #fff;
         }
 
-        .popup-cost-item.total .cost-value {
-            font-size: 18px;
-            color: #4CAF50;
+        .popup-currency {
+            margin-bottom: 12px;
         }
 
-        .popup-cost-item .cost-label {
-            font-size: 10px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            margin-top: 2px;
-        }
-
-        /* Booking links section */
-        .popup-booking-links {
-            display: flex;
-            gap: 16px;
-            padding-top: 12px;
+        /* Collapsible booking drawer */
+        .booking-drawer {
             border-top: 1px solid #404040;
+            margin-top: 8px;
         }
 
-        .booking-section {
-            flex: 1;
-        }
-
-        .booking-label {
-            display: block;
-            font-size: 11px;
-            color: #888;
-            margin-bottom: 8px;
-        }
-
-        .booking-buttons {
+        .booking-drawer-toggle {
+            width: 100%;
             display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            border: none;
+            color: #00d4ff;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 12px 0;
+            cursor: pointer;
+            transition: color 0.2s;
         }
 
-        .booking-btn {
+        .booking-drawer-toggle:hover {
+            color: #4de4ff;
+        }
+
+        .drawer-arrow {
+            transition: transform 0.2s;
+            font-size: 10px;
+        }
+
+        .booking-drawer.open .drawer-arrow {
+            transform: rotate(180deg);
+        }
+
+        .booking-drawer-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .booking-drawer.open .booking-drawer-content {
+            max-height: 200px;
+        }
+
+        .booking-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #404040;
+        }
+
+        .booking-row:last-child {
+            border-bottom: none;
+        }
+
+        .booking-row-label {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .booking-row-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .booking-link {
             background: #404040;
             color: #00d4ff;
-            padding: 6px 12px;
+            padding: 5px 12px;
             border-radius: 6px;
             font-size: 11px;
             text-decoration: none;
             transition: all 0.2s;
-            white-space: nowrap;
         }
 
-        .booking-btn:hover {
+        .booking-link:hover {
             background: #00d4ff;
             color: #1a1a1a;
+        }
+
+        /* Footer with total price */
+        .popup-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #1a3d2a 0%, #0d261a 100%);
+            padding: 16px 20px;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .popup-footer-left {
+            flex: 1;
+        }
+
+        .footer-total-label {
+            font-size: 11px;
+            color: #7dcea0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-breakdown {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .popup-footer-right {
+            text-align: right;
+        }
+
+        .footer-total {
+            font-size: 28px;
+            font-weight: 700;
+            color: #4CAF50;
+        }
+
+        .footer-perday {
+            font-size: 12px;
+            color: #7dcea0;
         }
 
         /* Legacy support */
@@ -1414,7 +1525,7 @@
     <div class="container">
         <aside class="sidebar">
             <h1 class="logo">✈️ Fuck, where do we go?</h1>
-            <p class="tagline">Find places to go for a short break, in short order <span class="version">v1.16.0</span></p>
+            <p class="tagline">Find places to go for a short break, in short order <span class="version">v1.17.0</span></p>
 
             <!-- Step 1: Trip Details -->
             <div class="step-section always-on" id="step1">

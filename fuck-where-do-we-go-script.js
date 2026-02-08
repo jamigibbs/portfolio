@@ -4241,38 +4241,40 @@ function createPopupContent(dest, travelers, nights) {
     const costs = dest.costs;
     const travelTimeStr = formatTravelTime(dest.travelTime);
 
-    // Season tag styling
-    const seasonTag = costs.seasonMultiplier > 1.1
-        ? '<span class="popup-tag warning">🔥 Peak Season</span>'
-        : costs.seasonMultiplier < 0.9
-            ? '<span class="popup-tag highlight">💰 Off-Season</span>'
-            : '<span class="popup-tag">📅 Shoulder Season</span>';
+    // Generate a unique ID for this popup's collapsible
+    const popupId = `popup-${dest.city.replace(/\s+/g, '-')}-${Date.now()}`;
 
-    // Hero section with image or fallback
-    let heroHtml = '';
-    if (dest.image && dest.image.url) {
-        heroHtml = `
-            <div class="popup-hero">
-                <img src="${dest.image.url}" alt="${dest.city}" loading="lazy">
-                <div class="popup-hero-overlay">
-                    <h2 class="popup-hero-title">${dest.city}</h2>
-                    <div class="popup-hero-subtitle">${dest.region}, ${dest.country}</div>
-                </div>
-                <div class="popup-hero-credit">
-                    <a href="${dest.image.credit.link}" target="_blank" rel="noopener">📷 ${dest.image.credit.name}</a>
-                </div>
+    // Placeholder images by destination type/region
+    const placeholderImages = [
+        'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600&h=300&fit=crop', // Road trip
+        'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&h=300&fit=crop', // Lake view
+        'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=300&fit=crop', // Beach
+        'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600&h=300&fit=crop', // City
+        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=300&fit=crop', // Mountains
+        'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&h=300&fit=crop', // Europe
+        'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600&h=300&fit=crop', // Mediterranean
+        'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=600&h=300&fit=crop', // Historic
+    ];
+    // Pick a consistent placeholder based on destination name
+    const placeholderIndex = dest.city.charCodeAt(0) % placeholderImages.length;
+    const placeholderUrl = placeholderImages[placeholderIndex];
+
+    // Hero section with image (always show image now)
+    const imageUrl = dest.image?.url || placeholderUrl;
+    const imageCredit = dest.image?.credit
+        ? `<div class="popup-hero-credit"><a href="${dest.image.credit.link}" target="_blank" rel="noopener">📷 ${dest.image.credit.name}</a></div>`
+        : '';
+
+    const heroHtml = `
+        <div class="popup-hero">
+            <img src="${imageUrl}" alt="${dest.city}" loading="lazy" onerror="this.src='${placeholderUrl}'">
+            <div class="popup-hero-overlay">
+                <h2 class="popup-hero-title">${dest.city}</h2>
+                <div class="popup-hero-subtitle">${dest.region}, ${dest.country}</div>
             </div>
-        `;
-    } else {
-        heroHtml = `
-            <div class="popup-hero popup-hero-noimage">
-                <div>
-                    <h2 class="popup-hero-title">${dest.city}</h2>
-                    <div class="popup-hero-subtitle">${dest.region}, ${dest.country}</div>
-                </div>
-            </div>
-        `;
-    }
+            ${imageCredit}
+        </div>
+    `;
 
     // Weather card
     let weatherHtml = '';
@@ -4367,48 +4369,34 @@ function createPopupContent(dest, travelers, nights) {
         touristScoreHtml = `<span class="tourist-score ${scoreClass}">${scoreIcon} ${scoreLabel}</span>`;
     }
 
-    // Highlights section (top reasons to visit)
+    // Highlights as inline tags
     let highlightsHtml = '';
     if (dest.highlights && dest.highlights.length > 0) {
         const highlightTags = dest.highlights.map(h => `<span class="highlight-tag">${h}</span>`).join('');
-        highlightsHtml = `
-            <div class="popup-highlights">
-                <div class="popup-highlights-label">Why visit ${touristScoreHtml}</div>
-                <div class="popup-highlights-list">${highlightTags}</div>
-            </div>
-        `;
-    } else if (touristScoreHtml) {
-        // Show tourist score even without highlights
-        highlightsHtml = `
-            <div class="popup-highlights">
-                <div class="popup-highlights-label">${touristScoreHtml}</div>
-            </div>
-        `;
+        highlightsHtml = `<div class="popup-highlights-inline">${highlightTags}</div>`;
     }
 
-    // Transport details
+    // Quick info badges (travel time, weather summary)
     const transportIcon = costs.transportType === 'drive' ? '🚗' : '✈️';
-    const transportLabel = costs.transportType === 'drive' ? 'Drive' : 'Flights';
-    const transportDetail = costs.transportType === 'drive'
-        ? `${Math.round(dest.distance)} mi`
-        : `${travelers} traveler${travelers > 1 ? 's' : ''}`;
+    const weatherBadge = dest.weather
+        ? `<span class="info-badge">${dest.weather.conditions?.split(' ')[0] || '🌤️'} ${dest.weather.avgHigh || dest.weather.current?.temp || ''}°</span>`
+        : '';
+    const seasonBadge = costs.seasonMultiplier > 1.1
+        ? '<span class="info-badge warning">🔥 Peak</span>'
+        : costs.seasonMultiplier < 0.9
+            ? '<span class="info-badge highlight">💰 Off-Season</span>'
+            : '';
 
-    // Advisory tag (clickable to show explanation)
-    let advisoryTag = '';
-    if (dest.advisory) {
-        const safetyClass = dest.advisory.level <= 2 ? 'highlight' : dest.advisory.level >= 3 ? 'warning' : '';
-        advisoryTag = `<span class="popup-tag ${safetyClass} clickable" onclick="showSecurityModal(${dest.advisory.level})" title="Click for details">🛡️ Level ${dest.advisory.level} ⓘ</span>`;
+    // Advisory badge
+    let advisoryBadge = '';
+    if (dest.advisory && dest.advisory.level >= 3) {
+        advisoryBadge = `<span class="info-badge warning" onclick="showSecurityModal(${dest.advisory.level})" style="cursor:pointer">⚠️ Advisory</span>`;
     }
 
-    // Currency info
-    let currencyHtml = '';
+    // Currency info (compact)
+    let currencyBadge = '';
     if (dest.localCurrency && dest.localCurrency !== 'USD' && dest.exchangeRate) {
-        currencyHtml = `
-            <div class="popup-info-row">
-                <span class="popup-info-label">💱 Exchange Rate</span>
-                <span class="popup-info-value">$1 = ${dest.exchangeRate.toFixed(2)} ${dest.localCurrency}</span>
-            </div>
-        `;
+        currencyBadge = `<span class="info-badge">💱 $1 = ${dest.exchangeRate.toFixed(1)} ${dest.localCurrency}</span>`;
     }
 
     // Generate booking links
@@ -4433,88 +4421,83 @@ function createPopupContent(dest, travelers, nights) {
     // Airbnb link
     const airbnbUrl = `https://www.airbnb.com/s/${encodeURIComponent(dest.city + '--' + dest.country)}/homes?checkin=${departureDate}&checkout=${returnDate}&adults=${travelers}`;
 
-    // Only show flight links for fly destinations
-    let bookingLinksHtml = '';
+    // Collapsible booking section
+    let flightLinksHtml = '';
     if (costs.transportType === 'fly') {
-        bookingLinksHtml = `
-            <div class="popup-booking-links">
-                <div class="booking-section">
-                    <span class="booking-label">✈️ Flights</span>
-                    <div class="booking-buttons">
-                        <a href="${googleFlightsUrl}" target="_blank" rel="noopener" class="booking-btn">Google Flights</a>
-                        <a href="${kayakUrl}" target="_blank" rel="noopener" class="booking-btn">Kayak</a>
-                    </div>
-                </div>
-                <div class="booking-section">
-                    <span class="booking-label">🏨 Stay</span>
-                    <div class="booking-buttons">
-                        <a href="${bookingUrl}" target="_blank" rel="noopener" class="booking-btn">Booking.com</a>
-                        <a href="${airbnbUrl}" target="_blank" rel="noopener" class="booking-btn">Airbnb</a>
-                    </div>
-                </div>
-            </div>
-        `;
-    } else {
-        bookingLinksHtml = `
-            <div class="popup-booking-links">
-                <div class="booking-section">
-                    <span class="booking-label">🏨 Stay</span>
-                    <div class="booking-buttons">
-                        <a href="${bookingUrl}" target="_blank" rel="noopener" class="booking-btn">Booking.com</a>
-                        <a href="${airbnbUrl}" target="_blank" rel="noopener" class="booking-btn">Airbnb</a>
-                    </div>
+        flightLinksHtml = `
+            <div class="booking-row">
+                <span class="booking-row-label">✈️ Flights</span>
+                <div class="booking-row-links">
+                    <a href="${googleFlightsUrl}" target="_blank" rel="noopener" class="booking-link">Google Flights</a>
+                    <a href="${kayakUrl}" target="_blank" rel="noopener" class="booking-link">Kayak</a>
                 </div>
             </div>
         `;
     }
 
+    const bookingDrawerHtml = `
+        <div class="booking-drawer">
+            <button class="booking-drawer-toggle" onclick="this.parentElement.classList.toggle('open')">
+                <span>📋 Book This Trip</span>
+                <span class="drawer-arrow">▼</span>
+            </button>
+            <div class="booking-drawer-content">
+                ${flightLinksHtml}
+                <div class="booking-row">
+                    <span class="booking-row-label">🏨 Accommodation</span>
+                    <div class="booking-row-links">
+                        <a href="${bookingUrl}" target="_blank" rel="noopener" class="booking-link">Booking.com</a>
+                        <a href="${airbnbUrl}" target="_blank" rel="noopener" class="booking-link">Airbnb</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Cost breakdown - cleaner inline format
+    const transportLabel = costs.transportType === 'drive' ? 'Gas' : 'Flights';
+    const costBreakdown = `
+        <div class="cost-breakdown">
+            <div class="cost-line"><span>${transportIcon} ${transportLabel}</span><span>$${costs.transport}</span></div>
+            <div class="cost-line"><span>🏨 ${nights} nights</span><span>$${costs.accommodation}</span></div>
+            <div class="cost-line"><span>🍽️ Food & drinks</span><span>$${costs.food}</span></div>
+            <div class="cost-line"><span>🎯 Activities</span><span>$${costs.activities}</span></div>
+        </div>
+    `;
+
     return `
-        <div class="popup-content">
+        <div class="popup-content popup-redesign">
             ${heroHtml}
 
             <div class="popup-body">
-                ${highlightsHtml}
+                <div class="popup-header-row">
+                    ${touristScoreHtml}
+                    <span class="info-badge">${transportIcon} ${travelTimeStr}</span>
+                    ${weatherBadge}
+                    ${seasonBadge}
+                    ${advisoryBadge}
+                </div>
 
                 <p class="popup-description">${description}</p>
 
-                <div class="popup-tags">
-                    ${seasonTag}
-                    <span class="popup-tag">⏱️ ${travelTimeStr}</span>
-                    ${advisoryTag}
+                ${highlightsHtml}
+
+                ${costBreakdown}
+
+                ${currencyBadge ? `<div class="popup-currency">${currencyBadge}</div>` : ''}
+
+                ${bookingDrawerHtml}
+            </div>
+
+            <div class="popup-footer">
+                <div class="popup-footer-left">
+                    <div class="footer-total-label">Estimated Total</div>
+                    <div class="footer-breakdown">${travelers} traveler${travelers > 1 ? 's' : ''} · ${nights} nights</div>
                 </div>
-
-                ${weatherHtml}
-
-                <div class="popup-costs-row">
-                    <div class="popup-cost-item">
-                        <span class="cost-icon">${transportIcon}</span>
-                        <span class="cost-value">$${costs.transport}</span>
-                        <span class="cost-label">${transportLabel}</span>
-                    </div>
-                    <div class="popup-cost-item">
-                        <span class="cost-icon">🏨</span>
-                        <span class="cost-value">$${costs.accommodation}</span>
-                        <span class="cost-label">${nights}n</span>
-                    </div>
-                    <div class="popup-cost-item">
-                        <span class="cost-icon">🍽️</span>
-                        <span class="cost-value">$${costs.food}</span>
-                        <span class="cost-label">Food</span>
-                    </div>
-                    <div class="popup-cost-item">
-                        <span class="cost-icon">🎯</span>
-                        <span class="cost-value">$${costs.activities}</span>
-                        <span class="cost-label">Activities</span>
-                    </div>
-                    <div class="popup-cost-item total">
-                        <span class="cost-value">$${costs.total.toLocaleString()}</span>
-                        <span class="cost-label">Total</span>
-                    </div>
+                <div class="popup-footer-right">
+                    <div class="footer-total">$${costs.total.toLocaleString()}</div>
+                    <div class="footer-perday">$${costs.perDay}/day</div>
                 </div>
-
-                ${currencyHtml}
-
-                ${bookingLinksHtml}
             </div>
         </div>
     `;
