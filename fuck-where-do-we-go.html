@@ -560,6 +560,151 @@
             opacity: 0.8;
         }
 
+        /* Tier 1: Large prominent markers */
+        .marker-tier1 {
+            min-width: 95px;
+            padding: 8px 14px;
+            border-width: 3px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .marker-tier1 .marker-city {
+            font-size: 14px;
+            max-width: 100px;
+        }
+
+        .marker-tier1 .marker-price {
+            font-size: 18px;
+        }
+
+        .marker-tier1 .marker-details {
+            font-size: 11px;
+        }
+
+        /* Tier 2: Medium markers */
+        .marker-tier2 {
+            min-width: 70px;
+            padding: 5px 10px;
+        }
+
+        .marker-tier2 .marker-city {
+            font-size: 11px;
+            max-width: 80px;
+        }
+
+        .marker-tier2 .marker-price {
+            font-size: 14px;
+        }
+
+        .marker-tier2 .marker-details {
+            font-size: 9px;
+        }
+
+        /* Tier 3: Dot markers */
+        .marker-dot-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .marker-dot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 45px;
+            padding: 4px 8px;
+            background: rgba(30, 30, 30, 0.9);
+            border: 2px solid;
+            border-radius: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .marker-dot:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .marker-dot .dot-price {
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .marker-dot.marker-cheap {
+            border-color: #4CAF50;
+        }
+
+        .marker-dot.marker-cheap .dot-price {
+            color: #4CAF50;
+        }
+
+        .marker-dot.marker-moderate {
+            border-color: #FF9800;
+        }
+
+        .marker-dot.marker-moderate .dot-price {
+            color: #FF9800;
+        }
+
+        .marker-dot.marker-expensive {
+            border-color: #f44336;
+        }
+
+        .marker-dot.marker-expensive .dot-price {
+            color: #f44336;
+        }
+
+        /* Minimal popup for tier 3 */
+        .popup-minimal {
+            padding: 16px;
+            color: #fff;
+        }
+
+        .popup-minimal-header {
+            margin-bottom: 12px;
+        }
+
+        .popup-minimal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+            color: #fff;
+        }
+
+        .popup-minimal-region {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .popup-minimal-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .popup-minimal-badge {
+            background: #404040;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        .popup-minimal-price {
+            font-size: 22px;
+            font-weight: 700;
+            color: #4CAF50;
+        }
+
+        .popup-minimal-perday {
+            font-size: 12px;
+            color: #888;
+            text-align: right;
+        }
+
         /* Home marker */
         .home-marker {
             font-size: 24px;
@@ -1526,7 +1671,7 @@
     <div class="container">
         <aside class="sidebar">
             <h1 class="logo">✈️ Fuck, where do we go?</h1>
-            <p class="tagline">Find places to go for a short break, in short order <span class="version">v1.18.0</span></p>
+            <p class="tagline">Find places to go for a short break, in short order <span class="version">v1.19.0</span></p>
 
             <!-- Step 1: Trip Details -->
             <div class="step-section always-on" id="step1">
