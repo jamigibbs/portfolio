@@ -6,12 +6,14 @@ let map;
 let markers = [];
 let destinationsData = [];
 let selectedHomeCity = null;
-let travelMode = 'drive';
+let travelMode = 'drive'; // 'drive' or 'fly' (no more 'both')
+let plannerTab = 'drive'; // Active planner tab
 let dateType = 'specific';
 let travelRadiusLayer = null; // For visualizing travel radius on map
 let homeMarker = null; // Marker for home city
 let selectedMonths = [];
-let maxTravelTime = 3; // hours
+let maxDriveTime = 3; // hours for driving
+let maxFlightTime = 4; // hours for flying
 let hasSearched = false;
 let lastSearchBounds = null;
 
@@ -2957,7 +2959,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initDatePickers();
     initAutocomplete();
     initMonthSelector();
-    initTravelTimeSelector();
+    initPlannerTabs();
     initSearchTriggers();
 
     // Wrap in try-catch to prevent breaking initialization
@@ -2967,6 +2969,36 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('API status update failed:', e);
     }
 });
+
+// Initialize planner tabs and their associated controls
+function initPlannerTabs() {
+    // Set initial state - drive tab active
+    const driveOptions = document.querySelector('.drive-options');
+    const flyOptions = document.querySelector('.fly-options');
+
+    if (driveOptions) driveOptions.classList.add('active');
+    if (flyOptions) flyOptions.classList.remove('active');
+
+    // Initialize time displays
+    const driveTimeDisplay = document.getElementById('driveTimeDisplay');
+    const flightTimeDisplay = document.getElementById('flightTimeDisplay');
+    const driveTimeInput = document.getElementById('maxDriveTime');
+    const flightTimeInput = document.getElementById('maxFlightTime');
+
+    if (driveTimeDisplay && driveTimeInput) {
+        const driveHours = parseInt(driveTimeInput.value) || 3;
+        driveTimeDisplay.textContent = `${driveHours} hr${driveHours !== 1 ? 's' : ''}`;
+    }
+
+    if (flightTimeDisplay && flightTimeInput) {
+        const flightHours = parseInt(flightTimeInput.value) || 4;
+        flightTimeDisplay.textContent = `${flightHours} hr${flightHours !== 1 ? 's' : ''}`;
+    }
+
+    // Update info displays
+    updateDriveTimeInfo();
+    updateFlightTimeInfo();
+}
 
 // Track if user has made changes since last search
 let searchParamsChanged = false;
@@ -2982,7 +3014,8 @@ function initSearchTriggers() {
         'accommodationType',
         'budgetMin',
         'budgetMax',
-        'maxTravelTime'
+        'maxDriveTime',
+        'maxFlightTime'
     ];
 
     // Debounced auto-search function
@@ -3010,8 +3043,8 @@ function initSearchTriggers() {
         }
     });
 
-    // Travel mode buttons
-    document.querySelectorAll('.travel-mode-btn').forEach(btn => {
+    // Planner tab buttons
+    document.querySelectorAll('.planner-tab').forEach(btn => {
         btn.addEventListener('click', () => {
             if (hasSearched) {
                 searchParamsChanged = true;
@@ -3186,37 +3219,58 @@ function toggleMonth(btn, monthIndex) {
 }
 
 // Initialize travel time selector
+// Legacy function - kept for backwards compatibility but now a no-op
+// Time selection is now handled by initPlannerTabs
 function initTravelTimeSelector() {
-    const select = document.getElementById('maxTravelTime');
-    select.addEventListener('change', () => {
-        updateTravelTimeInfo();
-        // Auto-search when travel time changes (if home city is selected)
-        if (selectedHomeCity) {
-            searchDestinations();
-        }
-    });
-    updateTravelTimeInfo(); // Set initial info
+    // No-op - time selection now handled by planner tabs
 }
 
-// Adjust travel time with stepper buttons
+// Adjust drive time with stepper buttons (for Driving Planner)
 function adjustTravelTime(delta) {
-    const input = document.getElementById('maxTravelTime');
-    const display = document.getElementById('travelTimeDisplay');
-    let currentValue = parseInt(input.value) || 0;
+    const input = document.getElementById('maxDriveTime');
+    const display = document.getElementById('driveTimeDisplay');
+    if (!input || !display) return;
 
-    // Increment by 1 hour, min 0, max 24
-    currentValue = Math.max(0, Math.min(24, currentValue + delta));
+    let currentValue = parseInt(input.value) || 3;
+
+    // Increment by 1 hour, min 1, max 8 (practical driving limit)
+    currentValue = Math.max(1, Math.min(8, currentValue + delta));
     input.value = currentValue;
+    maxDriveTime = currentValue;
 
     // Update display text
-    if (currentValue === 0) {
-        display.textContent = 'Any';
-    } else {
-        display.textContent = `${currentValue} hr${currentValue !== 1 ? 's' : ''}`;
-    }
+    display.textContent = `${currentValue} hr${currentValue !== 1 ? 's' : ''}`;
 
-    // Trigger the travel time info update and auto-search
-    updateTravelTimeInfo();
+    // Update info text
+    updateDriveTimeInfo();
+
+    // Debounced auto-search
+    if (selectedHomeCity && hasSearched) {
+        clearTimeout(window.travelTimeSearchTimeout);
+        window.travelTimeSearchTimeout = setTimeout(() => {
+            searchDestinations();
+        }, 500);
+    }
+}
+
+// Adjust flight time with stepper buttons (for Flying Planner)
+function adjustFlightTime(delta) {
+    const input = document.getElementById('maxFlightTime');
+    const display = document.getElementById('flightTimeDisplay');
+    if (!input || !display) return;
+
+    let currentValue = parseInt(input.value) || 4;
+
+    // Increment by 1 hour, min 1, max 16 (longest practical flight)
+    currentValue = Math.max(1, Math.min(16, currentValue + delta));
+    input.value = currentValue;
+    maxFlightTime = currentValue;
+
+    // Update display text
+    display.textContent = `${currentValue} hr${currentValue !== 1 ? 's' : ''}`;
+
+    // Update info text
+    updateFlightTimeInfo();
 
     // Debounced auto-search
     if (selectedHomeCity && hasSearched) {
@@ -3249,46 +3303,56 @@ function adjustTripDuration(delta) {
     }
 }
 
-// Update travel time info display
-function updateTravelTimeInfo() {
-    const hours = parseInt(document.getElementById('maxTravelTime').value) || 0;
-    maxTravelTime = hours;
+// Update drive time info display
+function updateDriveTimeInfo() {
+    const hours = parseInt(document.getElementById('maxDriveTime')?.value) || maxDriveTime;
+    maxDriveTime = hours;
 
-    // Also update the stepper display in case called from elsewhere
-    const display = document.getElementById('travelTimeDisplay');
-    if (display) {
-        display.textContent = hours === 0 ? 'Any' : `${hours} hr${hours !== 1 ? 's' : ''}`;
-    }
+    const infoEl = document.getElementById('driveTimeInfo');
+    if (!infoEl) return;
 
-    const infoEl = document.getElementById('travelTimeInfo');
-
-    if (hours === 0) {
-        infoEl.textContent = '🌍 Showing all destinations worldwide';
-    } else if (!selectedHomeCity) {
-        infoEl.textContent = '📍 Select your home city to see travel radius';
+    if (!selectedHomeCity) {
+        infoEl.textContent = 'Select your city to see reachable destinations';
     } else {
-        // Calculate actual radius based on selected time
-        // Using updated formula: 50 mph base + 15 min per 100 mi for longer trips
-        let driveMiles;
-        if (hours <= 4) {
-            driveMiles = Math.round(hours * 50);
-        } else {
-            // For longer trips, account for stops: solve hours = distance/50 + (distance/100)*0.25
-            // hours = distance * (1/50 + 0.0025) = distance * 0.0225
-            driveMiles = Math.round(hours / 0.0225);
-        }
-        const flyMiles = Math.round((hours - 3) * 500); // 500 mph minus 3h airport time
-
-        if (hours <= 3) {
-            infoEl.textContent = `🚗 Up to ~${driveMiles.toLocaleString()} mi drive from ${selectedHomeCity.city}`;
-        } else {
-            infoEl.textContent = `🚗 ~${driveMiles.toLocaleString()} mi drive or ✈️ ~${flyMiles.toLocaleString()} mi flight from ${selectedHomeCity.city}`;
-        }
+        // Calculate drive radius
+        const driveMiles = Math.round(hours * 55); // ~55 mph average
+        infoEl.textContent = `Destinations within ~${driveMiles.toLocaleString()} miles of ${selectedHomeCity.city}`;
     }
 
-    // Auto-zoom the map if home city is selected
-    if (selectedHomeCity && hours > 0) {
+    // Auto-zoom the map if home city is selected and in drive mode
+    if (selectedHomeCity && plannerTab === 'drive') {
         autoZoomToTravelRadius(hours);
+    }
+}
+
+// Update flight time info display
+function updateFlightTimeInfo() {
+    const hours = parseInt(document.getElementById('maxFlightTime')?.value) || maxFlightTime;
+    maxFlightTime = hours;
+
+    const infoEl = document.getElementById('flightTimeInfo');
+    if (!infoEl) return;
+
+    if (!selectedHomeCity) {
+        infoEl.textContent = 'Select your city to see flight destinations';
+    } else {
+        // Calculate flight radius (500 mph cruise speed)
+        const flyMiles = Math.round(hours * 500);
+        infoEl.textContent = `~${flyMiles.toLocaleString()} mile range from ${selectedHomeCity.city}`;
+    }
+
+    // Auto-zoom the map if home city is selected and in fly mode
+    if (selectedHomeCity && plannerTab === 'fly') {
+        autoZoomToTravelRadius(hours);
+    }
+}
+
+// Legacy function for backward compatibility
+function updateTravelTimeInfo() {
+    if (plannerTab === 'drive') {
+        updateDriveTimeInfo();
+    } else {
+        updateFlightTimeInfo();
     }
 }
 
@@ -3492,10 +3556,11 @@ function selectHomeCity(item) {
     document.getElementById('homeCityResults').classList.remove('show');
 
     // Update travel time info with new home city
-    updateTravelTimeInfo();
+    updateDriveTimeInfo();
+    updateFlightTimeInfo();
 
     // If travel time is set, auto-zoom; otherwise just center on home city
-    const hours = parseInt(document.getElementById('maxTravelTime').value) || 0;
+    const hours = getMaxTravelHours();
     if (hours > 0) {
         autoZoomToTravelRadius(hours);
     } else {
@@ -3510,10 +3575,13 @@ function selectHomeCity(item) {
 function autoZoomToTravelRadius(hours) {
     if (!selectedHomeCity) return;
 
-    // Calculate approximate radius in miles
-    const driveRadius = hours * 55; // 55 mph average
-    const flyRadius = hours > 3 ? (hours - 3) * 500 : 0; // 500 mph minus airport time
-    const maxRadius = Math.max(driveRadius, flyRadius);
+    // Calculate approximate radius based on active planner tab
+    let maxRadius;
+    if (plannerTab === 'drive') {
+        maxRadius = hours * 55; // 55 mph average for driving
+    } else {
+        maxRadius = hours * 500; // 500 mph for flights
+    }
 
     // Remove existing radius layer if any
     if (travelRadiusLayer) {
@@ -3536,13 +3604,14 @@ function autoZoomToTravelRadius(hours) {
     }).addTo(map);
     homeMarker.bindPopup(`<b>Your location</b><br>${selectedHomeCity.city}, ${selectedHomeCity.state || selectedHomeCity.country}`);
 
-    // Create travel radius visualization based on selected travel mode
+    // Create travel radius visualization based on active planner tab
     const layers = [];
 
     if (hours > 0) {
-        // Flight radius - only show for 'fly' or 'both' modes
-        if ((travelMode === 'fly' || travelMode === 'both') && flyRadius > 0) {
-            const flyRadiusMeters = flyRadius * 1609.34;
+        // Show radius based on active planner
+        if (plannerTab === 'fly') {
+            // Flight radius - dashed blue circle
+            const flyRadiusMeters = maxRadius * 1609.34;
             layers.push(L.circle([selectedHomeCity.lat, selectedHomeCity.lon], {
                 radius: flyRadiusMeters,
                 color: '#00d4ff',
@@ -3553,9 +3622,9 @@ function autoZoomToTravelRadius(hours) {
             }));
         }
 
-        // Drive radius - only show for 'drive' or 'both' modes
-        if ((travelMode === 'drive' || travelMode === 'both') && driveRadius > 0) {
-            const driveRadiusMeters = driveRadius * 1609.34;
+        // Drive radius - show for drive mode (isochrone will be displayed separately)
+        if (plannerTab === 'drive') {
+            const driveRadiusMeters = maxRadius * 1609.34;
             layers.push(L.circle([selectedHomeCity.lat, selectedHomeCity.lon], {
                 radius: driveRadiusMeters,
                 color: '#FF9800',
@@ -3584,20 +3653,46 @@ function autoZoomToTravelRadius(hours) {
 }
 
 // UI state functions
-function setTravelMode(mode) {
-    travelMode = mode;
-    document.querySelectorAll('.travel-mode-btn').forEach(btn => {
+function switchPlannerTab(mode) {
+    plannerTab = mode;
+    travelMode = mode; // Sync travel mode with planner tab
+
+    // Update tab UI
+    document.querySelectorAll('.planner-tab').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.mode === mode);
     });
 
-    // Update radius visualization when travel mode changes
+    // Toggle planner-specific options
+    document.querySelectorAll('.planner-options').forEach(el => {
+        el.classList.remove('active');
+    });
+    const optionsEl = document.querySelector(`.${mode}-options`);
+    if (optionsEl) {
+        optionsEl.classList.add('active');
+    }
+
+    // Update radius visualization when planner changes
     if (selectedHomeCity) {
-        const hours = parseInt(document.getElementById('maxTravelTime').value) || 0;
+        const hours = getMaxTravelHours();
         if (hours > 0) {
             autoZoomToTravelRadius(hours);
         }
-        // Auto-search when travel mode changes
+        // Auto-search when planner changes
         searchDestinations();
+    }
+}
+
+// Legacy function for backwards compatibility
+function setTravelMode(mode) {
+    switchPlannerTab(mode);
+}
+
+// Get the max travel hours based on active planner tab
+function getMaxTravelHours() {
+    if (plannerTab === 'drive') {
+        return parseInt(document.getElementById('maxDriveTime')?.value) || maxDriveTime;
+    } else {
+        return parseInt(document.getElementById('maxFlightTime')?.value) || maxFlightTime;
     }
 }
 
@@ -3654,7 +3749,9 @@ async function searchDestinations(searchInArea = false) {
     const accommodationType = document.getElementById('accommodationType').value;
     const budgetMin = parseInt(document.getElementById('budgetMin').value) || 0;
     const budgetMax = parseInt(document.getElementById('budgetMax').value) || Infinity;
-    const maxHours = parseInt(document.getElementById('maxTravelTime').value) || 0;
+
+    // Get max hours based on active planner tab
+    const maxHours = getMaxTravelHours();
 
     // Get current map bounds if searching in area
     const mapBounds = searchInArea ? map.getBounds() : null;
@@ -3692,19 +3789,13 @@ async function searchDestinations(searchInArea = false) {
                 };
             } else {
                 // Calculate bounds based on travel radius from home city
-                // Use appropriate speed based on travel mode
+                // Use appropriate speed based on active planner tab
                 let maxDistance;
-                if (maxHours === 0) {
-                    maxDistance = 12000; // "Any distance" - worldwide
-                } else if (travelMode === 'drive') {
+                if (plannerTab === 'drive') {
                     maxDistance = maxHours * 60; // ~60 mph for driving bounds
-                } else if (travelMode === 'fly') {
-                    maxDistance = (maxHours - 3) * 500 + 500; // Flight speed minus airport time
                 } else {
-                    // "Both" mode - use larger of the two
-                    const driveDistance = maxHours * 60;
-                    const flyDistance = maxHours > 3 ? (maxHours - 3) * 500 + 500 : 500;
-                    maxDistance = Math.max(driveDistance, flyDistance);
+                    // Flying planner - use flight speed
+                    maxDistance = maxHours * 500; // ~500 mph cruising speed
                 }
                 const latOffset = maxDistance / 69; // ~69 miles per degree of latitude
                 const lonOffset = maxDistance / (69 * Math.cos(selectedHomeCity.lat * Math.PI / 180));
@@ -3743,13 +3834,14 @@ async function searchDestinations(searchInArea = false) {
         const ukDests = allDestinations.filter(d => d.country === 'UK' || d.country === 'United Kingdom');
         console.log('UK destinations found:', ukDests.length, ukDests.slice(0, 3).map(d => d.city));
 
-        // Fetch isochrone for drive mode - this gives us accurate reachable area
+        // Fetch isochrone ONLY for driving planner - this gives us accurate reachable area
         // TravelTime API supports up to 4 hours
         let isochroneData = null;
         const MAX_ISOCHRONE_HOURS = 4; // TravelTime supports up to 4 hours
-        if ((travelMode === 'drive' || travelMode === 'both') && maxHours > 0 && API_KEYS.travelTime && API_KEYS.travelTime.appId) {
+
+        if (plannerTab === 'drive' && maxHours > 0 && API_KEYS.travelTime && API_KEYS.travelTime.appId) {
             const isochroneHours = Math.min(maxHours, MAX_ISOCHRONE_HOURS);
-            console.log('Fetching driving isochrone for', isochroneHours, 'hour(s)...', maxHours > MAX_ISOCHRONE_HOURS ? `(capped from ${maxHours}h due to API limit)` : '');
+            console.log('Driving Planner: Fetching isochrone for', isochroneHours, 'hour(s)...', maxHours > MAX_ISOCHRONE_HOURS ? `(capped from ${maxHours}h due to API limit)` : '');
             const timeSeconds = isochroneHours * 3600; // Convert hours to seconds
             isochroneData = await fetchDrivingIsochrone(selectedHomeCity.lat, selectedHomeCity.lon, timeSeconds);
             if (isochroneData) {
@@ -3823,15 +3915,19 @@ async function searchDestinations(searchInArea = false) {
                 effectiveType = distance <= DRIVE_THRESHOLD ? 'drive' : 'fly';
             }
 
-            // Filter by travel mode preference
-            if (travelMode === 'fly' && effectiveType === 'drive') {
+            // Filter by active planner tab
+            // Driving Planner: Only show drivable destinations
+            // Flying Planner: Only show flyable destinations (too far to drive or requires water crossing)
+            if (plannerTab === 'fly' && effectiveType === 'drive') {
+                // Flying planner - skip drivable destinations
                 filterStats.modeFilter++;
-                if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = 'modeFilter (drive in fly mode)';
+                if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = 'modeFilter (drivable in flying planner)';
                 continue;
             }
-            if (travelMode === 'drive' && effectiveType === 'fly') {
+            if (plannerTab === 'drive' && effectiveType === 'fly') {
+                // Driving planner - skip non-drivable destinations
                 filterStats.modeFilter++;
-                if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = `modeFilter (effectiveType=${effectiveType}, canDrive=${canDrive})`;
+                if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = `modeFilter (not drivable: canDrive=${canDrive})`;
                 continue;
             }
 
@@ -3842,24 +3938,33 @@ async function searchDestinations(searchInArea = false) {
             // Use generous estimate (faster speed) to avoid filtering out reachable destinations
             const roughTravelTime = calculateTravelTime(selectedHomeCity, destWithType, distance);
 
-            // For drive mode with valid isochrone (not capped), use the accurate polygon for filtering
-            const useIsochroneFilter = effectiveType === 'drive' && isochroneData && isochroneData.polygon && maxHours <= MAX_ISOCHRONE_HOURS;
-            if (useIsochroneFilter) {
-                const inIsochrone = isPointInIsochrone(dest.lat, dest.lon, isochroneData.polygon);
-                if (isUK) {
-                    console.log(`UK isochrone check: ${dest.city} at (${dest.lat}, ${dest.lon}) - inIsochrone: ${inIsochrone}`);
+            // Driving Planner: Use isochrone for accurate filtering (if available)
+            // Flying Planner: Use distance-based filtering
+            if (plannerTab === 'drive') {
+                const useIsochroneFilter = isochroneData && isochroneData.polygon && maxHours <= MAX_ISOCHRONE_HOURS;
+                if (useIsochroneFilter) {
+                    const inIsochrone = isPointInIsochrone(dest.lat, dest.lon, isochroneData.polygon);
+                    if (isUK) {
+                        console.log(`UK isochrone check: ${dest.city} at (${dest.lat}, ${dest.lon}) - inIsochrone: ${inIsochrone}`);
+                    }
+                    if (!inIsochrone) {
+                        filterStats.isochroneFilter++;
+                        if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = 'isochroneFilter (outside drivable area)';
+                        continue;
+                    }
+                } else if (maxHours > 0) {
+                    // Fallback to time-based filter when no isochrone or isochrone was capped
+                    if (roughTravelTime > maxHours * 1.3) {
+                        filterStats.timeFilter++;
+                        if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = `timeFilter (${roughTravelTime.toFixed(1)}h > ${(maxHours * 1.3).toFixed(1)}h)`;
+                        continue;
+                    }
                 }
-                if (!inIsochrone) {
-                    filterStats.isochroneFilter++;
-                    if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = 'isochroneFilter (outside drivable area)';
-                    continue;
-                }
-            } else if (maxHours > 0) {
-                // Fallback to time-based filter when no isochrone or isochrone was capped
-                const filterBuffer = effectiveType === 'drive' ? 1.3 : 1.0;
-                if (roughTravelTime > maxHours * filterBuffer) {
+            } else {
+                // Flying Planner: Use simple distance/time-based filtering
+                if (maxHours > 0 && roughTravelTime > maxHours) {
                     filterStats.timeFilter++;
-                    if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = `timeFilter (${roughTravelTime.toFixed(1)}h > ${(maxHours * filterBuffer).toFixed(1)}h)`;
+                    if (isUK) ukFilterDebug[ukFilterDebug.length - 1].filteredBy = `timeFilter (${roughTravelTime.toFixed(1)}h > ${maxHours}h)`;
                     continue;
                 }
             }
@@ -4358,10 +4463,10 @@ function createPopupContent(dest, travelers, nights, tier = 1) {
     const placeholderUrl = 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=600&h=300&fit=crop';
 
     // Hero section with image
-    // Tier 1: Use real image or placeholder
-    // Tier 2: Always use placeholder
-    const imageUrl = tier === 1 ? (dest.image?.url || placeholderUrl) : placeholderUrl;
-    const imageCredit = (tier === 1 && dest.image?.credit)
+    // Tier 1 & Tier 2: Use real Wikipedia image (with placeholder fallback)
+    // This makes destination cards more visually engaging
+    const imageUrl = dest.image?.url || placeholderUrl;
+    const imageCredit = dest.image?.credit
         ? `<div class="popup-hero-credit"><a href="${dest.image.credit.link}" target="_blank" rel="noopener">📷 ${dest.image.credit.name}</a></div>`
         : '';
 
