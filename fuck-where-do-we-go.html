@@ -248,13 +248,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 12px 16px;
+            gap: 6px;
+            padding: 10px 8px;
             background: transparent;
             border: none;
             border-radius: 8px;
             color: #888;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
@@ -270,8 +270,12 @@
             color: #fff;
         }
 
+        .planner-tab[data-mode="roadtrip"].active {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+        }
+
         .planner-tab .tab-icon {
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .planner-tab .tab-label {
@@ -1543,12 +1547,12 @@
             }
 
             .planner-tab {
-                padding: 10px 12px;
-                font-size: 13px;
+                padding: 9px 6px;
+                font-size: 12px;
             }
 
             .planner-tab .tab-icon {
-                font-size: 16px;
+                font-size: 15px;
             }
 
             /* Stack travelers row on mobile */
@@ -1629,12 +1633,16 @@
             }
 
             .planner-tab .tab-label {
-                font-size: 12px;
+                display: none;
             }
 
             .planner-tab {
-                gap: 4px;
-                padding: 8px 10px;
+                gap: 0;
+                padding: 10px 4px;
+            }
+
+            .planner-tab .tab-icon {
+                font-size: 18px;
             }
 
             .step-number {
@@ -1854,35 +1862,40 @@
             text-decoration: underline;
         }
 
-        /* Road Trip Generator */
-        .roadtrip-section {
-            margin-top: 16px;
-            border-top: 1px solid #404040;
-            padding-top: 14px;
-        }
-
-        .roadtrip-section-label {
-            font-size: 11px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
+        /* Road Trip Planner */
+        .roadtrip-home-display {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            background: #363636;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            font-size: 13px;
+            color: #ccc;
+        }
+
+        .roadtrip-home-icon {
+            font-size: 16px;
+        }
+
+        .label-optional {
+            font-size: 11px;
+            color: #666;
+            font-weight: 400;
         }
 
         .btn-roadtrip {
             width: 100%;
-            padding: 12px;
+            padding: 13px;
             background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
             border: none;
             border-radius: 8px;
             color: #fff;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 12px;
+            margin-top: 14px;
             transition: opacity 0.2s, transform 0.1s;
             display: flex;
             align-items: center;
@@ -1898,33 +1911,31 @@
             transform: scale(0.98);
         }
 
-        /* Road trip results panel */
-        .roadtrip-results {
-            background: #363636;
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 16px;
+        /* Road trip timeline (day-by-day results) */
+        .roadtrip-timeline {
+            margin-top: 18px;
             display: none;
         }
 
-        .roadtrip-results.show {
+        .roadtrip-timeline.show {
             display: block;
         }
 
-        .roadtrip-results-header {
+        .roadtrip-timeline-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
 
-        .roadtrip-results-title {
-            font-weight: 600;
+        .roadtrip-timeline-title {
+            font-weight: 700;
             color: #FF9800;
             font-size: 14px;
+            letter-spacing: 0.3px;
         }
 
-        .roadtrip-close {
+        .roadtrip-timeline-close {
             background: #404040;
             border: none;
             color: #888;
@@ -1939,117 +1950,126 @@
             transition: background 0.2s;
         }
 
-        .roadtrip-close:hover {
+        .roadtrip-timeline-close:hover {
             background: #f44336;
             color: #fff;
         }
 
-        .roadtrip-stop {
+        .roadtrip-day {
             display: flex;
             gap: 12px;
             align-items: flex-start;
-            padding: 10px 0;
-            border-bottom: 1px solid #404040;
+            padding: 8px 6px;
+            border-radius: 8px;
             cursor: pointer;
             transition: background 0.15s;
-            border-radius: 6px;
-            padding: 8px;
         }
 
-        .roadtrip-stop:last-child {
-            border-bottom: none;
+        .roadtrip-day:hover {
+            background: #363636;
         }
 
-        .roadtrip-stop:hover {
-            background: #404040;
+        .roadtrip-day-num {
+            font-size: 10px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            min-width: 46px;
+            padding-top: 2px;
         }
 
-        .roadtrip-stop-number {
-            width: 26px;
-            height: 26px;
-            background: #FF9800;
+        .roadtrip-day-icon {
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
-            color: #fff;
             flex-shrink: 0;
-        }
-
-        .roadtrip-stop-number.home {
-            background: #00d4ff;
-            color: #000;
-        }
-
-        .roadtrip-stop-number.destination {
-            background: #4CAF50;
-            color: #000;
-        }
-
-        .roadtrip-stop-number.end {
-            background: #9C27B0;
+            background: #FF9800;
             color: #fff;
         }
 
-        .roadtrip-stop-info {
+        .roadtrip-day-icon.home     { background: #00d4ff; color: #000; }
+        .roadtrip-day-icon.dest     { background: #4CAF50; color: #000; }
+        .roadtrip-day-icon.end      { background: #9C27B0; color: #fff; }
+
+        .roadtrip-day-content {
             flex: 1;
         }
 
-        .roadtrip-stop-city {
+        .roadtrip-day-city {
             font-weight: 600;
             font-size: 14px;
             color: #fff;
         }
 
-        .roadtrip-stop-detail {
+        .roadtrip-day-detail {
             font-size: 12px;
             color: #888;
             margin-top: 2px;
         }
 
-        .roadtrip-stop-price {
+        .roadtrip-day-badge {
+            display: inline-block;
+            font-size: 10px;
+            padding: 1px 5px;
+            border-radius: 4px;
+            margin-left: 5px;
+            vertical-align: middle;
             font-weight: 600;
-            font-size: 14px;
-            color: #4CAF50;
-            flex-shrink: 0;
         }
 
-        .roadtrip-connector {
+        .roadtrip-leg {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 4px 8px;
+            padding: 2px 6px 2px 68px; /* indent past day-num + icon */
+            font-size: 11px;
+            color: #555;
+            position: relative;
+        }
+
+        .roadtrip-leg::before {
+            content: '';
+            position: absolute;
+            left: 57px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: repeating-linear-gradient(to bottom, #444 0, #444 4px, transparent 4px, transparent 8px);
+        }
+
+        .roadtrip-leg-text {
+            background: #2a2a2a;
+            padding: 3px 8px;
+            border-radius: 10px;
             font-size: 11px;
             color: #666;
         }
 
-        .roadtrip-connector-line {
-            flex: 1;
-            height: 1px;
-            background: repeating-linear-gradient(to right, #555 0, #555 4px, transparent 4px, transparent 8px);
-        }
-
-        .roadtrip-total {
-            background: #2d2d2d;
+        .roadtrip-timeline-total {
+            background: #363636;
             border-radius: 8px;
-            padding: 12px;
+            padding: 12px 14px;
             margin-top: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .roadtrip-total-label {
+        .roadtrip-timeline-total-label {
             font-size: 12px;
             color: #888;
         }
 
-        .roadtrip-total-value {
-            font-size: 20px;
+        .roadtrip-timeline-total-value {
+            font-size: 16px;
             font-weight: 700;
-            color: #4CAF50;
+            color: #FF9800;
         }
     </style>
 </head>
@@ -2057,17 +2077,21 @@
     <div class="container">
         <aside class="sidebar">
             <h1 class="logo">Fuck, where do we go?</h1>
-            <p class="tagline">Find places to go for a short break, in short order <span class="version">v1.21.0</span></p>
+            <p class="tagline">Find places to go for a short break, in short order <span class="version">v1.22.0</span></p>
 
             <!-- Planner Mode Tabs -->
             <div class="planner-tabs">
                 <button class="planner-tab active" data-mode="drive" onclick="switchPlannerTab('drive')">
                     <span class="tab-icon">🚗</span>
-                    <span class="tab-label">Driving Planner</span>
+                    <span class="tab-label">Driving</span>
                 </button>
                 <button class="planner-tab" data-mode="fly" onclick="switchPlannerTab('fly')">
                     <span class="tab-icon">✈️</span>
-                    <span class="tab-label">Flying Planner</span>
+                    <span class="tab-label">Flying</span>
+                </button>
+                <button class="planner-tab" data-mode="roadtrip" onclick="switchPlannerTab('roadtrip')">
+                    <span class="tab-icon">🗺️</span>
+                    <span class="tab-label">Road Trip</span>
                 </button>
             </div>
 
@@ -2122,33 +2146,6 @@
                         <div class="info-box travel-time-info">
                             <span id="driveTimeInfo">Shows destinations within 3-hour drive</span>
                         </div>
-
-                        <!-- Road Trip Generator -->
-                        <div class="roadtrip-section">
-                            <div class="roadtrip-section-label">🗺️ Road Trip Generator</div>
-                            <label>Destination city</label>
-                            <div class="autocomplete-container">
-                                <input type="text" id="roadtripDestination" placeholder="e.g., Nashville, TN">
-                                <div class="autocomplete-results" id="roadtripDestResults"></div>
-                            </div>
-                            <label>End city (optional — for A→B trips)</label>
-                            <div class="autocomplete-container">
-                                <input type="text" id="roadtripEndCity" placeholder="Leave blank for out-and-back">
-                                <div class="autocomplete-results" id="roadtripEndResults"></div>
-                            </div>
-                            <label>Road trip duration (days)</label>
-                            <div class="stepper-control">
-                                <button type="button" class="stepper-btn" onclick="adjustRoadTripDays(-1)">−</button>
-                                <div class="stepper-value">
-                                    <span id="roadtripDaysDisplay">5 days</span>
-                                    <input type="hidden" id="roadtripDays" value="5">
-                                </div>
-                                <button type="button" class="stepper-btn" onclick="adjustRoadTripDays(1)">+</button>
-                            </div>
-                            <button class="btn-roadtrip" onclick="generateRoadTrip()">
-                                🗺️ Generate Road Trip
-                            </button>
-                        </div>
                     </div>
 
                     <!-- Flying Planner Options -->
@@ -2165,6 +2162,43 @@
                         <div class="info-box travel-time-info">
                             <span id="flightTimeInfo">~2000 mi range from your city</span>
                         </div>
+                    </div>
+
+                    <!-- Road Trip Planner Options -->
+                    <div class="planner-options roadtrip-options">
+                        <div class="roadtrip-home-display" id="roadtripHomeDisplay">
+                            <span class="roadtrip-home-icon">🏠</span>
+                            <span id="roadtripHomeLabel">Set your home city above first</span>
+                        </div>
+
+                        <label>Destination city</label>
+                        <div class="autocomplete-container">
+                            <input type="text" id="roadtripDestination" placeholder="e.g., Nashville, TN">
+                            <div class="autocomplete-results" id="roadtripDestResults"></div>
+                        </div>
+
+                        <label>End city <span class="label-optional">(optional — leave blank for out-and-back)</span></label>
+                        <div class="autocomplete-container">
+                            <input type="text" id="roadtripEndCity" placeholder="e.g., Atlanta, GA">
+                            <div class="autocomplete-results" id="roadtripEndResults"></div>
+                        </div>
+
+                        <label>Trip duration</label>
+                        <div class="stepper-control">
+                            <button type="button" class="stepper-btn" onclick="adjustRoadTripDays(-1)">−</button>
+                            <div class="stepper-value">
+                                <span id="roadtripDaysDisplay">7 days</span>
+                                <input type="hidden" id="roadtripDays" value="7">
+                            </div>
+                            <button type="button" class="stepper-btn" onclick="adjustRoadTripDays(1)">+</button>
+                        </div>
+
+                        <button class="btn-roadtrip" onclick="generateRoadTrip()">
+                            🗺️ Generate Road Trip
+                        </button>
+
+                        <!-- Timeline renders here after generation -->
+                        <div class="roadtrip-timeline" id="roadtripTimeline"></div>
                     </div>
                 </div>
             </div>
@@ -2270,19 +2304,6 @@
                         <span>Wikipedia Images</span>
                         <span class="api-badge">Live</span>
                     </div>
-                </div>
-            </div>
-            <!-- Road Trip Results Panel (shown after generating a road trip) -->
-            <div class="roadtrip-results" id="roadtripResults">
-                <div class="roadtrip-results-header">
-                    <div class="roadtrip-results-title">🗺️ Your Road Trip</div>
-                    <button class="roadtrip-close" onclick="clearRoadTripRoute()">✕</button>
-                </div>
-                <div id="roadtripStopsList">
-                    <!-- Stops are injected here by JS -->
-                </div>
-                <div class="roadtrip-total" id="roadtripTotal">
-                    <!-- Total is injected here -->
                 </div>
             </div>
         </aside>

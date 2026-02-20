@@ -3561,6 +3561,7 @@ function selectHomeCity(item) {
     // Update travel time info with new home city
     updateDriveTimeInfo();
     updateFlightTimeInfo();
+    updateRoadTripHomeDisplay();
 
     // If travel time is set, auto-zoom; otherwise just center on home city
     const hours = getMaxTravelHours();
@@ -3657,8 +3658,9 @@ function autoZoomToTravelRadius(hours) {
 
 // UI state functions
 function switchPlannerTab(mode) {
+    const prevTab = plannerTab;
     plannerTab = mode;
-    travelMode = mode; // Sync travel mode with planner tab
+    travelMode = mode === 'roadtrip' ? 'drive' : mode; // roadtrip uses drive routing
 
     // Update tab UI
     document.querySelectorAll('.planner-tab').forEach(btn => {
@@ -3670,18 +3672,51 @@ function switchPlannerTab(mode) {
         el.classList.remove('active');
     });
     const optionsEl = document.querySelector(`.${mode}-options`);
-    if (optionsEl) {
-        optionsEl.classList.add('active');
-    }
+    if (optionsEl) optionsEl.classList.add('active');
 
-    // Update radius visualization when planner changes
-    if (selectedHomeCity) {
-        const hours = getMaxTravelHours();
-        if (hours > 0) {
-            autoZoomToTravelRadius(hours);
+    if (mode === 'roadtrip') {
+        // Entering road trip mode — update the home city display
+        updateRoadTripHomeDisplay();
+
+        // Show nearby destinations on map so user can see what's around
+        if (selectedHomeCity) {
+            travelMode = 'drive';
+            // Use a wide drive radius to populate the map with the dataset
+            searchDestinations();
         }
-        // Auto-search when planner changes
-        searchDestinations();
+
+        // Remove isochrone if present (route planning doesn't use isochrones)
+        if (currentIsochrone) {
+            map.removeLayer(currentIsochrone);
+            currentIsochrone = null;
+        }
+    } else {
+        // Leaving road trip mode — clear the route
+        if (prevTab === 'roadtrip') {
+            clearRoadTripRoute();
+        }
+
+        // Update radius visualization and search
+        if (selectedHomeCity) {
+            const hours = getMaxTravelHours();
+            if (hours > 0) autoZoomToTravelRadius(hours);
+            searchDestinations();
+        }
+    }
+}
+
+// Update the home city label in the road trip options panel
+function updateRoadTripHomeDisplay() {
+    const labelEl = document.getElementById('roadtripHomeLabel');
+    if (!labelEl) return;
+    if (selectedHomeCity) {
+        const parts = [selectedHomeCity.city];
+        if (selectedHomeCity.state) parts.push(selectedHomeCity.state);
+        labelEl.textContent = parts.join(', ');
+        labelEl.style.color = '#fff';
+    } else {
+        labelEl.textContent = 'Set your home city above first';
+        labelEl.style.color = '#888';
     }
 }
 
@@ -3692,7 +3727,7 @@ function setTravelMode(mode) {
 
 // Get the max travel hours based on active planner tab
 function getMaxTravelHours() {
-    if (plannerTab === 'drive') {
+    if (plannerTab === 'drive' || plannerTab === 'roadtrip') {
         return parseInt(document.getElementById('maxDriveTime')?.value) || maxDriveTime;
     } else {
         return parseInt(document.getElementById('maxFlightTime')?.value) || maxFlightTime;
@@ -5014,7 +5049,7 @@ function setupCityAutocomplete(inputId, resultsId, onSelect) {
 // Main road trip generator — reads inputs, finds stops, displays route
 async function generateRoadTrip() {
     if (!selectedHomeCity) {
-        alert('Please select your home city first (Step 1 above).');
+        alert('Please select your home city first — use the "Where are you traveling from?" field above.');
         return;
     }
     if (!roadtripDestCity) {
@@ -5022,7 +5057,7 @@ async function generateRoadTrip() {
         return;
     }
 
-    const totalDays = parseInt(document.getElementById('roadtripDays')?.value) || 5;
+    const totalDays = parseInt(document.getElementById('roadtripDays')?.value) || 7;
     const endCity = roadtripEndCityData || null;
 
     const btn = document.querySelector('.btn-roadtrip');
@@ -5038,6 +5073,11 @@ async function generateRoadTrip() {
             destinationsData
         );
         displayRoadTripRoute(stops, endCity);
+
+        // Also run a regular destination search so the map shows the dataset
+        // around the corridor (user can see what's available near the route)
+        travelMode = 'drive';
+        searchDestinations();
     } catch (err) {
         console.error('Road trip generation failed:', err);
         alert('Could not generate road trip. Please try again.');
@@ -5248,80 +5288,118 @@ function displayRoadTripRoute(stops, endCity) {
 }
 
 // Render the road trip stops list in the sidebar results panel
+// Render the day-by-day timeline inside .roadtrip-timeline
 function renderRoadTripResults(stops, endCity) {
-    const panel    = document.getElementById('roadtripResults');
-    const stopsList = document.getElementById('roadtripStopsList');
-    const totalEl  = document.getElementById('roadtripTotal');
-    if (!panel || !stopsList || !totalEl) return;
+    const timeline = document.getElementById('roadtripTimeline');
+    if (!timeline) return;
 
-    let stopsHtml = '';
+    let html = `
+        <div class="roadtrip-timeline-header">
+            <div class="roadtrip-timeline-title">🗺️ Your Itinerary</div>
+            <button class="roadtrip-timeline-close" onclick="clearRoadTripRoute()">✕</button>
+        </div>`;
+
+    let currentDay = 1;
     let totalNights = 0;
+    let totalDistMiles = 0;
 
     stops.forEach((stop, idx) => {
         const isLast = idx === stops.length - 1;
 
-        let badge = '';
-        if (stop.type === 'home')        badge = '<span style="font-size:10px;background:#00d4ff;color:#000;border-radius:4px;padding:1px 5px;margin-left:4px;">START</span>';
-        else if (stop.type === 'destination') badge = '<span style="font-size:10px;background:#4CAF50;color:#fff;border-radius:4px;padding:1px 5px;margin-left:4px;">DEST</span>';
-        else if (stop.type === 'end')    badge = '<span style="font-size:10px;background:#9C27B0;color:#fff;border-radius:4px;padding:1px 5px;margin-left:4px;">END</span>';
-
-        const nightsText = stop.nights > 0
-            ? `${stop.nights} night${stop.nights !== 1 ? 's' : ''}`
-            : (stop.type === 'home' || stop.type === 'end') ? 'Home base' : '';
-
+        // Compute day label for this stop
+        let dayLabel;
+        if (stop.type === 'home') {
+            dayLabel = 'Day 1';
+            currentDay = 1;
+        } else if (stop.nights > 0) {
+            const startDay = currentDay + 1;
+            const endDay = startDay + stop.nights - 1;
+            dayLabel = startDay === endDay ? `Day ${startDay}` : `Day ${startDay}–${endDay}`;
+            currentDay = endDay;
+        } else {
+            // end city or zero-night arrival
+            currentDay += 1;
+            dayLabel = `Day ${currentDay}`;
+        }
         totalNights += stop.nights || 0;
 
-        const numClass = stop.type === 'home' ? 'home' : stop.type === 'end' ? 'end' : stop.type === 'destination' ? 'destination' : '';
-        const numLabel = stop.type === 'home' ? '🏠' : stop.type === 'destination' ? '★' : stop.type === 'end' ? '🏁' : idx;
+        // Icon class and label
+        let iconClass = '';
+        let iconLabel = '';
+        if (stop.type === 'home')        { iconClass = 'home'; iconLabel = '🏠'; }
+        else if (stop.type === 'destination') { iconClass = 'dest'; iconLabel = '★'; }
+        else if (stop.type === 'end')    { iconClass = 'end';  iconLabel = '🏁'; }
+        else                             { iconClass = '';     iconLabel = String(idx); }
 
-        stopsHtml += `
-            <div class="roadtrip-stop" onclick="map.setView([${stop.lat}, ${stop.lon}], 9)">
-                <div class="roadtrip-stop-number ${numClass}">${numLabel}</div>
-                <div class="roadtrip-stop-info">
-                    <div class="roadtrip-stop-city">${stop.city}${stop.state ? ', ' + stop.state : ''}${badge}</div>
-                    <div class="roadtrip-stop-detail">${nightsText}</div>
+        // Badge
+        let badge = '';
+        if (stop.type === 'destination') badge = `<span class="roadtrip-day-badge" style="background:#4CAF50;color:#000;">DESTINATION</span>`;
+        else if (stop.type === 'end')    badge = `<span class="roadtrip-day-badge" style="background:#9C27B0;color:#fff;">END</span>`;
+
+        // Nights detail
+        let detail = '';
+        if (stop.nights > 0)                              detail = `${stop.nights} night${stop.nights !== 1 ? 's' : ''}`;
+        else if (stop.type === 'home' && !endCity)        detail = 'Depart & return here';
+        else if (stop.type === 'home')                    detail = 'Departure point';
+        else if (stop.type === 'end')                     detail = 'Arrival / end point';
+
+        const cityLine = `${stop.city}${stop.state ? ', ' + stop.state : ''}`;
+
+        html += `
+            <div class="roadtrip-day" onclick="map.setView([${stop.lat}, ${stop.lon}], 9)">
+                <div class="roadtrip-day-num">${dayLabel}</div>
+                <div class="roadtrip-day-icon ${iconClass}">${iconLabel}</div>
+                <div class="roadtrip-day-content">
+                    <div class="roadtrip-day-city">${cityLine}${badge}</div>
+                    ${detail ? `<div class="roadtrip-day-detail">${detail}</div>` : ''}
                 </div>
             </div>`;
 
+        // Leg connector to next stop
         if (!isLast) {
             const nextStop = stops[idx + 1];
             const dist = Math.round(calculateDistance(stop.lat, stop.lon, nextStop.lat, nextStop.lon));
-            stopsHtml += `
-                <div class="roadtrip-connector">
-                    <div class="roadtrip-connector-line">···</div>
-                    <span>~${dist.toLocaleString()} mi drive</span>
+            const driveHrs = (dist / 55).toFixed(1); // ~55 mph avg
+            totalDistMiles += dist;
+            html += `
+                <div class="roadtrip-leg">
+                    <span class="roadtrip-leg-text">↓ ~${dist.toLocaleString()} mi · ~${driveHrs} hrs</span>
                 </div>`;
         }
     });
 
-    stopsList.innerHTML = stopsHtml;
+    // If round trip, add the return leg
+    if (!endCity && stops.length >= 2) {
+        const last = stops[stops.length - 1];
+        const home = stops[0];
+        const returnDist = Math.round(calculateDistance(last.lat, last.lon, home.lat, home.lon));
+        totalDistMiles += returnDist;
+        const returnHrs = (returnDist / 55).toFixed(1);
+        html += `
+            <div class="roadtrip-leg">
+                <span class="roadtrip-leg-text">↩ Return ~${returnDist.toLocaleString()} mi · ~${returnHrs} hrs</span>
+            </div>`;
+    }
 
-    // Compute total driving distance
-    const totalDistMiles = Math.round(
-        stops.reduce((sum, stop, idx) => {
-            if (idx === 0) return 0;
-            return sum + calculateDistance(stops[idx - 1].lat, stops[idx - 1].lon, stop.lat, stop.lon);
-        }, 0)
-    );
+    // Total summary
     const intermediateCount = stops.filter(s => s.type === 'stop').length;
-
-    totalEl.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;">
-            <div>
-                <div class="roadtrip-total-label">${intermediateCount} stop${intermediateCount !== 1 ? 's' : ''} · ${totalNights} nights</div>
-                <div style="font-size:11px;color:#666;margin-top:2px;">~${totalDistMiles.toLocaleString()} mi total driving</div>
+    html += `
+        <div class="roadtrip-timeline-total">
+            <div class="roadtrip-timeline-total-label">
+                ${intermediateCount} stop${intermediateCount !== 1 ? 's' : ''} · ${totalNights} nights
             </div>
-            <div class="roadtrip-total-value">${totalNights}N</div>
+            <div class="roadtrip-timeline-total-value">~${totalDistMiles.toLocaleString()} mi</div>
         </div>`;
 
-    panel.classList.add('show');
+    timeline.innerHTML = html;
+    timeline.classList.add('show');
 
-    // Scroll sidebar to show the results
+    // Scroll sidebar down to show the timeline
     const sidebar = document.querySelector('.sidebar');
     if (sidebar) sidebar.scrollTop = sidebar.scrollHeight;
 }
 
-// Remove road trip route from map and hide the results panel
+// Remove road trip route from map and clear the inline timeline
 function clearRoadTripRoute() {
     if (roadtripRouteLayer) {
         map.removeLayer(roadtripRouteLayer);
@@ -5330,12 +5408,9 @@ function clearRoadTripRoute() {
     roadtripMarkers.forEach(m => map.removeLayer(m));
     roadtripMarkers = [];
 
-    const panel = document.getElementById('roadtripResults');
-    if (panel) panel.classList.remove('show');
-
-    const stopsList = document.getElementById('roadtripStopsList');
-    if (stopsList) stopsList.innerHTML = '';
-
-    const totalEl = document.getElementById('roadtripTotal');
-    if (totalEl) totalEl.innerHTML = '';
+    const timeline = document.getElementById('roadtripTimeline');
+    if (timeline) {
+        timeline.classList.remove('show');
+        timeline.innerHTML = '';
+    }
 }
