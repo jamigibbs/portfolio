@@ -2998,6 +2998,9 @@ function initPlannerTabs() {
     // Update info displays
     updateDriveTimeInfo();
     updateFlightTimeInfo();
+
+    // Wire up road trip city autocomplete inputs
+    initRoadTripAutocomplete();
 }
 
 // Track if user has made changes since last search
@@ -4422,9 +4425,7 @@ function addDestinationMarker(dest, travelers, nights) {
     const popup = createPopupContent(dest, travelers, nights, tier);
 
     // Adjust popup size based on tier
-    const popupOptions = tier === 3
-        ? { maxWidth: 320, minWidth: 280 }
-        : { maxWidth: 550, minWidth: 520 };
+    const popupOptions = { maxWidth: 550, minWidth: 520 };
 
     const marker = L.marker([dest.lat, dest.lon], { icon })
         .bindPopup(popup, popupOptions)
@@ -4437,24 +4438,6 @@ function addDestinationMarker(dest, travelers, nights) {
 function createPopupContent(dest, travelers, nights, tier = 1) {
     const costs = dest.costs;
     const travelTimeStr = formatTravelTime(dest.travelTime);
-
-    // Tier 3: Minimal popup (just name, price, basic info)
-    if (tier === 3) {
-        const transportIcon = costs.transportType === 'drive' ? '🚗' : '✈️';
-        return `
-            <div class="popup-content popup-minimal">
-                <div class="popup-minimal-header">
-                    <h3 class="popup-minimal-title">${dest.city}</h3>
-                    <span class="popup-minimal-region">${dest.region}, ${dest.country}</span>
-                </div>
-                <div class="popup-minimal-info">
-                    <span class="popup-minimal-badge">${transportIcon} ${travelTimeStr}</span>
-                    <span class="popup-minimal-price">$${costs.total.toLocaleString()}</span>
-                </div>
-                <div class="popup-minimal-perday">$${costs.perDay}/day · ${nights} nights</div>
-            </div>
-        `;
-    }
 
     // Generate a unique ID for this popup's collapsible
     const popupId = `popup-${dest.city.replace(/\s+/g, '-')}-${Date.now()}`;
@@ -4898,4 +4881,461 @@ function closeSecurityModal() {
     if (modal) {
         modal.style.display = 'none';
     }
+}
+
+// ============================================
+// ROAD TRIP GENERATOR
+// ============================================
+
+let roadtripDestCity = null;    // Selected destination city {city, state, country, lat, lon}
+let roadtripEndCityData = null; // Optional end city for A→B trips
+let roadtripRouteLayer = null;  // Leaflet polyline layer for the route
+let roadtripMarkers = [];       // Numbered stop markers on the map
+
+// Adjust road trip days with stepper buttons
+function adjustRoadTripDays(delta) {
+    const input = document.getElementById('roadtripDays');
+    const display = document.getElementById('roadtripDaysDisplay');
+    if (!input || !display) return;
+
+    let currentValue = parseInt(input.value) || 5;
+    currentValue = Math.max(2, Math.min(21, currentValue + delta));
+    input.value = currentValue;
+    display.textContent = `${currentValue} day${currentValue !== 1 ? 's' : ''}`;
+}
+
+// Initialize autocomplete for the two road trip city inputs
+function initRoadTripAutocomplete() {
+    setupCityAutocomplete(
+        'roadtripDestination',
+        'roadtripDestResults',
+        (cityData) => { roadtripDestCity = cityData; }
+    );
+    setupCityAutocomplete(
+        'roadtripEndCity',
+        'roadtripEndResults',
+        (cityData) => { roadtripEndCityData = cityData; }
+    );
+}
+
+// Generic Nominatim city autocomplete — reusable for any input/results pair
+function setupCityAutocomplete(inputId, resultsId, onSelect) {
+    const input = document.getElementById(inputId);
+    const results = document.getElementById(resultsId);
+    if (!input || !results) return;
+
+    const searchCities = debounce(async (query) => {
+        if (query.length < 2) {
+            results.classList.remove('show');
+            return;
+        }
+
+        try {
+            results.innerHTML = '<div class="autocomplete-item" style="color: #888;">Searching...</div>';
+            results.classList.add('show');
+
+            const url = `https://nominatim.openstreetmap.org/search?` + new URLSearchParams({
+                q: query,
+                format: 'json',
+                addressdetails: '1',
+                limit: '8',
+                dedupe: '1'
+            }).toString();
+
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Nominatim search failed');
+            const data = await response.json();
+
+            if (data.length === 0) {
+                results.innerHTML = '<div class="autocomplete-item" style="color: #888;">No cities found</div>';
+                return;
+            }
+
+            const cityTypes = ['city', 'town', 'village', 'municipality', 'administrative'];
+            const cities = data.filter(place => {
+                const type = place.type || place.class;
+                return cityTypes.some(t => type?.includes(t)) || place.addresstype === 'city';
+            });
+            const displayResults = cities.length > 0 ? cities : data;
+
+            results.innerHTML = displayResults.map(place => {
+                const city = place.address?.city || place.address?.town || place.address?.village ||
+                             place.address?.municipality || place.name || '';
+                const state = place.address?.state || place.address?.region || '';
+                const country = place.address?.country || '';
+                const displayName = formatLocationDisplay(city, state, country);
+
+                return `<div class="autocomplete-item"
+                    data-city="${escapeHtml(city)}"
+                    data-state="${escapeHtml(state)}"
+                    data-country="${escapeHtml(country)}"
+                    data-lat="${place.lat}"
+                    data-lon="${place.lon}"
+                    data-display="${escapeHtml(displayName)}">
+                    ${displayName}
+                </div>`;
+            }).join('');
+
+            results.querySelectorAll('.autocomplete-item').forEach(item => {
+                if (item.dataset.lat) {
+                    item.onclick = () => {
+                        const cityData = {
+                            city: item.dataset.city,
+                            state: item.dataset.state,
+                            country: item.dataset.country,
+                            lat: parseFloat(item.dataset.lat),
+                            lon: parseFloat(item.dataset.lon)
+                        };
+                        input.value = item.dataset.display;
+                        results.classList.remove('show');
+                        onSelect(cityData);
+                    };
+                }
+            });
+
+        } catch (error) {
+            console.error('Road trip autocomplete error:', error);
+            results.innerHTML = `<div class="autocomplete-item" style="color: #f44;">Search failed</div>`;
+        }
+    }, 400);
+
+    input.addEventListener('input', (e) => {
+        if (e.target.value.trim() === '') onSelect(null);
+        searchCities(e.target.value.trim());
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !results.contains(e.target)) {
+            results.classList.remove('show');
+        }
+    });
+}
+
+// Main road trip generator — reads inputs, finds stops, displays route
+async function generateRoadTrip() {
+    if (!selectedHomeCity) {
+        alert('Please select your home city first (Step 1 above).');
+        return;
+    }
+    if (!roadtripDestCity) {
+        alert('Please enter a destination city for your road trip.');
+        return;
+    }
+
+    const totalDays = parseInt(document.getElementById('roadtripDays')?.value) || 5;
+    const endCity = roadtripEndCityData || null;
+
+    const btn = document.querySelector('.btn-roadtrip');
+    const originalText = btn?.innerHTML;
+    if (btn) btn.innerHTML = '⏳ Finding stops...';
+
+    try {
+        const stops = findRoadTripStops(
+            selectedHomeCity,
+            roadtripDestCity,
+            endCity,
+            totalDays,
+            destinationsData
+        );
+        displayRoadTripRoute(stops, endCity);
+    } catch (err) {
+        console.error('Road trip generation failed:', err);
+        alert('Could not generate road trip. Please try again.');
+    } finally {
+        if (btn) btn.innerHTML = originalText;
+    }
+}
+
+// Find best intermediate stops along the home → destination corridor
+function findRoadTripStops(homeCity, destCity, endCity, totalDays, allDestinations) {
+    // Reserve 2 nights at the main destination; remaining days go to intermediate stops
+    const maxStops = Math.max(0, Math.min(5, totalDays - 2));
+
+    const totalDistMiles = calculateDistance(homeCity.lat, homeCity.lon, destCity.lat, destCity.lon);
+    // Corridor width scales with trip distance (80–200 mi)
+    const corridorWidth = Math.min(200, Math.max(80, totalDistMiles * 0.25));
+
+    const candidates = [];
+    allDestinations.forEach(dest => {
+        if (!dest.lat || !dest.lon) return;
+
+        const perpDist = perpendicularDistanceMiles(
+            homeCity.lat, homeCity.lon,
+            destCity.lat, destCity.lon,
+            dest.lat, dest.lon
+        );
+
+        const projection = projectionOnSegment(
+            homeCity.lat, homeCity.lon,
+            destCity.lat, destCity.lon,
+            dest.lat, dest.lon
+        );
+
+        // Must be within corridor and between the two endpoints
+        if (perpDist <= corridorWidth && projection > 0.1 && projection < 0.9) {
+            candidates.push({
+                dest,
+                projection,
+                perpDist,
+                touristScore: dest.touristScore || 3
+            });
+        }
+    });
+
+    const intermediateStops = maxStops > 0 && candidates.length > 0
+        ? selectEvenlySpacedStops(candidates, maxStops).map(c => c.dest)
+        : [];
+
+    return buildRouteStops(homeCity, destCity, endCity, intermediateStops, totalDays);
+}
+
+// Pick up to N evenly-spaced stops from sorted candidates
+function selectEvenlySpacedStops(candidates, maxStops) {
+    // Sort by position along the route axis
+    candidates.sort((a, b) => a.projection - b.projection);
+
+    if (candidates.length <= maxStops) return candidates;
+
+    // Bucket the [0..1] projection range and pick the highest-scored candidate per bucket
+    const bucketSize = 1.0 / maxStops;
+    const selected = [];
+
+    for (let i = 0; i < maxStops; i++) {
+        const bucketStart = i * bucketSize;
+        const bucketEnd = (i + 1) * bucketSize;
+        const inBucket = candidates.filter(
+            c => c.projection >= bucketStart && c.projection < bucketEnd
+        );
+        if (inBucket.length === 0) continue;
+        inBucket.sort((a, b) => b.touristScore - a.touristScore);
+        selected.push(inBucket[0]);
+    }
+
+    return selected;
+}
+
+// Perpendicular distance (miles) from point P to line segment A→B
+function perpendicularDistanceMiles(aLat, aLon, bLat, bLon, pLat, pLon) {
+    const dx = bLat - aLat;
+    const dy = bLon - aLon;
+    const lenSq = dx * dx + dy * dy;
+    if (lenSq === 0) return calculateDistance(aLat, aLon, pLat, pLon);
+
+    let t = ((pLat - aLat) * dx + (pLon - aLon) * dy) / lenSq;
+    t = Math.max(0, Math.min(1, t));
+
+    return calculateDistance(pLat, pLon, aLat + t * dx, aLon + t * dy);
+}
+
+// How far along A→B (0 = at A, 1 = at B) does point P project?
+function projectionOnSegment(aLat, aLon, bLat, bLon, pLat, pLon) {
+    const dx = bLat - aLat;
+    const dy = bLon - aLon;
+    const lenSq = dx * dx + dy * dy;
+    if (lenSq === 0) return 0;
+    return ((pLat - aLat) * dx + (pLon - aLon) * dy) / lenSq;
+}
+
+// Build the ordered stop array with metadata for rendering
+function buildRouteStops(homeCity, destCity, endCity, intermediateStops, totalDays) {
+    const stops = [];
+
+    stops.push({
+        type: 'home',
+        city: homeCity.city,
+        state: homeCity.state,
+        country: homeCity.country,
+        lat: homeCity.lat,
+        lon: homeCity.lon,
+        nights: 0
+    });
+
+    const daysForStops = Math.max(0, totalDays - 2);
+    const nightsPerStop = intermediateStops.length > 0
+        ? Math.max(1, Math.floor(daysForStops / intermediateStops.length))
+        : 0;
+
+    intermediateStops.forEach(dest => {
+        stops.push({
+            type: 'stop',
+            city: dest.city,
+            state: dest.region,
+            country: dest.country,
+            lat: dest.lat,
+            lon: dest.lon,
+            nights: nightsPerStop,
+            dest
+        });
+    });
+
+    stops.push({
+        type: 'destination',
+        city: destCity.city,
+        state: destCity.state || '',
+        country: destCity.country || '',
+        lat: destCity.lat,
+        lon: destCity.lon,
+        nights: 2
+    });
+
+    if (endCity) {
+        stops.push({
+            type: 'end',
+            city: endCity.city,
+            state: endCity.state || '',
+            country: endCity.country || '',
+            lat: endCity.lat,
+            lon: endCity.lon,
+            nights: 0
+        });
+    }
+
+    return stops;
+}
+
+// Display the road trip route on the map and render results panel
+function displayRoadTripRoute(stops, endCity) {
+    clearRoadTripRoute();
+    if (stops.length < 2) return;
+
+    // Build polyline coordinates; add home at end for round trips
+    const latlngs = stops.map(s => [s.lat, s.lon]);
+    if (!endCity) latlngs.push([stops[0].lat, stops[0].lon]);
+
+    roadtripRouteLayer = L.polyline(latlngs, {
+        color: '#FF9800',
+        weight: 4,
+        opacity: 0.85,
+        dashArray: '8, 6'
+    }).addTo(map);
+
+    // Place a numbered/icon marker for each stop
+    stops.forEach((stop, idx) => {
+        let bgColor, label;
+        if (stop.type === 'home')        { bgColor = '#00d4ff'; label = '🏠'; }
+        else if (stop.type === 'destination') { bgColor = '#4CAF50'; label = '★'; }
+        else if (stop.type === 'end')     { bgColor = '#9C27B0'; label = '🏁'; }
+        else                              { bgColor = '#FF9800'; label = String(idx); }
+
+        const icon = L.divIcon({
+            className: '',
+            html: `<div style="
+                background:${bgColor};
+                color:${stop.type === 'stop' ? '#fff' : '#000'};
+                width:32px;height:32px;border-radius:50%;
+                display:flex;align-items:center;justify-content:center;
+                font-size:${stop.type === 'stop' ? '13px' : '16px'};
+                font-weight:700;
+                border:2px solid rgba(255,255,255,0.8);
+                box-shadow:0 2px 6px rgba(0,0,0,0.5);
+            ">${label}</div>`,
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+        });
+
+        const marker = L.marker([stop.lat, stop.lon], { icon }).addTo(map);
+        marker.bindPopup(`
+            <div style="min-width:140px;padding:4px;">
+                <strong>${stop.city}</strong><br>
+                <span style="color:#888;font-size:12px;">${stop.state ? stop.state + ', ' : ''}${stop.country}</span>
+                ${stop.nights > 0 ? `<br><span style="font-size:12px;">${stop.nights} night${stop.nights !== 1 ? 's' : ''}</span>` : ''}
+            </div>`);
+        roadtripMarkers.push(marker);
+    });
+
+    map.fitBounds(roadtripRouteLayer.getBounds(), { padding: [40, 40] });
+    renderRoadTripResults(stops, endCity);
+}
+
+// Render the road trip stops list in the sidebar results panel
+function renderRoadTripResults(stops, endCity) {
+    const panel    = document.getElementById('roadtripResults');
+    const stopsList = document.getElementById('roadtripStopsList');
+    const totalEl  = document.getElementById('roadtripTotal');
+    if (!panel || !stopsList || !totalEl) return;
+
+    let stopsHtml = '';
+    let totalNights = 0;
+
+    stops.forEach((stop, idx) => {
+        const isLast = idx === stops.length - 1;
+
+        let badge = '';
+        if (stop.type === 'home')        badge = '<span style="font-size:10px;background:#00d4ff;color:#000;border-radius:4px;padding:1px 5px;margin-left:4px;">START</span>';
+        else if (stop.type === 'destination') badge = '<span style="font-size:10px;background:#4CAF50;color:#fff;border-radius:4px;padding:1px 5px;margin-left:4px;">DEST</span>';
+        else if (stop.type === 'end')    badge = '<span style="font-size:10px;background:#9C27B0;color:#fff;border-radius:4px;padding:1px 5px;margin-left:4px;">END</span>';
+
+        const nightsText = stop.nights > 0
+            ? `${stop.nights} night${stop.nights !== 1 ? 's' : ''}`
+            : (stop.type === 'home' || stop.type === 'end') ? 'Home base' : '';
+
+        totalNights += stop.nights || 0;
+
+        const numClass = stop.type === 'home' ? 'home' : stop.type === 'end' ? 'end' : stop.type === 'destination' ? 'destination' : '';
+        const numLabel = stop.type === 'home' ? '🏠' : stop.type === 'destination' ? '★' : stop.type === 'end' ? '🏁' : idx;
+
+        stopsHtml += `
+            <div class="roadtrip-stop" onclick="map.setView([${stop.lat}, ${stop.lon}], 9)">
+                <div class="roadtrip-stop-number ${numClass}">${numLabel}</div>
+                <div class="roadtrip-stop-info">
+                    <div class="roadtrip-stop-city">${stop.city}${stop.state ? ', ' + stop.state : ''}${badge}</div>
+                    <div class="roadtrip-stop-detail">${nightsText}</div>
+                </div>
+            </div>`;
+
+        if (!isLast) {
+            const nextStop = stops[idx + 1];
+            const dist = Math.round(calculateDistance(stop.lat, stop.lon, nextStop.lat, nextStop.lon));
+            stopsHtml += `
+                <div class="roadtrip-connector">
+                    <div class="roadtrip-connector-line">···</div>
+                    <span>~${dist.toLocaleString()} mi drive</span>
+                </div>`;
+        }
+    });
+
+    stopsList.innerHTML = stopsHtml;
+
+    // Compute total driving distance
+    const totalDistMiles = Math.round(
+        stops.reduce((sum, stop, idx) => {
+            if (idx === 0) return 0;
+            return sum + calculateDistance(stops[idx - 1].lat, stops[idx - 1].lon, stop.lat, stop.lon);
+        }, 0)
+    );
+    const intermediateCount = stops.filter(s => s.type === 'stop').length;
+
+    totalEl.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;">
+            <div>
+                <div class="roadtrip-total-label">${intermediateCount} stop${intermediateCount !== 1 ? 's' : ''} · ${totalNights} nights</div>
+                <div style="font-size:11px;color:#666;margin-top:2px;">~${totalDistMiles.toLocaleString()} mi total driving</div>
+            </div>
+            <div class="roadtrip-total-value">${totalNights}N</div>
+        </div>`;
+
+    panel.classList.add('show');
+
+    // Scroll sidebar to show the results
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) sidebar.scrollTop = sidebar.scrollHeight;
+}
+
+// Remove road trip route from map and hide the results panel
+function clearRoadTripRoute() {
+    if (roadtripRouteLayer) {
+        map.removeLayer(roadtripRouteLayer);
+        roadtripRouteLayer = null;
+    }
+    roadtripMarkers.forEach(m => map.removeLayer(m));
+    roadtripMarkers = [];
+
+    const panel = document.getElementById('roadtripResults');
+    if (panel) panel.classList.remove('show');
+
+    const stopsList = document.getElementById('roadtripStopsList');
+    if (stopsList) stopsList.innerHTML = '';
+
+    const totalEl = document.getElementById('roadtripTotal');
+    if (totalEl) totalEl.innerHTML = '';
 }

@@ -1853,13 +1853,211 @@
         .api-help a:hover {
             text-decoration: underline;
         }
+
+        /* Road Trip Generator */
+        .roadtrip-section {
+            margin-top: 16px;
+            border-top: 1px solid #404040;
+            padding-top: 14px;
+        }
+
+        .roadtrip-section-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-roadtrip {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: opacity 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-roadtrip:hover {
+            opacity: 0.9;
+        }
+
+        .btn-roadtrip:active {
+            transform: scale(0.98);
+        }
+
+        /* Road trip results panel */
+        .roadtrip-results {
+            background: #363636;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .roadtrip-results.show {
+            display: block;
+        }
+
+        .roadtrip-results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .roadtrip-results-title {
+            font-weight: 600;
+            color: #FF9800;
+            font-size: 14px;
+        }
+
+        .roadtrip-close {
+            background: #404040;
+            border: none;
+            color: #888;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .roadtrip-close:hover {
+            background: #f44336;
+            color: #fff;
+        }
+
+        .roadtrip-stop {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 10px 0;
+            border-bottom: 1px solid #404040;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-radius: 6px;
+            padding: 8px;
+        }
+
+        .roadtrip-stop:last-child {
+            border-bottom: none;
+        }
+
+        .roadtrip-stop:hover {
+            background: #404040;
+        }
+
+        .roadtrip-stop-number {
+            width: 26px;
+            height: 26px;
+            background: #FF9800;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .roadtrip-stop-number.home {
+            background: #00d4ff;
+            color: #000;
+        }
+
+        .roadtrip-stop-number.destination {
+            background: #4CAF50;
+            color: #000;
+        }
+
+        .roadtrip-stop-number.end {
+            background: #9C27B0;
+            color: #fff;
+        }
+
+        .roadtrip-stop-info {
+            flex: 1;
+        }
+
+        .roadtrip-stop-city {
+            font-weight: 600;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .roadtrip-stop-detail {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .roadtrip-stop-price {
+            font-weight: 600;
+            font-size: 14px;
+            color: #4CAF50;
+            flex-shrink: 0;
+        }
+
+        .roadtrip-connector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 8px;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .roadtrip-connector-line {
+            flex: 1;
+            height: 1px;
+            background: repeating-linear-gradient(to right, #555 0, #555 4px, transparent 4px, transparent 8px);
+        }
+
+        .roadtrip-total {
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .roadtrip-total-label {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .roadtrip-total-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #4CAF50;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <aside class="sidebar">
             <h1 class="logo">Fuck, where do we go?</h1>
-            <p class="tagline">Find places to go for a short break, in short order <span class="version">v1.20.0</span></p>
+            <p class="tagline">Find places to go for a short break, in short order <span class="version">v1.21.0</span></p>
 
             <!-- Planner Mode Tabs -->
             <div class="planner-tabs">
@@ -1923,6 +2121,33 @@
                         </div>
                         <div class="info-box travel-time-info">
                             <span id="driveTimeInfo">Shows destinations within 3-hour drive</span>
+                        </div>
+
+                        <!-- Road Trip Generator -->
+                        <div class="roadtrip-section">
+                            <div class="roadtrip-section-label">🗺️ Road Trip Generator</div>
+                            <label>Destination city</label>
+                            <div class="autocomplete-container">
+                                <input type="text" id="roadtripDestination" placeholder="e.g., Nashville, TN">
+                                <div class="autocomplete-results" id="roadtripDestResults"></div>
+                            </div>
+                            <label>End city (optional — for A→B trips)</label>
+                            <div class="autocomplete-container">
+                                <input type="text" id="roadtripEndCity" placeholder="Leave blank for out-and-back">
+                                <div class="autocomplete-results" id="roadtripEndResults"></div>
+                            </div>
+                            <label>Road trip duration (days)</label>
+                            <div class="stepper-control">
+                                <button type="button" class="stepper-btn" onclick="adjustRoadTripDays(-1)">−</button>
+                                <div class="stepper-value">
+                                    <span id="roadtripDaysDisplay">5 days</span>
+                                    <input type="hidden" id="roadtripDays" value="5">
+                                </div>
+                                <button type="button" class="stepper-btn" onclick="adjustRoadTripDays(1)">+</button>
+                            </div>
+                            <button class="btn-roadtrip" onclick="generateRoadTrip()">
+                                🗺️ Generate Road Trip
+                            </button>
                         </div>
                     </div>
 
@@ -2045,6 +2270,19 @@
                         <span>Wikipedia Images</span>
                         <span class="api-badge">Live</span>
                     </div>
+                </div>
+            </div>
+            <!-- Road Trip Results Panel (shown after generating a road trip) -->
+            <div class="roadtrip-results" id="roadtripResults">
+                <div class="roadtrip-results-header">
+                    <div class="roadtrip-results-title">🗺️ Your Road Trip</div>
+                    <button class="roadtrip-close" onclick="clearRoadTripRoute()">✕</button>
+                </div>
+                <div id="roadtripStopsList">
+                    <!-- Stops are injected here by JS -->
+                </div>
+                <div class="roadtrip-total" id="roadtripTotal">
+                    <!-- Total is injected here -->
                 </div>
             </div>
         </aside>
